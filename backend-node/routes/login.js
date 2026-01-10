@@ -2,8 +2,15 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const mysql = require("mysql2/promise");
+const jwt = require("jsonwebtoken"); // ✅ ADD THIS
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+
+// in-memory upload (for profile photo)
+const upload = multer({ storage: multer.memoryStorage() });
 
 // CHANGE these to match your MySQL settings
 const dbConfig = {
@@ -42,16 +49,16 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// ========== MULTI-TABLE ROLE-BASED LOGIN ==========
+// ========== MULTI-TABLE ROLE-BASED LOGIN with JWT ✅ ==========
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const connection = await getConnection();
 
-    // 1. Check SUPER ADMIN (admins table)
+    // 1. Check MIDDLE ADMIN first (middle_admins table)
     let [rows] = await connection.execute(
-      "SELECT id, username, email, password FROM admins WHERE email = ?",
+      "SELECT id, username, full_name, phone, email, password FROM middle_admins WHERE email = ?",
       [email]
     );
 
@@ -61,38 +68,29 @@ router.post("/login", async (req, res) => {
 
       if (isMatch) {
         await connection.end();
-        return res.json({
-          success: true,
-          message: "Login successful",
-          user: {
+        
+        // ✅ GENERATE JWT TOKEN
+        const token = jwt.sign(
+          {
             id: user.id,
             username: user.username,
             email: user.email,
-            role: "super_admin",
-            table: "admins",
+            role: "middle_admin",
+            table: "middle_admins",
           },
-        });
-      }
-    }
+          process.env.JWT_SECRET,
+          { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
 
-    // 2. Check MIDDLE ADMIN (middle_admins table)
-    [rows] = await connection.execute(
-      "SELECT id, username, email, password FROM middle_admins WHERE email = ?",
-      [email]
-    );
-
-    if (rows.length > 0) {
-      const user = rows[0];
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (isMatch) {
-        await connection.end();
         return res.json({
           success: true,
           message: "Login successful",
+          token: token, // ✅ SEND TOKEN
           user: {
             id: user.id,
             username: user.username,
+            full_name: user.full_name || "",
+            phone: user.phone || "",
             email: user.email,
             role: "middle_admin",
             table: "middle_admins",
@@ -101,9 +99,9 @@ router.post("/login", async (req, res) => {
       }
     }
 
-    // 3. Check OFFICER (officers table)
+    // 2. Check OFFICER next (officers table)
     [rows] = await connection.execute(
-      "SELECT id, username, email, password FROM officers WHERE email = ?",
+      "SELECT id, name, mobile, email, password, username FROM officers WHERE email = ?",
       [email]
     );
 
@@ -113,15 +111,75 @@ router.post("/login", async (req, res) => {
 
       if (isMatch) {
         await connection.end();
-        return res.json({
-          success: true,
-          message: "Login successful",
-          user: {
+        
+        // ✅ GENERATE JWT TOKEN
+        const token = jwt.sign(
+          {
             id: user.id,
-            username: user.username,
+            username: user.username || user.name || "",
             email: user.email,
             role: "officer",
             table: "officers",
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        return res.json({
+          success: true,
+          message: "Login successful",
+          token: token, // ✅ SEND TOKEN
+          user: {
+            id: user.id,
+            username: user.username || user.name || "",
+            full_name: user.name || "",
+            phone: user.mobile || "",
+            email: user.email,
+            role: "officer",
+            table: "officers",
+          },
+        });
+      }
+    }
+
+    // 3. Finally check SUPER ADMIN (admins table)
+    [rows] = await connection.execute(
+      "SELECT id, username, full_name, phone, email, password FROM admins WHERE email = ?",
+      [email]
+    );
+
+    if (rows.length > 0) {
+      const user = rows[0];
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (isMatch) {
+        await connection.end();
+        
+        // ✅ GENERATE JWT TOKEN
+        const token = jwt.sign(
+          {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: "super_admin",
+            table: "admins",
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        return res.json({
+          success: true,
+          message: "Login successful",
+          token: token, // ✅ SEND TOKEN
+          user: {
+            id: user.id,
+            username: user.username,
+            full_name: user.full_name || "",
+            phone: user.phone || "",
+            email: user.email,
+            role: "super_admin",
+            table: "admins",
           },
         });
       }
@@ -234,6 +292,170 @@ router.post("/reset-password", async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Error updating password" });
+  }
+});
+
+// ========== CHECK USERNAME AVAILABILITY ==========
+router.get("/check-username", async (req, res) => {
+  const { username, excludeId, table } = req.query;
+
+  if (!username) {
+    return res.json({ available: false, message: "Username is required" });
+  }
+
+  try {
+    const connection = await getConnection();
+
+    // If table is provided and valid, check only that table (profile edit),
+    // otherwise check all three tables (can be used for signup).
+    const tables =
+      table && ["admins", "middle_admins", "officers"].includes(table)
+        ? [table]
+        : ["admins", "middle_admins", "officers"];
+
+    for (const t of tables) {
+      const [rows] = await connection.execute(
+        `SELECT id FROM ${t} WHERE username = ? AND id != ?`,
+        [username, excludeId || 0]
+      );
+      if (rows.length > 0) {
+        await connection.end();
+        return res.json({ available: false });
+      }
+    }
+
+    await connection.end();
+    return res.json({ available: true });
+  } catch (err) {
+    console.error("CHECK USERNAME ERROR:", err);
+    return res
+      .status(500)
+      .json({ available: false, message: "Error checking username" });
+  }
+});
+
+// ========== UPDATE PROFILE ==========
+router.put("/profile", upload.single("photo"), async (req, res) => {
+  const { id, table, username, full_name, phone } = req.body;
+
+  if (!id || !table || !username) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
+  }
+
+  // Map logical fields to real column names
+  let nameColumn = "full_name";
+  let phoneColumn = "phone";
+
+  if (table === "officers") {
+    nameColumn = "name";
+    phoneColumn = "mobile";
+  }
+
+  try {
+    const connection = await getConnection();
+
+    let query =
+      `UPDATE ${table} SET username = ?, ${nameColumn} = ?, ${phoneColumn} = ?`;
+    const params = [username, full_name || null, phone || null];
+
+    // optional photo
+    if (req.file) {
+      const uploadsDir = path.join(__dirname, "..", "uploads", "profiles");
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      const filename = Date.now() + "-" + req.file.originalname;
+      const fullPath = path.join(uploadsDir, filename);
+      fs.writeFileSync(fullPath, req.file.buffer);
+
+      const relativePath = "profiles/" + filename;
+      query += ", photo_url = ?";
+      params.push(relativePath);
+    }
+
+    query += " WHERE id = ?";
+    params.push(id);
+
+    await connection.execute(query, params);
+    await connection.end();
+
+    return res.json({ success: true, message: "Profile updated" });
+  } catch (err) {
+    console.error("PROFILE UPDATE ERROR:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Error updating profile" });
+  }
+});
+
+// ========== CHANGE PASSWORD ==========
+router.post("/change-password", async (req, res) => {
+  const { userId, table, currentPassword, newPassword } = req.body;
+
+  if (!userId || !table || !currentPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
+  }
+
+  // allow only these tables
+  const allowedTables = ["admins", "middle_admins", "officers"];
+  if (!allowedTables.includes(table)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid table" });
+  }
+
+  try {
+    const connection = await getConnection();
+
+    // 1) Get current hashed password from the correct table
+    const [rows] = await connection.execute(
+      `SELECT password FROM ${table} WHERE id = ?`,
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      await connection.end();
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const user = rows[0];
+
+    // 2) Check current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      await connection.end();
+      return res
+        .status(400)
+        .json({ success: false, message: "Current password is incorrect" });
+    }
+
+    // 3) Hash new password and update in that table
+    const salt = await bcrypt.genSalt(10);
+    const hashed = await bcrypt.hash(newPassword, salt);
+
+    await connection.execute(
+      `UPDATE ${table} SET password = ? WHERE id = ?`,
+      [hashed, userId]
+    );
+
+    await connection.end();
+
+    return res.json({
+      success: true,
+      message: "Password changed successfully",
+    });
+  } catch (err) {
+    console.error("CHANGE PASSWORD ERROR:", err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Error changing password" });
   }
 });
 

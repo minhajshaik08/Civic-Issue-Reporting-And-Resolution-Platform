@@ -1,59 +1,7 @@
-body {
-  background-color: #e9f4ff; /* light blue */
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.section-wrapper {
-  padding: 60px 0;
-}
 
-.section-title {
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 16px;
-}
 
-.section-subtitle {
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto 40px;
-  color: #6c757d;
-}
 
-.feature-card {
-  border-radius: 18px;
-  background-color: #ffffff;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  padding: 24px;
-  height: 100%;
-}
-
-.stat-card {
-  border-radius: 18px;
-  background-color: #ffffff;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  padding: 24px;
-  text-align: center;
-}
-
-.hero-wrapper {
-  padding: 80px 0 40px;
-}
-
-.hero-title {
-  font-size: 2.6rem;
-  font-weight: 800;
-}
-
-.hero-subtitle {
-  font-size: 1.05rem;
-  color: #6c757d;
-  max-width: 520px;
-}
-
-.footer {
-  background-color: #111827;
-  color: #e5e7eb;
-  padding: 40px 0;
-  margin-top: 40px;
-}

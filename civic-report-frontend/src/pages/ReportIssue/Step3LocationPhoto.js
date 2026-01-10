@@ -44,8 +44,20 @@ function Step3LocationPhoto({
       return;
     }
 
-    // mapPosition and photos will be validated in parent (ReportIssuePage)
     onSubmit();
+  };
+
+  const handleFilesChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    // append to existing files
+    setPhotoFiles((prev) => [...prev, ...files]);
+    // reset input so same file can be chosen again if needed
+    e.target.value = "";
+  };
+
+  const handleRemoveFile = (indexToRemove) => {
+    setPhotoFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   return (
@@ -77,10 +89,7 @@ function Step3LocationPhoto({
               overflow: "hidden",
             }}
           >
-            <LocationMap
-              position={mapPosition}
-              setPosition={setMapPosition}
-            />
+            <LocationMap position={mapPosition} setPosition={setMapPosition} />
           </div>
           <div
             style={{
@@ -95,53 +104,120 @@ function Step3LocationPhoto({
 
         <Form.Group className="mb-3">
           <Form.Label>Upload Photo *</Form.Label>
+
+          {/* upload box */}
           <div
             style={{
               border: "1px dashed #28a745",
-              borderRadius: "6px",
-              padding: "32px 16px",
-              textAlign: "center",
+              borderRadius: "8px",
+              padding: "10px 12px",
               backgroundColor: "#f8fff9",
+              minHeight: "64px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+              flexWrap: "wrap",
             }}
           >
-            <div className="mb-2" style={{ color: "#28a745" }}>
-              ⬆ Drag &amp; Drop Photos Here
-            </div>
+            {/* left: instruction + selected files as chips */}
             <div
-              className="mb-3"
-              style={{ fontSize: "0.9rem", color: "#6c757d" }}
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: "8px",
+                flex: 1,
+                minWidth: 0,
+              }}
             >
-              or click the button below
+              <span
+                style={{
+                  color: "#28a745",
+                  fontSize: "0.9rem",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                ⬆ Drag &amp; drop photos
+              </span>
+              <span
+                style={{
+                  color: "#6c757d",
+                  fontSize: "0.85rem",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                or click Choose Photos
+              </span>
+
+              {photoFiles &&
+                photoFiles.length > 0 &&
+                photoFiles.map((file, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      maxWidth: "180px",
+                      padding: "2px 6px",
+                      borderRadius: "999px",
+                      backgroundColor: "#e6f9ec",
+                      border: "1px solid #22c55e",
+                      fontSize: "0.8rem",
+                      color: "#14532d",
+                      whiteSpace: "nowrap",
+                    }}
+                    title={file.name}
+                  >
+                    <span
+                      style={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: "140px",
+                      }}
+                    >
+                      {file.name}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFile(idx)}
+                      style={{
+                        marginLeft: "4px",
+                        border: "none",
+                        background: "transparent",
+                        color: "#b91c1c",
+                        cursor: "pointer",
+                        fontSize: "0.85rem",
+                        lineHeight: 1,
+                      }}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
             </div>
 
-            <Form.Control
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => setPhotoFiles(Array.from(e.target.files))}
-              style={{ display: "none" }}
-              id="photoInput"
-            />
-            <Button
-              variant="success"
-              type="button"
-              onClick={() =>
-                document.getElementById("photoInput").click()
-              }
-            >
-              Choose Photos
-            </Button>
-
-            {photoFiles && photoFiles.length > 0 && (
-              <div className="mt-2" style={{ fontSize: "0.85rem" }}>
-                Selected:
-                <ul className="mb-0">
-                  {photoFiles.map((file, idx) => (
-                    <li key={idx}>{file.name}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            {/* right: hidden file input + button */}
+            <div>
+              <Form.Control
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFilesChange}
+                style={{ display: "none" }}
+                id="photoInput"
+              />
+              <Button
+                variant="success"
+                type="button"
+                size="sm"
+                onClick={() =>
+                  document.getElementById("photoInput").click()
+                }
+              >
+                Choose Photos
+              </Button>
+            </div>
           </div>
         </Form.Group>
 

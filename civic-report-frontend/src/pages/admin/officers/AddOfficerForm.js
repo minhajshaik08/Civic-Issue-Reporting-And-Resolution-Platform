@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 export default function AddOfficerForm() {
   const [form, setForm] = useState({
@@ -24,9 +25,14 @@ export default function AddOfficerForm() {
     e.preventDefault();
     setError("");
 
-    // simple frontend validation (can improve later)
-    if (!form.name.trim() || !form.email.trim() || !form.mobile.trim()) {
-      setError("Name, Email and Mobile are required.");
+    // simple frontend validation
+    if (
+      !form.name.trim() ||
+      !form.email.trim() ||
+      !form.mobile.trim() ||
+      !form.employeeId.trim()
+    ) {
+      setError("Name, Email, Mobile and Employee ID are required.");
       return;
     }
     if (form.password.length < 6) {
@@ -35,10 +41,32 @@ export default function AddOfficerForm() {
     }
 
     setLoading(true);
-    // TODO: call backend API later
-    // for now just console.log
-    console.log("Officer form submit:", form);
-    setLoading(false);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/admin/officers/add",
+        form
+      );
+
+      // clear form on success
+      setForm({
+        name: "",
+        designation: "",
+        department: "",
+        zone: "",
+        mobile: "",
+        email: "",
+        employeeId: "",
+        role: "",
+        password: "",
+      });
+
+      alert("Officer added successfully");
+    } catch (err) {
+      console.error("Add officer error:", err);
+      setError("Failed to add officer. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -127,7 +155,7 @@ export default function AddOfficerForm() {
       </div>
 
       <div className="mb-3">
-        <label className="form-label">Employee ID</label>
+        <label className="form-label">Employee ID *</label>
         <input
           type="text"
           className="form-control"
@@ -135,6 +163,7 @@ export default function AddOfficerForm() {
           value={form.employeeId}
           onChange={handleChange}
           disabled={loading}
+          required
         />
       </div>
 
@@ -176,7 +205,19 @@ export default function AddOfficerForm() {
           type="button"
           className="btn btn-outline-secondary"
           disabled={loading}
-          onClick={() => console.log("Cancel add officer")}
+          onClick={() =>
+            setForm({
+              name: "",
+              designation: "",
+              department: "",
+              zone: "",
+              mobile: "",
+              email: "",
+              employeeId: "",
+              role: "",
+              password: "",
+            })
+          }
         >
           Cancel
         </button>

@@ -1,7 +1,7 @@
 // civic-report-frontend/src/pages/ReportIssue/ReportIssuePage.js
 
 import React, { useState } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 import Step1UserDetails from "./Step1UserDetails";
@@ -29,10 +29,9 @@ function ReportIssuePage() {
 
   // step 3 – location & photos
   const [locationText, setLocationText] = useState("");
-  const [photoFiles, setPhotoFiles] = useState([]); // multiple photos
+  const [photoFiles, setPhotoFiles] = useState([]);
   const [mapPosition, setMapPosition] = useState(null);
 
-  // phone helpers
   const normalizeIndianPhone = (value) => {
     const digits = value.replace(/\D/g, "");
     if (digits.startsWith("91") && digits.length === 12) return digits.slice(2);
@@ -77,7 +76,8 @@ function ReportIssuePage() {
 
     try {
       const normalized = normalizeIndianPhone(phone);
-      const res = await fetch("http://localhost:8080/api/send-otp", {
+
+      const res = await fetch("http://localhost:5000/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: normalized }),
@@ -86,7 +86,6 @@ function ReportIssuePage() {
       const data = await res.json();
 
       if (!data.success) {
-        // Shows "Access denied. Your number is blocked by admin." for blocked mobiles
         setPhoneError(data.message || "Unable to send OTP. Please try again.");
         setOtpSent(false);
         return;
@@ -125,13 +124,16 @@ function ReportIssuePage() {
     setVerifying(true);
     try {
       const normalized = normalizeIndianPhone(phone);
-      const res = await fetch("http://localhost:8080/api/verify-otp", {
+
+      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: normalized, otp }),
       });
+
       const data = await res.json();
-      if (data.valid) {
+
+      if (data.success) {
         setStep(2);
       } else {
         setOtpError(
@@ -145,7 +147,6 @@ function ReportIssuePage() {
     }
   };
 
-  // FINAL SUBMIT: send to Node backend + MySQL
   const handleSubmitAll = async () => {
     const normalized = normalizeIndianPhone(phone);
 
@@ -166,10 +167,7 @@ function ReportIssuePage() {
     formData.append("locationText", locationText);
     formData.append("locationLat", mapPosition.lat);
     formData.append("locationLng", mapPosition.lng);
-
-    photoFiles.forEach((file) => {
-      formData.append("photos", file); // must be "photos" to match backend
-    });
+    photoFiles.forEach((file) => formData.append("photos", file));
 
     try {
       const res = await fetch("http://localhost:5000/api/issues/report", {
@@ -189,7 +187,6 @@ function ReportIssuePage() {
 
     alert("Report submitted successfully!");
 
-    // reset form + go home
     setFullName("");
     setPhone("");
     setPhoneError("");
@@ -209,90 +206,204 @@ function ReportIssuePage() {
   };
 
   return (
-    <main className="py-5">
-      <Container style={{ maxWidth: "720px" }}>
-        <h2 className="text-center mb-4">Report a Community Issue</h2>
+    <>
+      {/* inline CSS for this page only */}
+      <style>{`
+        .report-wrapper {
+          background-color: #e0f4ef;
+          min-height: 100vh;
+          padding: 60px 0 40px;
+        }
 
-        <p className="text-center text-success fw-semibold">
-          Step {step} of 3
-        </p>
+        .report-container {
+          max-width: 760px;
+        }
 
-        <Row className="text-center mb-4">
-          <Col>
-            <div
-              className={
-                step === 1 ? "fw-semibold text-success" : "text-muted"
-              }
-            >
-              User Details
+        .report-card {
+          background: #ffffff;
+          border-radius: 18px;
+          padding: 28px 24px;
+          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+          border: 1px solid #dbeafe;
+        }
+
+        .report-title {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: #0f172a;
+          margin-bottom: 0.25rem;
+        }
+
+        .report-subtitle {
+          font-size: 0.95rem;
+          color: #64748b;
+          margin-bottom: 1.3rem;
+        }
+
+        .step-indicator {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 18px;
+        }
+
+        .step-indicator-item {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          font-size: 0.85rem;
+        }
+
+        .step-indicator-dot {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 4px;
+          border: 2px solid #cbd5e1;
+          background-color: #ffffff;
+          color: #64748b;
+          font-weight: 600;
+          font-size: 0.8rem;
+        }
+
+        .step-indicator-label {
+          color: #94a3b8;
+        }
+
+        .step-indicator-item.active .step-indicator-dot {
+          border-color: #16a34a;
+          background-color: #22c55e;
+          color: #ffffff;
+        }
+
+        .step-indicator-item.active .step-indicator-label {
+          color: #16a34a;
+          font-weight: 600;
+        }
+
+        .report-inner {
+          margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+          .report-wrapper {
+            padding: 40px 0 30px;
+          }
+          .report-card {
+            padding: 22px 18px;
+            border-radius: 14px;
+          }
+          .report-title {
+            font-size: 1.5rem;
+          }
+          .step-indicator {
+            gap: 8px;
+          }
+          .step-indicator-label {
+            font-size: 0.8rem;
+          }
+        }
+      `}</style>
+
+      <main className="report-wrapper">
+        <Container className="report-container">
+          <div className="report-card">
+            <h2 className="text-center report-title">
+              Report a Community Issue
+            </h2>
+            <p className="text-center report-subtitle">
+              Help keep your city clean and safe by reporting problems directly
+              to the authorities in just three simple steps.
+            </p>
+
+            <div className="step-indicator">
+              <div
+                className={
+                  step === 1
+                    ? "step-indicator-item active"
+                    : "step-indicator-item"
+                }
+              >
+                <div className="step-indicator-dot">1</div>
+                <div className="step-indicator-label">User Details</div>
+              </div>
+              <div
+                className={
+                  step === 2
+                    ? "step-indicator-item active"
+                    : "step-indicator-item"
+                }
+              >
+                <div className="step-indicator-dot">2</div>
+                <div className="step-indicator-label">Problem Details</div>
+              </div>
+              <div
+                className={
+                  step === 3
+                    ? "step-indicator-item active"
+                    : "step-indicator-item"
+                }
+              >
+                <div className="step-indicator-dot">3</div>
+                <div className="step-indicator-label">Location &amp; Photo</div>
+              </div>
             </div>
-          </Col>
-          <Col>
-            <div
-              className={
-                step === 2 ? "fw-semibold text-success" : "text-muted"
-              }
-            >
-              Problem Details
+
+            <div className="report-inner">
+              {step === 1 && (
+                <Step1UserDetails
+                  fullName={fullName}
+                  setFullName={setFullName}
+                  phone={phone}
+                  setPhone={setPhone}
+                  phoneError={phoneError}
+                  setPhoneError={setPhoneError}
+                  otp={otp}
+                  setOtp={setOtp}
+                  otpError={otpError}
+                  setOtpError={setOtpError}
+                  otpSent={otpSent}
+                  sending={sending}
+                  verifying={verifying}
+                  canResendIn={canResendIn}
+                  onSendOtp={handleSendOtp}
+                  onVerifyNext={handleVerifyAndNext}
+                />
+              )}
+
+              {step === 2 && (
+                <Step2ProblemDetails
+                  issueType={issueType}
+                  setIssueType={setIssueType}
+                  description={description}
+                  setDescription={setDescription}
+                  onPrev={() => setStep(1)}
+                  onNext={() => setStep(3)}
+                />
+              )}
+
+              {step === 3 && (
+                <Step3LocationPhoto
+                  locationText={locationText}
+                  setLocationText={setLocationText}
+                  photoFiles={photoFiles}
+                  setPhotoFiles={setPhotoFiles}
+                  mapPosition={mapPosition}
+                  setMapPosition={setMapPosition}
+                  onPrev={() => setStep(2)}
+                  onSubmit={handleSubmitAll}
+                />
+              )}
             </div>
-          </Col>
-          <Col>
-            <div
-              className={
-                step === 3 ? "fw-semibold text-success" : "text-muted"
-              }
-            >
-              Location &amp; Photo
-            </div>
-          </Col>
-        </Row>
-
-        {step === 1 && (
-          <Step1UserDetails
-            fullName={fullName}
-            setFullName={setFullName}
-            phone={phone}
-            setPhone={setPhone}
-            phoneError={phoneError}
-            setPhoneError={setPhoneError}
-            otp={otp}
-            setOtp={setOtp}
-            otpError={otpError}
-            setOtpError={setOtpError}
-            otpSent={otpSent}
-            sending={sending}
-            verifying={verifying}
-            canResendIn={canResendIn}
-            onSendOtp={handleSendOtp}
-            onVerifyNext={handleVerifyAndNext}
-          />
-        )}
-
-        {step === 2 && (
-          <Step2ProblemDetails
-            issueType={issueType}
-            setIssueType={setIssueType}
-            description={description}
-            setDescription={setDescription}
-            onPrev={() => setStep(1)}
-            onNext={() => setStep(3)}
-          />
-        )}
-
-        {step === 3 && (
-          <Step3LocationPhoto
-            locationText={locationText}
-            setLocationText={setLocationText}
-            photoFiles={photoFiles}
-            setPhotoFiles={setPhotoFiles}
-            mapPosition={mapPosition}
-            setMapPosition={setMapPosition}
-            onPrev={() => setStep(2)}
-            onSubmit={handleSubmitAll}
-          />
-        )}
-      </Container>
-    </main>
+          </div>
+        </Container>
+      </main>
+    </>
   );
 }
 
