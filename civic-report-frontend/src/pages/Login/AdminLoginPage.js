@@ -111,7 +111,8 @@ function AdminLoginPage() {
         navigate("/admin/welcome", { replace: true });
       }
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("Login error:", err);n
+      
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);

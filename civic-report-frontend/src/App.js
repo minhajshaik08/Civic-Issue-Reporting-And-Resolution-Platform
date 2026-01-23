@@ -139,86 +139,97 @@ function HomePage() {
                 A smart platform that connects citizens and authorities to
                 resolve civic problems like potholes, garbage, drainage, and
                 streetlights with real-time updates and full transparency.
+                By improving communication between the public and civic bodies, the platform helps reduce response time and enhances the overall quality
+                of urban services. It encourages active citizen participation and supports the development of cleaner, safer, and more sustainable cities.
               </p>
-              <div className="d-flex gap-3 mt-3 flex-wrap">
-                <Button
-                  size="lg"
-                  variant="success"
-                  onClick={() => navigate("/report")}
-                >
-                  Report an Issue Now
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline-secondary"
-                  onClick={() => navigate("/view-issues")}
-                >
-                  View Reported Issues
-                </Button>
-              </div>
+              <div className="hero-actions">
+  <Button
+    size="lg"
+    className="hero-primary-btn"
+    onClick={() => navigate("/report")}
+  >
+    Report an Issue
+  </Button>
+  <Button
+    size="lg"
+    className="hero-secondary-btn"
+    onClick={() => navigate("/view-issues")}
+  >
+    View Reported Issues
+  </Button>
+</div>
+
+              
             </Col>
 
-            <Col md={5} className="mt-4 mt-md-0">
-              <div className="feature-card text-center">
-                <h4 className="mb-3">
-                24/7 System Available. 100% Secure &amp; Private. Real‑Time Status Updates.
-                </h4>
-                <p className="mb-0 text-muted">
-                  Citizens can report any civic issue anytime and track the
-                  status from submission to resolution with complete
-                  transparency.
-                </p>
-              </div>
-            </Col>
+            <Col md={5} className="mt-4 mt-md-0 hero-right-col">
+  <div className="feature-card hero-right-highlight">
+    <h4 className="mb-3">
+      24/7 System Available. 100% Secure &amp; Private. Real‑Time Status Updates.
+    </h4>
+    <p className="mb-0 text-muted">
+      Citizens can report any civic issue anytime and track the
+      status from submission to resolution with complete
+      transparency.
+    </p>
+  </div>
+</Col>
+
           </Row>
         </Container>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="section-wrapper how-works-section" id="how">
-        <Container fluid className="px-3 px-md-4">
-          <h2 className="section-title">How It Works</h2>
-          <p className="section-subtitle">
-            Our streamlined process ensures your civic issues are handled efficiently from report to resolution.
-          </p>
-          <Row className="g-4">
-            {[
-              {
-                step: "01",
-                title: "Report an Issue",
-                text:
-                  "Submit details with description, photo, and location through our simple form.",
-              },
-              {
-                step: "02",
-                title: "Stored in System",
-                text:
-                  "Issue is recorded in a centralized database for tracking and management.",
-              },
-              {
-                step: "03",
-                title: "Authorities Take Action",
-                text:
-                  "Concerned department is automatically notified and assigned the issue.",
-              },
-              {
-                step: "04",
-                title: "Track & Resolve",
-                text:
-                  "Citizen receives real-time updates until the issue is completely resolved.",
-              },
-            ].map((item) => (
-              <Col md={3} sm={6} key={item.step}>
-                <div className="feature-card text-center">
-                  <div className="fw-bold text-success mb-2">{item.step}</div>
-                  <h5>{item.title}</h5>
-                  <p className="mb-0 text-muted">{item.text}</p>
-                </div>
-              </Col>
-            ))}
-          </Row>
-        </Container>
-      </section>
+     {/* HOW IT WORKS */}
+<section className="section-wrapper how-works-section" id="how">
+  <Container fluid className="px-3 px-md-4">
+    <h2 className="section-title">How It Works</h2>
+    <p className="section-subtitle">
+      Our streamlined process ensures your civic issues are handled efficiently from report to resolution.
+    </p>
+    <Row className="g-4">
+      {[
+        {
+          step: "01",
+          title: "Report an Issue",
+          text:
+            "Submit details with description, photo, and location through our simple form.",
+          icon: "📝",
+        },
+        {
+          step: "02",
+          title: "Stored in System",
+          text:
+            "Issue is recorded in a centralized database for tracking and management.",
+          icon: "🗄️",
+        },
+        {
+          step: "03",
+          title: "Authorities Take Action",
+          text:
+            "Concerned department is automatically notified and assigned the issue.",
+          icon: "👤",   // person icon
+        },
+        {
+          step: "04",
+          title: "Track & Resolve",
+          text:
+            "Citizen receives real-time updates until the issue is completely resolved.",
+          icon: "✅",   // tick symbol
+        },
+      ].map((item) => (
+        <Col md={3} sm={6} key={item.step}>
+          <div className="feature-card text-center">
+            <div className="feature-icon">{item.icon}</div>
+            <div className="fw-bold text-success mb-2">{item.step}</div>
+            <h5>{item.title}</h5>
+            <p className="mb-0 text-muted">{item.text}</p>
+          </div>
+        </Col>
+      ))}
+    </Row>
+  </Container>
+</section>
+
 
       {/* ABOUT OUR MISSION */}
       <section className="section-wrapper about-mission-section" id="about">
