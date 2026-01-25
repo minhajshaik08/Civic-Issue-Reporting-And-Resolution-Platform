@@ -8,10 +8,9 @@ function OfficerIssueDetails() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // logged-in officer
-  const storedUser = localStorage.getItem("loggedInUser");
-  const currentUser = storedUser ? JSON.parse(storedUser) : null;
-  const officerId = currentUser?.id;
+  // logged-in officer - CORRECT KEY
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const officerId = storedUser.id;
 
   useEffect(() => {
     const loadIssue = async () => {

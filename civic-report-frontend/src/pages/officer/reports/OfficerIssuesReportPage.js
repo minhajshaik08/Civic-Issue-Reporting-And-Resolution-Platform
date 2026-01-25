@@ -1,17 +1,18 @@
 // src/pages/officer/reports/OfficerIssuesReportPage.jsx
 import React, { useEffect, useState } from "react";
-import { Row, Col, Form, Table, Spinner } from "react-bootstrap";
+import { Table, Form, Row, Col, Spinner, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const OfficerIssuesReportPage = () => {
-  const [period, setPeriod] = useState("daily");
-  const [status, setStatus] = useState("");
-  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [downloadLoading, setDownloadLoading] = useState(false);
+  const navigate = useNavigate();
 
   // logged‑in officer
-  const storedUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const officerId = storedUser.id;
 
   const loadIssues = async () => {
@@ -26,26 +27,27 @@ const OfficerIssuesReportPage = () => {
       setError("");
 
       const params = new URLSearchParams();
-      params.append("period", period);
-      params.append("officer_id", officerId.toString());
-      if (search) params.append("search", search);
-      if (status) params.append("status", status);
+      params.append("officer_id", officerId);
+      if (statusFilter) params.append("status", statusFilter);
 
       const res = await fetch(
-        "http://localhost:5000/api/officer/reports/issues?" +
-          params.toString()
+        "http://localhost:5000/api/officer/issues" +
+          (params.toString() ? "?" + params.toString() : "")
       );
+
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.message || "Failed to load issues report");
+        setError(data.message || "Failed to load issues");
         setIssues([]);
         return;
       }
 
-      setIssues(data.issues || []);
+      const list = data.issues || [];
+      setIssues(list);
     } catch (err) {
-      setError("Error loading issues report");
+      console.error("Error loading issues:", err);
+      setError("Error loading issues");
       setIssues([]);
     } finally {
       setLoading(false);
@@ -55,12 +57,7 @@ const OfficerIssuesReportPage = () => {
   useEffect(() => {
     loadIssues();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period, status]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    loadIssues();
-  };
+  }, [officerId, statusFilter]);
 
   const downloadReport = async (format) => {
     if (!officerId) {
@@ -69,11 +66,10 @@ const OfficerIssuesReportPage = () => {
     }
 
     try {
+      setDownloadLoading(true);
       const params = new URLSearchParams();
-      params.append("period", period);
       params.append("officer_id", officerId.toString());
-      if (search) params.append("search", search);
-      if (status) params.append("status", status);
+      if (statusFilter) params.append("status", statusFilter);
       params.append("format", format);
 
       const res = await fetch(
@@ -87,7 +83,7 @@ const OfficerIssuesReportPage = () => {
       }
 
       const contentDisposition = res.headers.get("content-disposition");
-      let filename = `my_assigned_issues.${format === "pdf" ? "pdf" : "xlsx"}`;
+      let filename = `assigned_issues_${new Date().toISOString().split('T')[0]}.${format === "pdf" ? "pdf" : "xlsx"}`;
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="(.+?)"/);
         if (match) filename = match[1];
@@ -103,112 +99,102 @@ const OfficerIssuesReportPage = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
+      console.error("Download error:", err);
       alert("Error downloading report");
+    } finally {
+      setDownloadLoading(false);
     }
   };
 
   return (
     <div>
-      <h2 className="mb-4">Assigned Issues Report</h2>
+      <h3 className="mb-3">My Assigned Issues Report</h3>
 
-      <Form onSubmit={handleSubmit} className="mb-3">
-        <Row className="g-2">
-          <Col md={3}>
-            <Form.Select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </Form.Select>
-          </Col>
+      <Row className="mb-3">
+        <Col md={3}>
+          <Form.Select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">All statuses</option>
+            <option value="NEW">New</option>
+            <option value="VIEWED">Viewed</option>
+            <option value="VERIFIED">Verified</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="SOLVED">Solved</option>
+          </Form.Select>
+        </Col>
+      </Row>
 
-          <Col md={3}>
-            <Form.Select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <option value="">All statuses</option>
-              <option value="NEW">New</option>
-              <option value="VIEWED">Viewed</option>
-              <option value="VERIFIED">Verified</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="SOLVED">Solved</option>
-            </Form.Select>
-          </Col>
-
-          <Col md={4}>
-            <Form.Control
-              placeholder="Search by issue type, area, or name"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </Col>
-
-          <Col md={2}>
-            <button type="submit" className="btn btn-primary w-100">
-              Search
-            </button>
-          </Col>
-        </Row>
-      </Form>
+      {/* Download Buttons */}
+      {issues.length > 0 && (
+        <div className="mb-3 d-flex gap-2">
+          <Button
+            variant="danger"
+            onClick={() => downloadReport("pdf")}
+            disabled={downloadLoading}
+            size="sm"
+          >
+            {downloadLoading ? "Downloading..." : "Download PDF"}
+          </Button>
+          <Button
+            variant="success"
+            onClick={() => downloadReport("excel")}
+            disabled={downloadLoading}
+            size="sm"
+          >
+            {downloadLoading ? "Downloading..." : "Download Excel"}
+          </Button>
+        </div>
+      )}
 
       {loading && (
         <div className="mb-3">
-          <Spinner animation="border" size="sm" /> Loading...
+          <Spinner animation="border" size="sm" /> Loading issues...
         </div>
       )}
 
       {error && <div className="text-danger mb-3">{error}</div>}
 
       {!loading && !error && issues.length === 0 && (
-        <p>No assigned issues found for this filter.</p>
+        <p>No issues assigned to you for this filter.</p>
       )}
 
       {issues.length > 0 && (
-        <>
-          <div className="mb-3 d-flex gap-2">
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={() => downloadReport("pdf")}
-            >
-              Download PDF
-            </button>
-            <button
-              type="button"
-              className="btn btn-success"
-              onClick={() => downloadReport("excel")}
-            >
-              Download Excel
-            </button>
-          </div>
-
-          <Table striped bordered hover size="sm">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Issue Type</th>
-                <th>Status</th>
-                <th>Area</th>
-                <th>Reported At</th>
+        <Table striped bordered hover size="sm">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Issue Type</th>
+              <th>Status</th>
+              <th>Location</th>
+              <th>Created At</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {issues.map((issue) => (
+              <tr key={issue.id}>
+                <td>{issue.id}</td>
+                <td>{issue.issue_type}</td>
+                <td>{issue.status}</td>
+                <td>{issue.location_text}</td>
+                <td>{issue.created_at}</td>
+                <td>
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    onClick={() =>
+                      navigate(`/officer/dashboard/issues/${issue.id}`)
+                    }
+                  >
+                    View
+                  </Button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {issues.map((issue, index) => (
-                <tr key={issue.id}>
-                  {/* serial number instead of database id */}
-                  <td>{index + 1}</td>
-                  <td>{issue.issue_type}</td>
-                  <td>{issue.status}</td>
-                  <td>{issue.location_text}</td>
-                  <td>{issue.created_at}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </>
+            ))}
+          </tbody>
+        </Table>
       )}
     </div>
   );

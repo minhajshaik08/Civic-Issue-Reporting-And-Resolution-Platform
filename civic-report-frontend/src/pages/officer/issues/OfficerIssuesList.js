@@ -13,12 +13,12 @@ function OfficerIssuesList() {
   const navigate = useNavigate();
 
   // Read logged-in officer from localStorage
-  const storedUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const officerId = storedUser.id;
 
   const loadIssues = async () => {
     if (!officerId) {
-      setError("Officer id not found in loggedInUser.");
+      setError("Officer id not found. Please login again.");
       setIssues([]);
       return;
     }
@@ -53,6 +53,7 @@ function OfficerIssuesList() {
       });
       setRowStatus(initial);
     } catch (err) {
+      console.error("Error loading issues:", err);
       setError("Error loading issues");
       setIssues([]);
     } finally {
@@ -63,7 +64,7 @@ function OfficerIssuesList() {
   useEffect(() => {
     loadIssues();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter]);
+  }, [officerId, statusFilter]);
 
   const handleRowStatusChange = (issueId, value) => {
     setRowStatus((prev) => ({

@@ -10,15 +10,16 @@ function AdminLoginPage() {
   const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // If already logged in (JWT token exists), redirect to dashboard
+  // ✅ Auto redirect only if session exists
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const role = user.role;
+    const role = user?.role;
 
     if (token && role) {
       setAlreadyLoggedIn(true);
       const normalizedRole = String(role).toLowerCase();
+
       if (normalizedRole === "super_admin") {
         navigate("/admin/welcome", { replace: true });
       } else if (normalizedRole === "middle_admin") {
@@ -42,7 +43,7 @@ function AdminLoginPage() {
     e.preventDefault();
     setError("");
 
-    // block submit if already logged in
+    // ✅ block submit if already logged in (session)
     const token = localStorage.getItem("token");
     if (token) {
       setError(
@@ -93,16 +94,32 @@ function AdminLoginPage() {
         setError(
           "Access denied. Only Admin, Middle Admin, and Officer accounts have dashboard access."
         );
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
         return;
       }
 
-      // Save token + user
-      localStorage.setItem("token", jwt);
-      localStorage.setItem("user", JSON.stringify({ email: user.email, role }));
+      // ✅ IMPORTANT: Clear old sessionStorage (avoid conflicts)
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
 
-      // Role-based dashboard redirect
+      // ✅ Save in LOCAL storage (persistent across sessions)
+      localStorage.setItem("token", jwt);
+
+      // ✅ Store ID also (needed for officer issues/reports)
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: user?.id,          // ✅ added
+          email: user?.email,
+          role: role,
+          username: user?.username || "",
+          full_name: user?.full_name || "",
+          phone: user?.phone || "",
+        })
+      );
+
+      // ✅ Role-based dashboard redirect
       if (role === "middle_admin") {
         navigate("/middle-admin/dashboard", { replace: true });
       } else if (role === "officer") {
@@ -111,8 +128,7 @@ function AdminLoginPage() {
         navigate("/admin/welcome", { replace: true });
       }
     } catch (err) {
-      console.error("Login error:", err);n
-      
+      console.error("Login error:", err);
       setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
