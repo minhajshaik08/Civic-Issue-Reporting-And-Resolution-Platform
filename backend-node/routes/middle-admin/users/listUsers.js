@@ -20,9 +20,14 @@ router.get("/list", async (req, res) => {
          MIN(r.id) AS id,
          r.phone,
          r.full_name,
+
+         -- ✅ SAME AS ADMIN
+         MIN(r.location_text) AS location_text,
+
          COUNT(*) AS report_count,
          MIN(r.created_at) AS first_report_at,
          MAX(r.created_at) AS last_report_at,
+
          CASE WHEN b.mobile IS NULL THEN 0 ELSE 1 END AS is_blocked
        FROM report_issues r
        LEFT JOIN blocked_mobiles b ON r.phone = b.mobile
@@ -32,19 +37,30 @@ router.get("/list", async (req, res) => {
 
     await connection.end();
 
-    const users = rows.map((r) => ({
-      id: r.id,
-      mobile: r.phone,
-      name: r.full_name,
-      report_count: r.report_count,
-      created_at: r.first_report_at,
-      last_login: r.last_report_at,
-      is_blocked: r.is_blocked === 1,
-    }));
+    // ✅ SAME city parsing logic as Admin
+    const users = rows.map((r) => {
+      const city =
+        r.location_text && String(r.location_text).includes(",")
+          ? String(r.location_text).split(",")[0].trim()
+          : r.location_text
+          ? String(r.location_text).trim()
+          : "-";
+
+      return {
+        id: r.id,
+        mobile: r.phone,
+        name: r.full_name,
+        city, // ✅ NOW INCLUDED
+        report_count: r.report_count,
+        created_at: r.first_report_at,
+        last_login: r.last_report_at,
+        is_blocked: r.is_blocked === 1,
+      };
+    });
 
     return res.json({ success: true, users });
   } catch (err) {
-    console.error("Middle-admin list users from report_issues error:", err);
+    console.error("Middle-admin list users error:", err);
     return res.json({ success: false, message: "Database error" });
   }
 });

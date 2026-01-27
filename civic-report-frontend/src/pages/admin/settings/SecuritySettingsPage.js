@@ -1,48 +1,49 @@
 import React, { useState } from "react";
-import { Card, Form, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Card, Form, Button, Alert } from "react-bootstrap";
 
 function SecuritySettingsPage() {
-  const navigate = useNavigate();
-  // use the same key used everywhere else
-  const storedUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+  const storedUser = JSON.parse(
+  localStorage.getItem("user") || "{}"
+);
+
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    setMessage("");
+    setError("");
+    setSuccess("");
 
-    if (!storedUser.id || !storedUser.table) {
-      setMessage("User information missing. Please login again.");
+    if (!storedUser.id) {
+      setError("User information missing. Please login again.");
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      setMessage("New passwords do not match.");
+      setError("New passwords do not match.");
       return;
     }
 
     if (newPassword.length < 6) {
-      setMessage("New password must be at least 6 characters.");
+      setError("New password must be at least 6 characters.");
       return;
     }
 
     setLoading(true);
+
     try {
-      // backend endpoint you will implement in /api/login/change-password
       const res = await fetch(
-        "http://localhost:5000/api/login/change-password",
+        "http://localhost:5000/api/admin/settings/change-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userId: storedUser.id,
-            table: storedUser.table, // "admins" | "middle_admins" | "officers"
             currentPassword,
             newPassword,
           }),
@@ -50,84 +51,127 @@ function SecuritySettingsPage() {
       );
 
       const data = await res.json();
+
       if (!res.ok || !data.success) {
-        setMessage(data.message || "Failed to change password.");
+        setError(data.message || "Failed to change password.");
         return;
       }
 
-      setMessage("Password updated successfully.");
+      setSuccess("✅ Password updated successfully.");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
     } catch (err) {
-      setMessage("Error changing password. Please try again.");
+      console.error(err);
+      setError("Error changing password. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogoutAll = () => {
-    // Clear current login for this browser
-    localStorage.removeItem("loggedInUser");
-    navigate("/Login");
-  };
-
   return (
-    <Card className="p-4 shadow-sm">
-      <h4 className="mb-3">Security</h4>
+    <>
+      {/* ===== Inline CSS ===== */}
+      <style>{`
+        .security-card {
+          max-width: 520px;
+          margin: 40px auto;
+          padding: 28px;
+          border-radius: 16px;
+          border: none;
+          box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+        }
 
-      <Form onSubmit={handleChangePassword} className="mb-4">
-        <h5 className="mb-3">Change Password</h5>
-        <Form.Group className="mb-3">
-          <Form.Label>Current Password</Form.Label>
-          <Form.Control
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>New Password</Form.Label>
-          <Form.Control
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Confirm New Password</Form.Label>
-          <Form.Control
-            type="password"
-            value={confirmNewPassword}
-            onChange={(e) => setConfirmNewPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </Form.Group>
-        <Button type="submit" variant="success" disabled={loading}>
-          {loading ? "Updating..." : "Update Password"}
-        </Button>
-        {message && (
-          <p className="mt-2" style={{ color: "#374151" }}>
-            {message}
-          </p>
-        )}
-      </Form>
+        .security-title {
+          font-size: 22px;
+          font-weight: 800;
+          color: #111827;
+          margin-bottom: 20px;
+        }
 
-      <div className="mb-4">
-        <h5>Logout from all devices</h5>
-        <p className="text-muted mb-2">
-          This will clear your current session on this browser.
-        </p>
-        <Button variant="outline-danger" onClick={handleLogoutAll}>
-          Logout from all devices
-        </Button>
-      </div>
-    </Card>
+        .form-label {
+          font-weight: 700;
+          color: #111827;
+        }
+
+        .form-control {
+          border-radius: 12px;
+          padding: 10px 12px;
+          font-weight: 600;
+        }
+
+        .form-control:focus {
+          border-color: #22c55e;
+          box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        .btn-save {
+          border-radius: 12px;
+          font-weight: 800;
+          padding: 10px 16px;
+        }
+
+        .hint-text {
+          font-size: 13px;
+          color: #6b7280;
+          margin-top: 6px;
+        }
+      `}</style>
+
+      <Card className="security-card">
+        <div className="security-title">Security Settings</div>
+
+        {error && <Alert variant="danger">{error}</Alert>}
+        {success && <Alert variant="success">{success}</Alert>}
+
+        <Form onSubmit={handleChangePassword}>
+          <Form.Group className="mb-3">
+            <Form.Label>Current Password</Form.Label>
+            <Form.Control
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>New Password</Form.Label>
+            <Form.Control
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <div className="hint-text">
+              Password must be at least 6 characters
+            </div>
+          </Form.Group>
+
+          <Form.Group className="mb-4">
+            <Form.Label>Confirm New Password</Form.Label>
+            <Form.Control
+              type="password"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </Form.Group>
+
+          <Button
+            type="submit"
+            variant="success"
+            className="btn-save w-100"
+            disabled={loading}
+          >
+            {loading ? "Updating Password..." : "Update Password"}
+          </Button>
+        </Form>
+      </Card>
+    </>
   );
 }
 

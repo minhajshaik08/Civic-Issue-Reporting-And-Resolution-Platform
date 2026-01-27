@@ -14,17 +14,19 @@ export default function MiddleAdminOfficerListPage() {
     const fetchOfficers = async () => {
       setLoading(true);
       setError("");
+
       try {
         const res = await fetch(
           "http://localhost:5000/api/middle-admin/officers/list"
         );
         const data = await res.json();
+
         if (!data.success) {
           setError(data.message || "Failed to fetch officers.");
         } else {
           setOfficers(data.officers || []);
         }
-      } catch (e) {
+      } catch {
         setError("Network error while loading officers.");
       } finally {
         setLoading(false);
@@ -40,12 +42,14 @@ export default function MiddleAdminOfficerListPage() {
     const matchSearch =
       !s ||
       (o.name && o.name.toLowerCase().includes(s)) ||
-      (o.mobile && o.mobile.includes(s)) ||
+      (o.mobile && String(o.mobile).includes(s)) ||
       (o.email && o.email.toLowerCase().includes(s)) ||
       (o.employee_id && o.employee_id.toLowerCase().includes(s));
 
     const matchZone = !zoneFilter || o.zone === zoneFilter;
     const matchDept = !deptFilter || o.department === deptFilter;
+
+    // status: 0 = Active, 1 = Blocked
     const matchStatus =
       !statusFilter ||
       (statusFilter === "Active" && o.status === 0) ||
@@ -55,123 +59,246 @@ export default function MiddleAdminOfficerListPage() {
   });
 
   if (loading) {
-    return <div style={{ padding: "1rem" }}>Loading officers...</div>;
+    return <div className="loading-text">Loading officers...</div>;
   }
 
   if (error) {
-    return (
-      <div style={{ padding: "1rem", color: "red" }}>
-        {error}
-      </div>
-    );
+    return <div className="error-text">{error}</div>;
   }
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <h2>Officer List (Middle Admin)</h2>
+    <>
+      {/* ✅ SAME CSS AS ADMIN OFFICER LIST */}
+      <style>{`
+        .page-wrapper {
+          background: #f6fbfb;
+          min-height: 100vh;
+          padding: 20px;
+        }
 
-      <div
-        style={{
-          display: "flex",
-          gap: "8px",
-          flexWrap: "wrap",
-          marginBottom: "10px",
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Search by name, mobile, email, employee ID"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ padding: "6px", minWidth: "260px" }}
-        />
-        <select
-          value={zoneFilter}
-          onChange={(e) => setZoneFilter(e.target.value)}
-        >
-          <option value="">All Zones</option>
-          <option value="North">North</option>
-          <option value="South">South</option>
-          <option value="East">East</option>
-          <option value="West">West</option>
-        </select>
+        .page-title {
+          margin: 0 0 14px 0;
+          font-weight: 800;
+          color: #111827;
+        }
 
-        <select
-          value={deptFilter}
-          onChange={(e) => setDeptFilter(e.target.value)}
-        >
-          <option value="">All Departments</option>
-          <option value="Sanitation">Sanitation</option>
-          <option value="Roads">Roads</option>
-          <option value="Streetlights">Streetlights</option>
-        </select>
+        .filters-row {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-bottom: 14px;
+        }
 
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="">All Status</option>
-          <option value="Active">Active</option>
-          <option value="Blocked">Blocked</option>
-        </select>
-      </div>
+        .input-search {
+          padding: 10px 12px;
+          border-radius: 10px;
+          border: 1px solid #d1d5db;
+          outline: none;
+          font-size: 14px;
+          min-width: 280px;
+          flex: 1;
+        }
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          border: "1px solid #ddd",
-        }}
-      >
-        <thead>
-          <tr style={{ backgroundColor: "#f7f7f7" }}>
-            <th style={{ padding: "6px" }}>ID</th>
-            <th style={{ padding: "6px" }}>Name</th>
-            <th style={{ padding: "6px" }}>Designation</th>
-            <th style={{ padding: "6px" }}>Dept</th>
-            <th style={{ padding: "6px" }}>Zone</th>
-            <th style={{ padding: "6px" }}>Mobile</th>
-            <th style={{ padding: "6px" }}>Email</th>
-            <th style={{ padding: "6px" }}>Status</th>
-            <th style={{ padding: "6px" }}>Created At</th>
-            <th style={{ padding: "6px" }}>Last Login</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredOfficers.length === 0 ? (
-            <tr>
-              <td colSpan="10" style={{ textAlign: "center", padding: "8px" }}>
-                No officers found.
-              </td>
-            </tr>
-          ) : (
-            filteredOfficers.map((o) => (
-              <tr key={o.id}>
-                <td style={{ padding: "6px" }}>{o.id}</td>
-                <td style={{ padding: "6px" }}>{o.name}</td>
-                <td style={{ padding: "6px" }}>{o.designation}</td>
-                <td style={{ padding: "6px" }}>{o.department}</td>
-                <td style={{ padding: "6px" }}>{o.zone}</td>
-                <td style={{ padding: "6px" }}>{o.mobile}</td>
-                <td style={{ padding: "6px" }}>{o.email}</td>
-                <td style={{ padding: "6px" }}>
-                  {o.status === 1 ? "Blocked" : "Active"}
-                </td>
-                <td style={{ padding: "6px" }}>
-                  {o.created_at
-                    ? new Date(o.created_at).toLocaleString()
-                    : ""}
-                </td>
-                <td style={{ padding: "6px" }}>
-                  {o.last_login
-                    ? new Date(o.last_login).toLocaleString()
-                    : "-"}
-                </td>
+        .input-search:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .filter-select {
+          padding: 10px 12px;
+          border-radius: 10px;
+          border: 1px solid #d1d5db;
+          outline: none;
+          font-size: 14px;
+          background: #fff;
+          min-width: 170px;
+        }
+
+        .table-card {
+          background: #ffffff;
+          border-radius: 14px;
+          box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.06);
+          padding: 14px;
+          overflow-x: auto;
+        }
+
+        .styled-table {
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 1100px;
+        }
+
+        .styled-table thead tr {
+          background: #111827;
+          color: white;
+          text-align: left;
+        }
+
+        .styled-table th,
+        .styled-table td {
+          padding: 12px 14px;
+          border-bottom: 1px solid #e5e7eb;
+          font-size: 14px;
+        }
+
+        .styled-table tbody tr:nth-child(even) {
+          background: #fafafa;
+        }
+
+        .styled-table tbody tr:hover {
+          background: #f1f5f9;
+          transition: 0.2s;
+        }
+
+        .status-pill {
+          display: inline-block;
+          padding: 5px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 700;
+        }
+
+        .status-active {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        .status-blocked {
+          background: #fee2e2;
+          color: #991b1b;
+        }
+
+        .empty-row {
+          text-align: center;
+          padding: 10px;
+          color: #6b7280;
+          font-weight: 600;
+        }
+
+        .loading-text {
+          padding: 20px;
+          font-weight: 600;
+        }
+
+        .error-text {
+          padding: 20px;
+          color: red;
+          font-weight: 700;
+        }
+      `}</style>
+
+      <div className="page-wrapper">
+        <h2 className="page-title">Officer List (Middle Admin)</h2>
+
+        {/* ✅ Filters */}
+        <div className="filters-row">
+          <input
+            type="text"
+            className="input-search"
+            placeholder="Search by name, mobile, email, employee ID"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <select
+            className="filter-select"
+            value={zoneFilter}
+            onChange={(e) => setZoneFilter(e.target.value)}
+          >
+            <option value="">All Zones</option>
+            <option value="North">North</option>
+            <option value="South">South</option>
+            <option value="East">East</option>
+            <option value="West">West</option>
+          </select>
+
+          <select
+            className="filter-select"
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+          >
+            <option value="">All Departments</option>
+            <option value="Sanitation">Sanitation</option>
+            <option value="Roads">Roads</option>
+            <option value="Streetlights">Streetlights</option>
+          </select>
+
+          <select
+            className="filter-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Blocked">Blocked</option>
+          </select>
+        </div>
+
+        {/* ✅ Table */}
+        <div className="table-card">
+          <table className="styled-table">
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Dept</th>
+                <th>Zone</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Last Login</th>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+            </thead>
+
+            <tbody>
+              {filteredOfficers.length === 0 ? (
+                <tr>
+                  <td colSpan="11" className="empty-row">
+                    No officers found.
+                  </td>
+                </tr>
+              ) : (
+                filteredOfficers.map((o, index) => (
+                  <tr key={o.id}>
+                    <td>{index + 1}</td>
+                    <td>{o.id}</td>
+                    <td>{o.name}</td>
+                    <td>{o.designation || "-"}</td>
+                    <td>{o.department || "-"}</td>
+                    <td>{o.zone || "-"}</td>
+                    <td>{o.mobile || "-"}</td>
+                    <td>{o.email || "-"}</td>
+                    <td>
+                      {o.status === 1 ? (
+                        <span className="status-pill status-blocked">
+                          Blocked
+                        </span>
+                      ) : (
+                        <span className="status-pill status-active">
+                          Active
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      {o.created_at
+                        ? new Date(o.created_at).toLocaleString("en-IN")
+                        : "-"}
+                    </td>
+                    <td>
+                      {o.last_login
+                        ? new Date(o.last_login).toLocaleString("en-IN")
+                        : "-"}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
   );
 }

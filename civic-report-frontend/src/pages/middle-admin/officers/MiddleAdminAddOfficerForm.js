@@ -15,6 +15,7 @@ export default function MiddleAdminAddOfficerForm() {
   });
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -24,7 +25,9 @@ export default function MiddleAdminAddOfficerForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
+    // ✅ validation (same behavior as Add Officer)
     if (
       !form.name.trim() ||
       !form.email.trim() ||
@@ -34,6 +37,7 @@ export default function MiddleAdminAddOfficerForm() {
       setError("Name, Email, Mobile and Employee ID are required.");
       return;
     }
+
     if (form.password.length < 6) {
       setError("Password must be at least 6 characters.");
       return;
@@ -41,11 +45,12 @@ export default function MiddleAdminAddOfficerForm() {
 
     setLoading(true);
     try {
-      // ✅ middle-admin endpoint (change to your real backend path)
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/middle-admin/officers/add",
         form
       );
+
+      setSuccess("✅ Officer added successfully!");
 
       setForm({
         name: "",
@@ -58,176 +63,236 @@ export default function MiddleAdminAddOfficerForm() {
         role: "",
         password: "",
       });
-
-      alert("Officer added successfully");
     } catch (err) {
-      console.error("Add officer error:", err);
-      setError("Failed to add officer. Please try again.");
+      console.error(err);
+      setError("❌ Failed to add officer. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCancel = () => {
+    setError("");
+    setSuccess("");
+    setForm({
+      name: "",
+      designation: "",
+      department: "",
+      zone: "",
+      mobile: "",
+      email: "",
+      employeeId: "",
+      role: "",
+      password: "",
+    });
+  };
+
   return (
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: "80vh" }}
-    >
-      <div className="w-100" style={{ maxWidth: "600px" }}>
+    <>
+      {/* ✅ SAME STYLING AS ADD OFFICER */}
+      <style>{`
+        .officer-page {
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #f6fbfb;
+          padding: 20px;
+        }
+
+        .officer-card {
+          width: 100%;
+          max-width: 620px;
+          background: #ffffff;
+          border-radius: 18px;
+          padding: 26px;
+          box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .officer-title {
+          font-size: 22px;
+          font-weight: 800;
+          text-align: center;
+          color: #111827;
+          margin-bottom: 6px;
+        }
+
+        .officer-subtitle {
+          text-align: center;
+          color: #6b7280;
+          font-size: 14px;
+          margin-bottom: 18px;
+        }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+        }
+
+        @media (max-width: 650px) {
+          .form-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .field {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .label {
+          font-weight: 700;
+          font-size: 14px;
+          color: #111827;
+        }
+
+        .input {
+          padding: 10px 12px;
+          border-radius: 10px;
+          border: 1px solid #d1d5db;
+          outline: none;
+          font-size: 14px;
+        }
+
+        .input:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .helper {
+          font-size: 12px;
+          color: #6b7280;
+        }
+
+        .error-box {
+          background: #fee2e2;
+          color: #991b1b;
+          padding: 10px 12px;
+          border-radius: 10px;
+          font-size: 14px;
+          font-weight: 700;
+          margin-bottom: 12px;
+        }
+
+        .success-box {
+          background: #dcfce7;
+          color: #166534;
+          padding: 10px 12px;
+          border-radius: 10px;
+          font-size: 14px;
+          font-weight: 700;
+          margin-bottom: 12px;
+        }
+
+        .btn-row {
+          display: flex;
+          gap: 12px;
+          margin-top: 18px;
+        }
+
+        .btn-save {
+          width: 50%;
+          background: #16a34a;
+          color: white;
+          border: none;
+          border-radius: 12px;
+          padding: 11px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .btn-cancel {
+          width: 50%;
+          background: transparent;
+          border: 1px solid #9ca3af;
+          border-radius: 12px;
+          padding: 11px;
+          font-weight: 800;
+          cursor: pointer;
+          color: #111827;
+        }
+
+        .btn-save:disabled,
+        .btn-cancel:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      `}</style>
+
+      <div className="officer-page">
         <form
+          className="officer-card"
           onSubmit={handleSubmit}
-          className="p-4 rounded shadow-sm bg-white"
+          autoComplete="off"
         >
-          <h3 className="mb-3 text-center">Add Officer (Middle Admin)</h3>
+          {/* 🚫 BLOCK BROWSER AUTOFILL */}
+          <input type="text" name="fakeuser" style={{ display: "none" }} />
+          <input type="password" name="fakepass" style={{ display: "none" }} />
 
-          {error && <p className="text-danger mb-2">{error}</p>}
-
-          {/* all your same fields */}
-          <div className="mb-3">
-            <label className="form-label">Name *</label>
-            <input
-              type="text"
-              className="form-control"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              disabled={loading}
-              required
-            />
+          <div className="officer-title">Add Officer (Middle Admin)</div>
+          <div className="officer-subtitle">
+            Create a new officer account
           </div>
 
-          <div className="mb-3">
-            <label className="form-label">Designation</label>
-            <input
-              type="text"
-              className="form-control"
-              name="designation"
-              value={form.designation}
-              onChange={handleChange}
-              disabled={loading}
-            />
+          {error && <div className="error-box">{error}</div>}
+          {success && <div className="success-box">{success}</div>}
+
+          <div className="form-grid">
+            {[
+              ["Name *", "name"],
+              ["Designation", "designation"],
+              ["Department", "department"],
+              ["Zone", "zone"],
+              ["Mobile *", "mobile"],
+              ["Email *", "email"],
+              ["Employee ID *", "employeeId"],
+              ["Role", "role"],
+            ].map(([label, name]) => (
+              <div className="field" key={name}>
+                <label className="label">{label}</label>
+                <input
+                  className="input"
+                  name={name}
+                  value={form[name]}
+                  onChange={handleChange}
+                  disabled={loading}
+                  autoComplete="off"
+                />
+              </div>
+            ))}
           </div>
 
-          <div className="mb-3">
-            <label className="form-label">Department</label>
-            <input
-              type="text"
-              className="form-control"
-              name="department"
-              value={form.department}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Zone</label>
-            <input
-              type="text"
-              className="form-control"
-              name="zone"
-              value={form.zone}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Mobile *</label>
-            <input
-              type="tel"
-              className="form-control"
-              name="mobile"
-              value={form.mobile}
-              onChange={handleChange}
-              disabled={loading}
-              required
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Email *</label>
-            <input
-              type="email"
-              className="form-control"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              disabled={loading}
-              required
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Employee ID *</label>
-            <input
-              type="text"
-              className="form-control"
-              name="employeeId"
-              value={form.employeeId}
-              onChange={handleChange}
-              disabled={loading}
-              required
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Role</label>
-            <input
-              type="text"
-              className="form-control"
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Password *</label>
+          <div className="field" style={{ marginTop: 14 }}>
+            <label className="label">Password *</label>
             <input
               type="password"
-              className="form-control"
+              className="input"
               name="password"
               value={form.password}
               onChange={handleChange}
               disabled={loading}
-              required
+              autoComplete="new-password"
             />
-            <small className="text-muted">Minimum 6 characters.</small>
+            <div className="helper">Minimum 6 characters.</div>
           </div>
 
-          <div className="mt-3 d-flex gap-2">
-            <button
-              type="submit"
-              className="btn btn-success"
-              disabled={loading}
-            >
+          <div className="btn-row">
+            <button type="submit" className="btn-save" disabled={loading}>
               {loading ? "Saving..." : "Save"}
             </button>
             <button
               type="button"
-              className="btn btn-outline-secondary"
+              className="btn-cancel"
+              onClick={handleCancel}
               disabled={loading}
-              onClick={() =>
-                setForm({
-                  name: "",
-                  designation: "",
-                  department: "",
-                  zone: "",
-                  mobile: "",
-                  email: "",
-                  employeeId: "",
-                  role: "",
-                  password: "",
-                })
-              }
             >
               Cancel
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 }

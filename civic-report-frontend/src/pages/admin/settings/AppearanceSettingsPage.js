@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Form, Button } from "react-bootstrap";
 
+
+
 function AppearanceSettingsPage() {
   // ✅ logged-in user (use "user" because your login page stores as "user")
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");

@@ -5,3 +5,190 @@
 
 
 
+
+/* ================= DARK THEME ================= */
+body[data-theme="extra-dark"] {
+  background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+  color: #e5e7eb;
+}
+
+body[data-theme="extra-dark"] .App-header,
+body[data-theme="extra-dark"] .hero-wrapper,
+body[data-theme="extra-dark"] .section-wrapper {
+  background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+}
+
+body[data-theme="extra-dark"] .custom-navbar {
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom-color: rgba(34, 197, 74, 0.2);
+}
+
+body[data-theme="extra-dark"] .custom-nav-link {
+  color: #cbd5e1 !important;
+}
+
+body[data-theme="extra-dark"] .custom-nav-link:hover {
+  color: #86efac !important;
+  background-color: rgba(34, 197, 74, 0.1) !important;
+}
+
+body[data-theme="extra-dark"] .feature-card {
+  background-color: #0f172a;
+  border-color: #1e293b;
+  color: #e5e7eb;
+}
+
+body[data-theme="extra-dark"] .feature-card h5 {
+  color: #f0fdf4;
+}
+
+body[data-theme="extra-dark"] .feature-card p {
+  color: #cbd5e1;
+}
+
+body[data-theme="extra-dark"] .feature-card:hover {
+  background-color: #111827;
+  border-color: #22c55e;
+}
+
+body[data-theme="extra-dark"] .stat-card,
+body[data-theme="extra-dark"] .step-card {
+  background-color: #020617;
+  border-color: #1f2937;
+  color: #e5e7eb;
+}
+
+body[data-theme="extra-dark"] .stat-card:hover,
+body[data-theme="extra-dark"] .step-card:hover {
+  background: linear-gradient(135deg, #020617 0%, #111827 100%);
+}
+
+body[data-theme="extra-dark"] .stat-card h3 {
+  color: #86efac;
+}
+
+body[data-theme="extra-dark"] .footer-section {
+  background: linear-gradient(135deg, #000000 0%, #0f172a 100%);
+  border-top-color: rgba(34, 197, 74, 0.2);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 992px) {
+  .hero-wrapper {
+    padding: 48px 0 34px;
+  }
+
+  .hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-right-card {
+    align-self: flex-end;
+    flex: 0 0 auto;
+    max-width: 330px;
+  }
+
+  .section-wrapper {
+    padding: 36px 0 40px;
+  }
+
+  .stat-card,
+  .step-card {
+    width: 220px;
+    height: 176px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-wrapper {
+    padding: 44px 0 32px;
+  }
+
+  .hero-inner {
+    padding: 0 1.25rem;
+  }
+
+  .hero-right-card {
+    align-self: stretch;
+    max-width: 100%;
+    margin-top: 1.2rem;
+  }
+
+  .section-wrapper {
+    padding: 34px 0 38px;
+  }
+
+  .stat-row,
+  .steps-row {
+    row-gap: 14px;
+    column-gap: 14px;
+  }
+
+  .stat-card,
+  .step-card {
+    width: 48%;
+    min-width: 230px;
+    height: 176px;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+    white-space: normal;
+    margin-left: 0;
+  }
+
+  .hero-subtitle,
+  .hero-actions {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.8rem;
+    white-space: normal;
+    margin-left: 0;
+  }
+
+  .hero-subtitle,
+  .hero-actions {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .hero-inner {
+    padding: 0 1rem;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+  }
+
+  .stat-row,
+  .steps-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat-card,
+  .step-card {
+    width: 100%;
+    max-width: 320px;
+    height: 180px;
+  }
+}
+
+/* ================= SPACING UTILITIES ================= */
+@media (min-width: 1200px) {
+  .px-3 {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .px-4 {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}

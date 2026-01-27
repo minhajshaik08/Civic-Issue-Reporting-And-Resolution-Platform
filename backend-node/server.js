@@ -98,6 +98,42 @@ app.use("/api/admin/reports/areas", topAreasReportRouter);
 app.use("/api/admin/reports/areas", areaDetailsReportRouter);
 app.use("/api/admin/reports/officers", officerPerformanceRouter);
 
+const profileSettingsRoutes = require("./routes/admin/settings/Profilesettingpage");
+
+app.use("/api/admin/settings/profile", profileSettingsRoutes);
+const securityRoutes = require("./routes/admin/settings/SecuritySettingsPage");
+
+app.use("/api/admin/settings", securityRoutes);
+
+const middleAdminDashboardRoutes = require(
+  "./routes/middle-admin/dashboard"
+);
+app.use(
+  "/api/middle-admin/dashboard",
+  middleAdminDashboardRoutes
+);
+
+const middleAdminProfileRoutes = require(
+  "./routes/middle-admin/settings/Middle_adminProfileSettingPage"
+);
+
+app.use(
+  "/api/middle-admin/settings/profile",
+  middleAdminProfileRoutes
+);
+const middleAdminSecuritySettingsRoute = require(
+  "./routes/middle-admin/settings/Middle_adminSecuritySettingsPage"
+);
+app.use(
+  "/api/middle-admin/settings",
+  middleAdminSecuritySettingsRoute
+);
+
+
+
+
+
+
 /**
  * ✅ OFFICER GALLERY ROUTES
  */

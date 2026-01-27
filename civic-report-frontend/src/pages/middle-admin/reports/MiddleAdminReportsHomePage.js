@@ -1,73 +1,110 @@
 import React from "react";
-import { Row, Col, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const MiddleAdminReportsHomePage = () => {
   return (
-    <div>
-      <h2 className="mb-4">Reports & Analytics</h2>
+    <>
+      {/* ✅ SAME CSS AS ADMIN */}
+      <style>{`
+        .reports-page {
+          background: #f6fbfb;
+          min-height: 100vh;
+          padding: 20px;
+        }
 
-      <Row className="g-3">
-        <Col md={4}>
-          <Card
-            as={Link}
+        .reports-title {
+          font-size: 22px;
+          font-weight: 900;
+          color: #111827;
+          margin-bottom: 16px;
+        }
+
+        .reports-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+          max-width: 1000px;
+        }
+
+        .report-card {
+          display: block;
+          text-decoration: none;
+          background: #fff;
+          border-radius: 16px;
+          padding: 18px;
+          box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.08);
+          border: 1px solid #eef2f7;
+          transition: 0.2s ease-in-out;
+          color: inherit;
+        }
+
+        .report-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
+          border-color: #c7d2fe;
+        }
+
+        .report-card h4 {
+          margin: 0 0 6px 0;
+          font-size: 18px;
+          font-weight: 900;
+          color: #111827;
+        }
+
+        .report-card p {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 600;
+          color: #6b7280;
+          line-height: 1.5;
+        }
+
+        @media (max-width: 992px) {
+          .reports-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 640px) {
+          .reports-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <div className="reports-page">
+        <h2 className="reports-title">Reports & Analytics</h2>
+
+        <div className="reports-grid">
+          {/* ✅ TOTAL ISSUES */}
+          <Link
             to="/middle-admin/dashboard/reports/issues"
-            className="p-3 text-decoration-none"
+            className="report-card"
           >
             <h4>Total Issues</h4>
-            <p>Daily / weekly / monthly issues, pending vs resolved.</p>
-          </Card>
-        </Col>
+            <p>Daily, weekly, and monthly issue trends.</p>
+          </Link>
 
-        <Col md={4}>
-          <Card
-            as={Link}
+          {/* ✅ TOP AREAS */}
+          <Link
             to="/middle-admin/dashboard/reports/areas"
-            className="p-3 text-decoration-none"
+            className="report-card"
           >
             <h4>Top Areas</h4>
-            <p>Top problematic areas by number of issues.</p>
-          </Card>
-        </Col>
+            <p>Most problematic areas based on complaints.</p>
+          </Link>
 
-        <Col md={4}>
-          <Card
-            as={Link}
+          {/* ✅ OFFICER PERFORMANCE */}
+          <Link
             to="/middle-admin/dashboard/reports/officers/performance"
-            className="p-3 text-decoration-none"
+            className="report-card"
           >
             <h4>Officer Performance</h4>
-            <p>Issues handled, resolved, and average resolution time.</p>
-          </Card>
-        </Col>
-
-        <Col md={4}>
-          <Card
-            as={Link}
-            to="/middle-admin/dashboard/reports/users"
-            className="p-3 text-decoration-none mt-3"
-          >
-            <h4>User Activity</h4>
-            <p>Active users and issues reported per user.</p>
-          </Card>
-        </Col>
-
-        <Col md={4}>
-          <Card className="p-3 mt-3">
-            <h4>Download Reports</h4>
-            <p>Export data as PDF or Excel.</p>
-            <div className="d-flex gap-2">
-              <button className="btn btn-outline-primary btn-sm">
-                Download PDF
-              </button>
-              <button className="btn btn-outline-success btn-sm">
-                Download Excel
-              </button>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-    </div>
+            <p>Issues handled, resolved, and efficiency metrics.</p>
+          </Link>
+        </div>
+      </div>
+    </>
   );
 };
 
