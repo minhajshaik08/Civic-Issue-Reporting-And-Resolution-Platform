@@ -1,14 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import { Spinner, Container } from "react-bootstrap";
 
 function RequireAuth({ allowedRoles }) {
-  // ✅ READ JWT TOKEN + USER (not loggedInUser)
-  const token = localStorage.getItem("token");
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const role = storedUser.role ? String(storedUser.role).toLowerCase() : "";
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    // ✅ READ JWT TOKEN + USER (with small delay to ensure localStorage is ready)
+    const token = localStorage.getItem("token");
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const userRole = storedUser.role ? String(storedUser.role).toLowerCase() : "";
+
+    if (token && userRole) {
+      setIsAuthenticated(true);
+      setRole(userRole);
+    } else {
+      setIsAuthenticated(false);
+      setRole("");
+    }
+    
+    setIsLoading(false);
+  }, []);
+
+  // Still loading - show spinner
+  if (isLoading) {
+    return (
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "100vh" }}
+      >
+        <Spinner animation="border" />
+      </Container>
+    );
+  }
 
   // not logged in → go to login
-  if (!token || !role) {
+  if (!isAuthenticated) {
     return <Navigate to="/Login" replace />;
   }
 

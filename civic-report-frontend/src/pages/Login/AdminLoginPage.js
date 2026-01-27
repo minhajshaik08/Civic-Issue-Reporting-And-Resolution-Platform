@@ -7,17 +7,15 @@ function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Auto redirect only if session exists
+  /* ================= AUTO REDIRECT IF SESSION EXISTS ================= */
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const role = user?.role;
 
     if (token && role) {
-      setAlreadyLoggedIn(true);
       const normalizedRole = String(role).toLowerCase();
 
       if (normalizedRole === "super_admin") {
@@ -27,8 +25,6 @@ function AdminLoginPage() {
       } else if (normalizedRole === "officer") {
         navigate("/officer/dashboard", { replace: true });
       }
-    } else {
-      setAlreadyLoggedIn(false);
     }
   }, [navigate]);
 
@@ -39,18 +35,10 @@ function AdminLoginPage() {
       value
     );
 
+  /* ================= LOGIN SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    // ✅ block submit if already logged in (session)
-    const token = localStorage.getItem("token");
-    if (token) {
-      setError(
-        "You are already logged in. Please logout first if you want to switch accounts."
-      );
-      return;
-    }
 
     if (!isValidEmail(email)) {
       setError("Please enter a valid email address.");
@@ -67,7 +55,6 @@ function AdminLoginPage() {
     setLoading(true);
 
     try {
-      // ✅ YOUR BACKEND LOGIN URL (correct)
       const res = await fetch("http://localhost:5000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -100,11 +87,10 @@ function AdminLoginPage() {
         return;
       }
 
-      // ✅ Clear old session storage
+      /* ================= SAVE SESSION (FIXED) ================= */
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("user");
 
-      // ✅ Save new login details
       localStorage.setItem("token", jwt);
       localStorage.setItem(
         "user",
@@ -113,12 +99,18 @@ function AdminLoginPage() {
           email: user?.email,
           role: role,
           username: user?.username || "",
+
+          // ✅ Admin / Middle Admin fields
           full_name: user?.full_name || "",
           phone: user?.phone || "",
+
+          // ✅ Officer fields (IMPORTANT FIX)
+          name: user?.name || user?.full_name || "",
+          mobile: user?.mobile || user?.phone || "",
         })
       );
 
-      // ✅ Role-based dashboard redirect
+      /* ================= ROLE BASED REDIRECT ================= */
       if (role === "middle_admin") {
         navigate("/middle-admin/dashboard", { replace: true });
       } else if (role === "officer") {
@@ -154,13 +146,6 @@ function AdminLoginPage() {
               </Alert>
             )}
 
-            {alreadyLoggedIn && (
-              <Alert variant="info" className="mb-3">
-                You are already logged in. Please logout from the dashboard if
-                you want to switch to another account.
-              </Alert>
-            )}
-
             <Form onSubmit={handleSubmit} noValidate>
               <Form.Group className="mb-3">
                 <Form.Label>Email</Form.Label>
@@ -169,7 +154,7 @@ function AdminLoginPage() {
                   placeholder="admin@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading || alreadyLoggedIn}
+                  disabled={loading}
                 />
               </Form.Group>
 
@@ -180,7 +165,7 @@ function AdminLoginPage() {
                   placeholder="Enter strong password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading || alreadyLoggedIn}
+                  disabled={loading}
                 />
                 <Form.Text className="text-muted">
                   At least 6 characters, 1 uppercase, 1 number, 1 special
@@ -194,7 +179,7 @@ function AdminLoginPage() {
                   size="sm"
                   className="p-0"
                   onClick={handleForgotPassword}
-                  disabled={loading || alreadyLoggedIn}
+                  disabled={loading}
                 >
                   Forgot password?
                 </Button>
@@ -204,7 +189,7 @@ function AdminLoginPage() {
                 <Button
                   type="submit"
                   variant="success"
-                  disabled={loading || alreadyLoggedIn}
+                  disabled={loading}
                 >
                   {loading ? "Logging in..." : "Login"}
                 </Button>

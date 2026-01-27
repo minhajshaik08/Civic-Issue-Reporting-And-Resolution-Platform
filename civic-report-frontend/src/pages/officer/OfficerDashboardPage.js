@@ -11,12 +11,7 @@ function OfficerDashboardPage() {
   const token = localStorage.getItem("token");
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // ✅ IF NO TOKEN, REDIRECT TO LOGIN
-  useEffect(() => {
-    if (!token) {
-      navigate("/login", { replace: true });
-    }
-  }, [token, navigate]);
+  // ✅ REMOVED: Token redirect check - RequireAuth handles this now
 
   const email = storedUser.email || "";
   const fullName = storedUser.full_name || storedUser.username || "";

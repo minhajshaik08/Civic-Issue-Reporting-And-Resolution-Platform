@@ -22,12 +22,7 @@ function MiddleAdminDashboardPage() {
 
   const [recentIssues, setRecentIssues] = useState([]);
 
-  // ✅ AUTH GUARD
-  useEffect(() => {
-    if (!token) {
-      navigate("/login", { replace: true });
-    }
-  }, [token, navigate]);
+  // ✅ REMOVED: Auth guard - RequireAuth handles this now
 
   // ✅ FETCH MIDDLE ADMIN DASHBOARD DATA
   useEffect(() => {

@@ -20,7 +20,7 @@ import "./utils/axiosConfig";
 import ReportIssuePage from "./pages/ReportIssue/ReportIssuePage";
 import ViewIssuePage from "./pages/ViewIssue/ViewIssuePage";
 import ContactPage from "./pages/contact/ContactPage";
-import MainGalleryPage from "./pages/gallery/MainGalleryPage";
+import MainGalleryPage from "./pages/gallary/MainGalleryPage";
 
 // Login routes
 import AdminLoginPage from "./pages/Login/AdminLoginPage";

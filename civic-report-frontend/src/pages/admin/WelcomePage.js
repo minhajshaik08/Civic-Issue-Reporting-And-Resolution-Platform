@@ -13,6 +13,8 @@ function WelcomePage() {
   const token = localStorage.getItem("token");
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
+  // ✅ REMOVED: Token redirect check - RequireAuth handles this now
+
   // ✅ REAL DASHBOARD DATA
   const [stats, setStats] = useState({
     totalIssues: 0,
@@ -22,13 +24,6 @@ function WelcomePage() {
   });
 
   const [recentIssues, setRecentIssues] = useState([]);
-
-  // ✅ IF NO TOKEN, REDIRECT TO LOGIN
-  useEffect(() => {
-    if (!token) {
-      navigate("/login", { replace: true });
-    }
-  }, [token, navigate]);
 
   // ✅ FETCH DASHBOARD DATA
   useEffect(() => {

@@ -2,24 +2,29 @@ import React, { useState } from "react";
 import { Card, Form, Button, Row, Col, Alert } from "react-bootstrap";
 
 function OfficerProfileSettingsPage() {
-  // Read logged-in user from localStorage (saved at login)
-  const storedUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+  const [userData, setUserData] = useState(() =>
+    JSON.parse(localStorage.getItem("user") || "{}")
+  );
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Form state
-  const [username, setUsername] = useState(storedUser.username || "");
-  const [fullName, setFullName] = useState(storedUser.full_name || "");
-  const [phone, setPhone] = useState(storedUser.phone || "");
-  const [photoFile, setPhotoFile] = useState(null);
+  const [username, setUsername] = useState(userData.username || "");
+  const [name, setName] = useState(userData.name || "");
+  const [mobile, setMobile] = useState(userData.mobile || "");
 
-  const email = storedUser.email || "";
-  const role = storedUser.role || "officer";
-  const userId = storedUser.id;
+  const email = userData.email;
+  const userId = userData.id;
 
+  const avatarLetter =
+    (email && email[0]) ||
+    (name && name[0]) ||
+    (username && username[0]) ||
+    "O";
+
+  /* ================= UPDATE PROFILE ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -27,197 +32,157 @@ function OfficerProfileSettingsPage() {
     setLoading(true);
 
     try {
-      // For officers, always use "officers" table
-      const table = "officers";
-
-      // Check if username already exists (call backend endpoint)
-      const checkRes = await fetch(
-        `http://localhost:5000/api/login/check-username?username=${encodeURIComponent(
-          username
-        )}&excludeId=${userId}&table=${table}`
-      );
-      const checkData = await checkRes.json();
-
-      if (!checkData.available) {
-        setError("Username already exists. Please choose another.");
-        setLoading(false);
+      if (!userId) {
+        setError("User not found. Please login again.");
         return;
       }
 
-      // Build FormData for file upload
-      const formData = new FormData();
-      formData.append("id", userId);
-      formData.append("table", table);
-      formData.append("username", username);
-      formData.append("full_name", fullName);
-      formData.append("phone", phone);
-      if (photoFile) {
-        formData.append("photo", photoFile);
+      // Username uniqueness check
+      if (username !== userData.username) {
+        const checkRes = await fetch(
+          `http://localhost:5000/api/officer/settings/profile/check-username?username=${encodeURIComponent(
+            username
+          )}&excludeId=${userId}`
+        );
+
+        const checkData = await checkRes.json();
+        if (!checkData.available) {
+          setError("Username already exists.");
+          return;
+        }
       }
 
-      // Call backend PUT endpoint
-      const res = await fetch("http://localhost:5000/api/login/profile", {
-        method: "PUT",
-        body: formData,
-      });
+      const res = await fetch(
+        "http://localhost:5000/api/officer/settings/profile",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: userId,
+            username,
+            name,
+            mobile,
+          }),
+        }
+      );
 
       const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        setError(data.message || "Failed to update profile");
-        setLoading(false);
+      if (!data.success) {
+        setError(data.message || "Update failed");
         return;
       }
 
-      // Update localStorage with new data
-      const updatedUser = { ...storedUser, username, full_name: fullName, phone };
-      localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+      const updatedUser = {
+        ...userData,
+        username,
+        name,
+        mobile,
+      };
 
-      setSuccess("Profile updated successfully!");
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUserData(updatedUser);
+
+      setSuccess("✅ Profile updated successfully!");
       setIsEditing(false);
-      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError("Error updating profile. Please try again.");
       console.error(err);
+      setError("Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card className="p-4 shadow-sm">
-      <h4 className="mb-4">Profile Settings</h4>
+    <div className="p-4">
+      <Card className="p-4 mx-auto" style={{ maxWidth: 750 }}>
+        <h4>Profile Settings</h4>
 
-      {/* Display current email */}
-      <div className="mb-4 p-3 bg-light border rounded">
-        <p className="mb-0">
-          <strong>Current Email:</strong>{" "}
-          <span className="text-primary">{email}</span>
+        <p>
+          <strong>Email:</strong>{" "}
+          <span style={{ color: "#2563eb" }}>{email}</span>
         </p>
-      </div>
 
-      {error && (
-        <Alert variant="danger" className="mb-3">
-          {error}
-        </Alert>
-      )}
+        {error && <Alert variant="danger">{error}</Alert>}
+        {success && <Alert variant="success">{success}</Alert>}
 
-      {success && (
-        <Alert variant="success" className="mb-3">
-          {success}
-        </Alert>
-      )}
+        {!isEditing ? (
+          <>
+            <Row className="mb-4">
+              <Col md={3} className="text-center">
+                <div
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: "50%",
+                    background: "#e5e7eb",
+                    fontSize: 32,
+                    fontWeight: 800,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {avatarLetter}
+                </div>
+                <div className="mt-2 fw-bold">OFFICER</div>
+              </Col>
 
-      {!isEditing ? (
-        // View mode
-        <div>
-          <Row className="mb-4">
-            <Col md={3} className="text-center">
-              <div
-                style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: "50%",
-                  backgroundColor: "#e5e7eb",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 32,
-                  fontWeight: 600,
-                }}
-              >
-                {fullName ? fullName[0].toUpperCase() : "O"}
-              </div>
-            </Col>
-            <Col md={9}>
-              <p className="mb-1">
-                <strong>Role:</strong> {role}
-              </p>
-              <p className="text-muted">
-                Role is managed by the system and cannot be edited here.
-              </p>
-            </Col>
-          </Row>
+              <Col md={9}>
+                <p><b>Username:</b> {userData.username}</p>
+                <p><b>Name:</b> {userData.name}</p>
+                <p><b>Mobile:</b> {userData.mobile || "—"}</p>
+              </Col>
+            </Row>
 
-          <div className="mb-3">
-            <p>
-              <strong>Username:</strong> {username || "Not set"}
-            </p>
-            <p>
-              <strong>Full Name:</strong> {fullName || "Not set"}
-            </p>
-            <p>
-              <strong>Phone Number:</strong> {phone || "Not set"}
-            </p>
-          </div>
-
-          <Button variant="primary" onClick={() => setIsEditing(true)}>
-            Edit Profile
-          </Button>
-        </div>
-      ) : (
-        // Edit mode
-        <Form onSubmit={handleSubmit}>
-          <Row className="mb-3">
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label>Username</Form.Label>
+            <Button onClick={() => setIsEditing(true)}>
+              Edit Profile
+            </Button>
+          </>
+        ) : (
+          <Form onSubmit={handleSubmit}>
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Label>Username *</Form.Label>
                 <Form.Control
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter username"
                   required
                 />
-                <Form.Text className="text-muted">
-                  Unique identifier for your account
-                </Form.Text>
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label>Full Name</Form.Label>
+              </Col>
+
+              <Col md={6}>
+                <Form.Label>Name *</Form.Label>
                 <Form.Control
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                 />
-              </Form.Group>
-            </Col>
-          </Row>
+              </Col>
+            </Row>
 
-          <Row className="mb-3">
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label>Phone Number</Form.Label>
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Label>Mobile</Form.Label>
                 <Form.Control
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter phone number"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
                 />
-              </Form.Group>
-            </Col>
-          </Row>
+              </Col>
+            </Row>
 
-          <div className="d-flex gap-2">
-            <Button type="submit" variant="success" disabled={loading}>
+            <Button type="submit" disabled={loading}>
               {loading ? "Saving..." : "Save Changes"}
-            </Button>
+            </Button>{" "}
             <Button
               variant="secondary"
-              onClick={() => {
-                setIsEditing(false);
-                setError("");
-                setSuccess("");
-              }}
-              disabled={loading}
+              onClick={() => setIsEditing(false)}
             >
               Cancel
             </Button>
-          </div>
-        </Form>
-      )}
-    </Card>
+          </Form>
+        )}
+      </Card>
+    </div>
   );
 }
 

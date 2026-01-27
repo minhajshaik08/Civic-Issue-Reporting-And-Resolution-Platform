@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Form, Row, Col, Spinner, Button } from "react-bootstrap";
+import { Form, Spinner, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function OfficerIssuesList() {
@@ -11,15 +11,11 @@ function OfficerIssuesList() {
   const [rowStatus, setRowStatus] = useState({});
 
   const navigate = useNavigate();
-
-  // Read logged-in officer from localStorage
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const officerId = storedUser.id;
+  const officerId = JSON.parse(localStorage.getItem("user") || "{}")?.id;
 
   const loadIssues = async () => {
     if (!officerId) {
       setError("Officer id not found. Please login again.");
-      setIssues([]);
       return;
     }
 
@@ -27,35 +23,26 @@ function OfficerIssuesList() {
       setLoading(true);
       setError("");
 
-      const params = new URLSearchParams();
-      params.append("officer_id", officerId);
+      const params = new URLSearchParams({ officer_id: officerId });
       if (statusFilter) params.append("status", statusFilter);
 
       const res = await fetch(
-        "http://localhost:5000/api/officer/issues" +
-          (params.toString() ? "?" + params.toString() : "")
+        "http://localhost:5000/api/officer/issues?" + params.toString()
       );
-
       const data = await res.json();
 
       if (!res.ok || !data.success) {
         setError(data.message || "Failed to load issues");
-        setIssues([]);
         return;
       }
 
-      const list = data.issues || [];
-      setIssues(list);
+      setIssues(data.issues || []);
 
       const initial = {};
-      list.forEach((iss) => {
-        initial[iss.id] = iss.status;
-      });
+      (data.issues || []).forEach(i => (initial[i.id] = i.status));
       setRowStatus(initial);
-    } catch (err) {
-      console.error("Error loading issues:", err);
+    } catch {
       setError("Error loading issues");
-      setIssues([]);
     } finally {
       setLoading(false);
     }
@@ -63,59 +50,139 @@ function OfficerIssuesList() {
 
   useEffect(() => {
     loadIssues();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [officerId, statusFilter]);
-
-  const handleRowStatusChange = (issueId, value) => {
-    setRowStatus((prev) => ({
-      ...prev,
-      [issueId]: value,
-    }));
-  };
+    // eslint-disable-next-line
+  }, [statusFilter]);
 
   const handleUpdateStatus = async (issueId) => {
-    const newStatus = rowStatus[issueId];
-    if (!newStatus) return;
-
     try {
       setSavingId(issueId);
-      setError("");
 
       const res = await fetch(
         `http://localhost:5000/api/officer/issues/${issueId}/status`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus, officer_id: officerId }),
+          body: JSON.stringify({
+            status: rowStatus[issueId],
+            officer_id: officerId,
+          }),
         }
       );
 
       const data = await res.json();
-
       if (!res.ok || !data.success) {
-        setError(data.message || "Failed to update status");
+        setError(data.message || "Update failed");
         return;
       }
 
-      setIssues((prev) =>
-        prev.map((iss) =>
-          iss.id === issueId ? { ...iss, status: newStatus } : iss
+      setIssues(prev =>
+        prev.map(i =>
+          i.id === issueId ? { ...i, status: rowStatus[issueId] } : i
         )
       );
-    } catch (err) {
+    } catch {
       setError("Error updating status");
     } finally {
       setSavingId(null);
     }
   };
 
-  return (
-    <div>
-      <h3 className="mb-3">My Assigned Issues</h3>
+  const statusClass = (st) => {
+    if (st === "NEW") return "status-pill st-new";
+    if (st === "VIEWED") return "status-pill st-viewed";
+    if (st === "VERIFIED") return "status-pill st-verified";
+    if (st === "IN_PROGRESS") return "status-pill st-progress";
+    if (st === "SOLVED") return "status-pill st-solved";
+    return "status-pill";
+  };
 
-      <Row className="mb-3">
-        <Col md={3}>
+  return (
+    <>
+      {/* ✅ SAME CSS AS MIDDLE ADMIN */}
+      <style>{`
+        .issues-page {
+          background: #f6fbfb;
+          min-height: 100vh;
+          padding: 20px;
+        }
+
+        .issues-title {
+          font-size: 22px;
+          font-weight: 900;
+          margin-bottom: 14px;
+        }
+
+        .filters-row {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 14px;
+        }
+
+        .filter-select {
+          width: 260px;
+          padding: 10px;
+          border-radius: 10px;
+        }
+
+        .table-card {
+          background: #fff;
+          border-radius: 14px;
+          padding: 14px;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          overflow-x: auto;
+        }
+
+        .styled-table {
+          width: 100%;
+          min-width: 1100px;
+          border-collapse: collapse;
+        }
+
+        .styled-table thead tr {
+          background: #111827;
+          color: white;
+        }
+
+        .styled-table th,
+        .styled-table td {
+          padding: 12px 14px;
+          border-bottom: 1px solid #e5e7eb;
+          white-space: nowrap;
+          font-size: 14px;
+        }
+
+        .styled-table tbody tr:nth-child(even) {
+          background: #fafafa;
+        }
+
+        .styled-table tbody tr:hover {
+          background: #f1f5f9;
+        }
+
+        .status-pill {
+          padding: 6px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 900;
+        }
+
+        .st-new { background:#dbeafe;color:#1e40af }
+        .st-viewed { background:#e0e7ff;color:#3730a3 }
+        .st-verified { background:#dcfce7;color:#166534 }
+        .st-progress { background:#fef9c3;color:#854d0e }
+        .st-solved { background:#e9fff2;color:#15803d }
+
+        .btn-update {
+          font-weight: 900;
+        }
+      `}</style>
+
+      <div className="issues-page">
+        <h3 className="issues-title">My Assigned Issues</h3>
+
+        <div className="filters-row">
           <Form.Select
+            className="filter-select"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -126,86 +193,87 @@ function OfficerIssuesList() {
             <option value="IN_PROGRESS">In Progress</option>
             <option value="SOLVED">Solved</option>
           </Form.Select>
-        </Col>
-      </Row>
-
-      {loading && (
-        <div className="mb-3">
-          <Spinner animation="border" size="sm" /> Loading issues...
         </div>
-      )}
 
-      {error && <div className="text-danger mb-3">{error}</div>}
+        {loading && <Spinner animation="border" size="sm" />}
+        {error && <div className="text-danger">{error}</div>}
 
-      {!loading && !error && issues.length === 0 && (
-        <p>No issues assigned to you for this filter.</p>
-      )}
+        {!loading && issues.length > 0 && (
+          <div className="table-card">
+            <table className="styled-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Issue</th>
+                  <th>Status</th>
+                  <th>Change Status</th>
+                  <th>Location</th>
+                  <th>Created</th>
+                  <th>Update</th>
+                  <th>View</th>
+                </tr>
+              </thead>
 
-      {issues.length > 0 && (
-        <Table striped bordered hover size="sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Issue Type</th>
-              <th>Status</th>
-              <th>Change Status</th>
-              <th>Location</th>
-              <th>Created At</th>
-              <th>Update</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {issues.map((issue) => (
-              <tr key={issue.id}>
-                <td>{issue.id}</td>
-                <td>{issue.issue_type}</td>
-                <td>{issue.status}</td>
-                <td>
-                  <Form.Select
-                    size="sm"
-                    value={rowStatus[issue.id] || ""}
-                    onChange={(e) =>
-                      handleRowStatusChange(issue.id, e.target.value)
-                    }
-                  >
-                    <option value="">Select status</option>
-                    <option value="NEW">New</option>
-                    <option value="VIEWED">Viewed</option>
-                    <option value="VERIFIED">Verified</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="SOLVED">Solved</option>
-                  </Form.Select>
-                </td>
-                <td>{issue.location_text}</td>
-                <td>{issue.created_at}</td>
-                <td>
-                  <Button
-                    size="sm"
-                    variant="success"
-                    disabled={!rowStatus[issue.id] || savingId === issue.id}
-                    onClick={() => handleUpdateStatus(issue.id)}
-                  >
-                    {savingId === issue.id ? "Saving..." : "Update"}
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    size="sm"
-                    variant="primary"
-                    onClick={() =>
-                      navigate(`/officer/dashboard/issues/${issue.id}`)
-                    }
-                  >
-                    View
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
-    </div>
+              <tbody>
+                {issues.map(issue => (
+                  <tr key={issue.id}>
+                    <td>{issue.id}</td>
+                    <td>{issue.issue_type}</td>
+                    <td>
+                      <span className={statusClass(issue.status)}>
+                        {issue.status}
+                      </span>
+                    </td>
+                    <td>
+                      <Form.Select
+                        size="sm"
+                        value={rowStatus[issue.id]}
+                        onChange={e =>
+                          setRowStatus(p => ({
+                            ...p,
+                            [issue.id]: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">Select</option>
+                        <option value="NEW">New</option>
+                        <option value="VIEWED">Viewed</option>
+                        <option value="VERIFIED">Verified</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="SOLVED">Solved</option>
+                      </Form.Select>
+                    </td>
+                    <td>{issue.location_text}</td>
+                    <td>{issue.created_at}</td>
+                    <td>
+                      <Button
+                        size="sm"
+                        className="btn-update"
+                        disabled={savingId === issue.id}
+                        onClick={() => handleUpdateStatus(issue.id)}
+                      >
+                        {savingId === issue.id ? "Saving..." : "Update"}
+                      </Button>
+                    </td>
+                    <td>
+                      <Button
+                        size="sm"
+                        variant="outline-primary"
+                        onClick={() =>
+                          navigate(`/officer/dashboard/issues/${issue.id}`)
+                        }
+                      >
+                        View
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

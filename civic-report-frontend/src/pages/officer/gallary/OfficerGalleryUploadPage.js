@@ -1,205 +1,293 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Container, Card, Form, Button, Alert, Row, Col, Badge } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Form,
+  Button,
+  Alert,
+  Row,
+  Col,
+  Badge,
+} from "react-bootstrap";
 import axios from "axios";
 
-const getAuthToken = () => localStorage.getItem('token') || localStorage.getItem('authToken') || localStorage.getItem('jwt') || sessionStorage.getItem('token');
+const getAuthToken = () =>
+  localStorage.getItem("token") || sessionStorage.getItem("token");
 
-export default function OfficerGalleryUploadPage() {
-  const [imageFiles, setImageFiles] = useState([]);
-  const [status, setStatus] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+const OfficerGalleryUploadPage = () => {
   const [headline, setHeadline] = useState("");
+  const [beforeText, setBeforeText] = useState("");
+  const [afterText, setAfterText] = useState("");
+
+  const [beforeImages, setBeforeImages] = useState([]);
+  const [afterImages, setAfterImages] = useState([]);
+
+  const [beforePreviews, setBeforePreviews] = useState([]);
+  const [afterPreviews, setAfterPreviews] = useState([]);
+
+  const [employeeId, setEmployeeId] = useState(null);
   const [currentEmail, setCurrentEmail] = useState("");
-  const [employeeId, setEmployeeId] = useState(null);  // ✅ Employee ID from officers table
-  const [previewUrls, setPreviewUrls] = useState([]);
-  const [isReadyToUpload, setIsReadyToUpload] = useState(false);
-  const fileInputRef = useRef(null);
+  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // ✅ Load JWT email + get employee_id from backend
+  const beforeRef = useRef(null);
+  const afterRef = useRef(null);
+
+  /* ================= LOAD PROFILE ================= */
   useEffect(() => {
-    const loadUserProfile = async () => {
+    const loadProfile = async () => {
       const token = getAuthToken();
-      
-      if (!token) {
-        setStatus("⚠️ Login from dashboard first");
-        return;
-      }
+      if (!token) return;
 
-      try {
-        // Parse JWT for email
-        const payload = token.split('.')[1];
-        const decoded = JSON.parse(atob(payload + '==='.slice((payload.length + 3) % 4)));
-        const email = decoded.email;
-        setCurrentEmail(email);
-        console.log('📧 JWT email:', email);
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      setCurrentEmail(payload.email);
 
-        // ✅ Backend lookup: email → employee_id
-        const profileRes = await axios.get("http://localhost:5000/api/officer/gallary/profile", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+      const res = await axios.get(
+        "http://localhost:5000/api/officer/gallary/profile",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-        setEmployeeId(profileRes.data.employee_id);
-        setStatus(`✅ Employee ID: ${profileRes.data.employee_id}`);
-        setIsReadyToUpload(true);
-        console.log('✅ Backend employee_id:', profileRes.data.employee_id);
-
-      } catch (err) {
-        console.error('Profile error:', err.response?.data || err);
-        setStatus(`❌ ${err.response?.data?.message || 'Officer not found'}`);
-        setEmployeeId(null);
-      }
+      setEmployeeId(res.data.employee_id);
     };
 
-    loadUserProfile();
+    loadProfile();
   }, []);
 
+  /* ================= PREVIEWS ================= */
   useEffect(() => {
-    const urls = imageFiles.map(file => URL.createObjectURL(file));
-    setPreviewUrls(urls);
+    const urls = beforeImages.map((f) => URL.createObjectURL(f));
+    setBeforePreviews(urls);
     return () => urls.forEach(URL.revokeObjectURL);
-  }, [imageFiles]);
+  }, [beforeImages]);
 
-  const handleFileChange = (e) => {
+  useEffect(() => {
+    const urls = afterImages.map((f) => URL.createObjectURL(f));
+    setAfterPreviews(urls);
+    return () => urls.forEach(URL.revokeObjectURL);
+  }, [afterImages]);
+
+  const handleImageChange = (e, type) => {
     const files = Array.from(e.target.files)
-      .filter(f => f.size <= 5 * 1024 * 1024 && f.type.startsWith('image/'))
-      .slice(0, 10);
-    setImageFiles(files);
-  };
+      .filter(
+        (f) => f.type.startsWith("image/") && f.size <= 5 * 1024 * 1024
+      )
+      .slice(0, 5);
 
-  const removeImage = (index) => {
-    setImageFiles(files => files.filter((_, i) => i !== index));
+    type === "before" ? setBeforeImages(files) : setAfterImages(files);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!employeeId) {
-      setStatus("❌ Officer profile required");
-      return;
-    }
-    if (!headline.trim()) {
-      setStatus("❌ Enter title");
-      return;
-    }
-    if (!imageFiles.length) {
-      setStatus("❌ Select images");
+
+    if (!employeeId || !headline || !beforeText || !afterText) {
+      setStatus("❌ All fields are required");
       return;
     }
 
-    setIsLoading(true);
-    setStatus("⏳ Uploading images...");
+    setLoading(true);
+    setStatus("⏳ Uploading gallery...");
 
     const token = getAuthToken();
     const formData = new FormData();
-    imageFiles.forEach(file => formData.append("images", file));
-    formData.append("headline", headline.trim());
+
+    formData.append("headline", headline);
+    formData.append("beforesolve", beforeText);
+    formData.append("afteresolve", afterText);
+
+    beforeImages.forEach((img) => formData.append("beforeImages", img));
+    afterImages.forEach((img) => formData.append("afterImages", img));
 
     try {
-      const res = await axios.post("http://localhost:5000/api/officer/gallary/upload", formData, {
-        headers: { 
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
-        },
-        timeout: 60000
-      });
+      const res = await axios.post(
+        "http://localhost:5000/api/officer/gallary/upload",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       setStatus(`✅ ${res.data.message}`);
-      setImageFiles([]);
       setHeadline("");
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      setTimeout(() => setStatus(""), 3000);
-      
-    } catch (err) {
-      setStatus(`❌ ${err.response?.data?.message || 'Upload failed'}`);
+      setBeforeText("");
+      setAfterText("");
+      setBeforeImages([]);
+      setAfterImages([]);
+      if (beforeRef.current) beforeRef.current.value = "";
+      if (afterRef.current) afterRef.current.value = "";
+    } catch {
+      setStatus("❌ Upload failed");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const isUploadReady = employeeId && headline.trim() && imageFiles.length > 0 && !isLoading;
-
   return (
-    <Container style={{ maxWidth: "900px", margin: "20px auto" }}>
-      <Card className="shadow-lg border-0">
-        <Card.Body className="p-4">
-          <h4 className="mb-3">📸 <strong>Officer Gallery</strong></h4>
+    <>
+      {/* ===== MEDIUM SIZE STYLES (IssueDetails-like) ===== */}
+      <style>{`
+        .gallery-page {
+          background: #f6fbfb;
+          min-height: 100vh;
+          padding: 16px;
+        }
 
-          {/* ✅ EMPLOYEE ID DISPLAY (from officers table) */}
-          <div className={`mb-4 p-3 rounded-3 ${employeeId ? 'bg-success-subtle' : 'bg-warning-subtle'}`}>
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <strong>👤 {currentEmail}</strong><br/>
-                <Badge bg="primary" className="mt-2 fs-6 px-4 py-2">
-                  Employee ID: <strong>{employeeId || "Loading..."}</strong>
-                </Badge>
-              </div>
-              <Badge bg={employeeId ? "success" : "secondary"} className="fs-6 px-3 py-2">
-                {employeeId ? "Verified" : "Checking..."}
-              </Badge>
-            </div>
-          </div>
+        .gallery-card {
+          background: #fff;
+          border-radius: 14px;
+          padding: 16px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+          max-width: 900px;
+          margin: auto;
+        }
+
+        .gallery-title {
+          font-size: 20px;
+          font-weight: 900;
+          margin-bottom: 12px;
+        }
+
+        .gallery-field {
+          background: #f8fafc;
+          border: 1px solid #e5e7eb;
+          border-radius: 10px;
+          padding: 10px;
+          margin-bottom: 12px;
+        }
+
+        .gallery-label {
+          font-size: 11px;
+          font-weight: 800;
+          color: #6b7280;
+          margin-bottom: 4px;
+          text-transform: uppercase;
+        }
+
+        .thumb-row {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          margin-top: 8px;
+        }
+
+        .thumb-img {
+          width: 100px;
+          height: 75px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 1px solid #e5e7eb;
+        }
+
+        .submit-btn {
+          width: 100%;
+          padding: 10px;
+          font-weight: 800;
+          border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+          .thumb-img {
+            width: 90px;
+            height: 70px;
+          }
+        }
+      `}</style>
+
+      <div className="gallery-page">
+        <div className="gallery-card">
+          <div className="gallery-title">Before / After Gallery</div>
+
+          <Badge bg="primary" className="mb-2">
+            Employee ID: {employeeId || "Loading..."}
+          </Badge>
 
           {status && (
-            <Alert variant={status.includes("✅") ? "success" : "danger"} dismissible 
-              onClose={() => setStatus("")} className="mb-4">
+            <Alert
+              variant={status.includes("✅") ? "success" : "danger"}
+              className="py-2"
+            >
               {status}
             </Alert>
           )}
 
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-4">
-              <Form.Label className="fw-bold">📰 Gallery Title <span className="text-danger">*</span></Form.Label>
-              <Form.Control as="textarea" rows={3} value={headline} 
-                onChange={e => setHeadline(e.target.value)}
-                placeholder={`Gallery for Employee #${employeeId || ''}`}
-                maxLength={255} disabled={!employeeId || isLoading}
+            <div className="gallery-field">
+              <div className="gallery-label">Gallery Title</div>
+              <Form.Control
+                size="sm"
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
+                placeholder="Road repair before and after"
               />
-              <small className="text-muted">{headline.length}/255</small>
-            </Form.Group>
+            </div>
 
-            <Form.Group className="mb-4">
-              <Form.Label className="fw-bold">📷 Photos <span className="text-danger">*</span></Form.Label>
-              <Form.Control type="file" accept="image/*" multiple ref={fileInputRef}
-                onChange={handleFileChange} disabled={!employeeId || isLoading} />
-              <small className="text-muted">Max 10 images, 5MB each</small>
-            </Form.Group>
+            <div className="gallery-field">
+              <div className="gallery-label">Before Resolve</div>
+              <Form.Control
+                as="textarea"
+                rows={2}
+                size="sm"
+                value={beforeText}
+                onChange={(e) => setBeforeText(e.target.value)}
+              />
+              <Form.Control
+                type="file"
+                size="sm"
+                multiple
+                accept="image/*"
+                ref={beforeRef}
+                className="mt-1"
+                onChange={(e) => handleImageChange(e, "before")}
+              />
 
-            {imageFiles.length > 0 && (
-              <div className="mb-4">
-                <h6>✅ {imageFiles.length}/10 selected</h6>
-                <Row>
-                  {imageFiles.map((file, index) => (
-                    <Col xs={6} sm={4} md={3} lg={2} key={index} className="mb-3">
-                      <div className="position-relative">
-                        <img src={previewUrls[index]} alt={`Preview ${index}`} 
-                          className="img-thumbnail w-100" style={{height: "130px", objectFit: "cover"}} />
-                        <Button variant="danger" size="sm" className="position-absolute top-0 end-0 m-1"
-                          onClick={() => removeImage(index)} disabled={isLoading}>×</Button>
-                      </div>
-                    </Col>
-                  ))}
-                </Row>
+              <div className="thumb-row">
+                {beforePreviews.map((src, i) => (
+                  <img key={i} src={src} className="thumb-img" />
+                ))}
               </div>
-            )}
+            </div>
 
-            <Button type="submit" className="w-100 btn-lg" variant="primary" disabled={!isUploadReady}>
-              {isLoading ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2"></span>
-                  Uploading...
-                </>
-              ) : (
-                `📤 Save Gallery (${imageFiles.length || 0} images)`
-              )}
+            <div className="gallery-field">
+              <div className="gallery-label">After Resolve</div>
+              <Form.Control
+                as="textarea"
+                rows={2}
+                size="sm"
+                value={afterText}
+                onChange={(e) => setAfterText(e.target.value)}
+              />
+              <Form.Control
+                type="file"
+                size="sm"
+                multiple
+                accept="image/*"
+                ref={afterRef}
+                className="mt-1"
+                onChange={(e) => handleImageChange(e, "after")}
+              />
+
+              <div className="thumb-row">
+                {afterPreviews.map((src, i) => (
+                  <img key={i} src={src} className="thumb-img" />
+                ))}
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              variant="success"
+              className="submit-btn"
+              disabled={loading}
+            >
+              {loading ? "Uploading..." : "Save Gallery"}
             </Button>
           </Form>
-
-          <div className="mt-4 p-3 bg-light rounded">
-            <strong>🔒 Employee #{employeeId || '?'}</strong><br/>
-            <small>Private gallery • officers table verified</small>
-          </div>
-        </Card.Body>
-      </Card>
-    </Container>
+        </div>
+      </div>
+    </>
   );
-}
+};
+
+export default OfficerGalleryUploadPage;
