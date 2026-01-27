@@ -17,6 +17,7 @@ export default function EditOfficerForm() {
     role: "",
     password: "",
   });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +38,11 @@ export default function EditOfficerForm() {
   }, [officer]);
 
   if (!officer) {
-    return <p style={{ padding: "1rem", color: "red" }}>No officer data to edit.</p>;
+    return (
+      <p style={{ padding: "1rem", color: "red", fontWeight: 700 }}>
+        No officer data to edit.
+      </p>
+    );
   }
 
   const handleChange = (e) => {
@@ -48,28 +53,55 @@ export default function EditOfficerForm() {
     e.preventDefault();
     setError("");
 
-    if (!form.name.trim() || !form.email.trim() || !form.mobile.trim()) {
-      setError("Name, Email and Mobile are required.");
+    // ✅ Mandatory fields
+    if (
+      !form.name.trim() ||
+      !form.mobile.trim() ||
+      !form.department.trim()
+    ) {
+      setError("Name, Mobile and Department are required.");
       return;
     }
 
-    if (form.password && form.password.length > 0 && form.password.length < 6) {
+    // ✅ Optional password validation
+    if (form.password.trim() && form.password.trim().length < 6) {
       setError("Password must be at least 6 characters if provided.");
       return;
     }
 
     setLoading(true);
+
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/officers/edit/${officer.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      // ✅ Only editable values sent
+      const payload = {
+        name: form.name.trim(),
+        designation: form.designation.trim(),
+        department: form.department.trim(),
+        zone: form.zone.trim(),
+        mobile: form.mobile.trim(),
+        role: form.role.trim(),
+      };
+
+      // ✅ update password only if entered
+      if (form.password.trim()) {
+        payload.password = form.password.trim();
+      }
+
+      const res = await fetch(
+        `http://localhost:5000/api/admin/officers/edit/${officer.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
       const data = await res.json();
+
       if (!data.success) {
         setError(data.message || "Failed to update officer.");
       } else {
-        alert("Officer updated successfully.");
+        alert("✅ Officer updated successfully.");
         navigate("/admin/welcome/officers/edit");
       }
     } catch {
@@ -80,133 +112,287 @@ export default function EditOfficerForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-4 rounded shadow-sm bg-white"
-      style={{ maxWidth: "600px" }}
-    >
-      <h3 className="mb-3">Edit Officer Details</h3>
+    <>
+      {/* ✅ CSS INSIDE SAME FILE */}
+      <style>{`
+        .edit-wrapper {
+          min-height: 100vh;
+          background: #f6fbfb;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+        }
 
-      {error && <p className="text-danger mb-2">{error}</p>}
+        .edit-card {
+          width: 100%;
+          max-width: 680px;
+          background: #ffffff;
+          padding: 22px;
+          border-radius: 16px;
+          box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.08);
+        }
 
-      <div className="mb-3">
-        <label className="form-label">Name *</label>
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          className="form-control"
-          required
-          disabled={loading}
-        />
+        .edit-title {
+          margin: 0;
+          font-weight: 900;
+          font-size: 22px;
+          color: #111827;
+          text-align: center;
+        }
+
+        .edit-subtitle {
+          margin-top: 6px;
+          font-size: 13px;
+          color: #6b7280;
+          text-align: center;
+          margin-bottom: 18px;
+          font-weight: 600;
+        }
+
+        .error-box {
+          background: #fee2e2;
+          border: 1px solid #fecaca;
+          color: #991b1b;
+          padding: 10px 12px;
+          border-radius: 12px;
+          font-weight: 700;
+          margin-bottom: 14px;
+          font-size: 14px;
+        }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .form-group label {
+          font-weight: 700;
+          color: #111827;
+          font-size: 13px;
+        }
+
+        .form-group input {
+          padding: 10px 12px;
+          border-radius: 10px;
+          border: 1px solid #d1d5db;
+          outline: none;
+          font-size: 14px;
+          background: white;
+        }
+
+        .form-group input:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        /* ✅ read-only look */
+        .readonly {
+          background: #f3f4f6 !important;
+          cursor: not-allowed;
+          color: #6b7280;
+          font-weight: 700;
+        }
+
+        .full-width {
+          grid-column: 1 / -1;
+        }
+
+        .hint {
+          font-size: 12px;
+          color: #6b7280;
+          font-weight: 600;
+          margin-top: -2px;
+        }
+
+        .actions-row {
+          display: flex;
+          gap: 10px;
+          margin-top: 16px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .btn-primary-custom {
+          border: none;
+          background: #2563eb;
+          color: #fff;
+          padding: 10px 18px;
+          border-radius: 12px;
+          font-weight: 800;
+          cursor: pointer;
+          min-width: 150px;
+        }
+
+        .btn-primary-custom:hover {
+          opacity: 0.9;
+        }
+
+        .btn-secondary-custom {
+          border: 1px solid #d1d5db;
+          background: #ffffff;
+          color: #111827;
+          padding: 10px 18px;
+          border-radius: 12px;
+          font-weight: 800;
+          cursor: pointer;
+          min-width: 150px;
+        }
+
+        .btn-secondary-custom:hover {
+          background: #f3f4f6;
+        }
+
+        .btn-primary-custom:disabled,
+        .btn-secondary-custom:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+          .form-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <div className="edit-wrapper">
+        <form className="edit-card" onSubmit={handleSubmit}>
+          <h3 className="edit-title">Edit Officer Details</h3>
+          <p className="edit-subtitle">
+            Email & Employee ID are read-only ✅ | Department is mandatory ✅
+          </p>
+
+          {error && <div className="error-box">{error}</div>}
+
+          <div className="form-grid">
+            <div className="form-group">
+              <label>Name *</label>
+              <input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Designation</label>
+              <input
+                name="designation"
+                value={form.designation}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Department *</label>
+              <input
+                name="department"
+                value={form.department}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                placeholder="Enter department"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Zone</label>
+              <input
+                name="zone"
+                value={form.zone}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Mobile *</label>
+              <input
+                name="mobile"
+                value={form.mobile}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            {/* ✅ READ ONLY EMAIL */}
+            <div className="form-group">
+              <label>Email (Read Only)</label>
+              <input
+                name="email"
+                value={form.email}
+                disabled
+                className="readonly"
+              />
+            </div>
+
+            {/* ✅ READ ONLY EMPLOYEE ID */}
+            <div className="form-group">
+              <label>Employee ID (Read Only)</label>
+              <input
+                name="employeeId"
+                value={form.employeeId}
+                disabled
+                className="readonly"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Role</label>
+              <input
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group full-width">
+              <label>New Password (Optional)</label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                disabled={loading}
+                placeholder="Leave blank to keep current password"
+              />
+              <div className="hint">Minimum 6 characters if changing.</div>
+            </div>
+          </div>
+
+          <div className="actions-row">
+            <button
+              type="submit"
+              className="btn-primary-custom"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </button>
+
+            <button
+              type="button"
+              className="btn-secondary-custom"
+              disabled={loading}
+              onClick={() => navigate("/admin/welcome/officers/edit")}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
-
-      <div className="mb-3">
-        <label className="form-label">Designation</label>
-        <input
-          name="designation"
-          value={form.designation}
-          onChange={handleChange}
-          className="form-control"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Department</label>
-        <input
-          name="department"
-          value={form.department}
-          onChange={handleChange}
-          className="form-control"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Zone</label>
-        <input
-          name="zone"
-          value={form.zone}
-          onChange={handleChange}
-          className="form-control"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Mobile *</label>
-        <input
-          name="mobile"
-          value={form.mobile}
-          onChange={handleChange}
-          className="form-control"
-          required
-          disabled={loading}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Email *</label>
-        <input
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          className="form-control"
-          required
-          disabled={loading}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Employee ID</label>
-        <input
-          name="employeeId"
-          value={form.employeeId}
-          onChange={handleChange}
-          className="form-control"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Role</label>
-        <input
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          className="form-control"
-          disabled={loading}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">New Password (Optional)</label>
-        <input
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          className="form-control"
-          disabled={loading}
-          placeholder="Leave blank to keep current password"
-        />
-        <small className="text-muted">Minimum 6 characters if changing.</small>
-      </div>
-
-      <div className="mt-3 d-flex gap-2">
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? "Saving..." : "Save Changes"}
-        </button>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          disabled={loading}
-          onClick={() => navigate("/admin/welcome/officers/edit")}
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+    </>
   );
 }

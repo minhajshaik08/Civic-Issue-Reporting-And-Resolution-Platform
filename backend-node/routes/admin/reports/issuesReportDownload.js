@@ -2,6 +2,7 @@ const express = require("express");
 const mysql = require("mysql2/promise");
 const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
+
 const router = express.Router();
 
 const dbConfig = {
@@ -11,31 +12,61 @@ const dbConfig = {
   database: "civicreport",
 };
 
-// Helper: get filtered issues based on period, search, status
-const getFilteredIssues = async (period = "daily", search = "", status = "") => {
-  let days = 1;
-  if (period === "weekly") days = 7;
-  if (period === "monthly") days = 30;
-
+// ✅ Helper: get filtered issues based on period, month, search, status
+const getFilteredIssues = async (
+  period = "daily",
+  month = "",
+  search = "",
+  status = ""
+) => {
   const connection = await mysql.createConnection(dbConfig);
 
-  let sql =
-    "SELECT * FROM report_issues WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)";
-  const params = [days];
+  let sql = `
+    SELECT id, issue_type, status, location_text, full_name, created_at
+    FROM report_issues
+    WHERE 1=1
+  `;
+  const params = [];
 
+  // ✅ PERIOD FILTER
+  if (period === "daily") {
+    sql += ` AND DATE(created_at) = CURDATE() `;
+  } else if (period === "weekly") {
+    sql += ` AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) `;
+  } else if (period === "monthly") {
+    if (month) {
+      // ✅ month must be YYYY-MM
+      sql += ` AND DATE_FORMAT(created_at, '%Y-%m') = ? `;
+      params.push(month);
+    } else {
+      // fallback current month
+      sql += ` AND DATE_FORMAT(created_at, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m') `;
+    }
+  } else if (period === "all") {
+    // ✅ no date filter, return all records
+  } else {
+    // fallback today
+    sql += ` AND DATE(created_at) = CURDATE() `;
+  }
+
+  // ✅ SEARCH FILTER
   if (search) {
-    sql +=
-      " AND (issue_type LIKE ? OR location_text LIKE ? OR full_name LIKE ?)";
+    sql += ` AND (
+      issue_type LIKE ? OR
+      location_text LIKE ? OR
+      full_name LIKE ?
+    ) `;
     const like = `%${search}%`;
     params.push(like, like, like);
   }
 
+  // ✅ STATUS FILTER
   if (status) {
-    sql += " AND status = ?";
+    sql += ` AND status = ? `;
     params.push(status);
   }
 
-  sql += " ORDER BY created_at DESC";
+  sql += ` ORDER BY created_at DESC `;
 
   const [rows] = await connection.execute(sql, params);
   await connection.end();
@@ -43,31 +74,44 @@ const getFilteredIssues = async (period = "daily", search = "", status = "") => 
   return rows;
 };
 
-// GET /api/admin/reports/issues/download?period=...&status=...&search=...&format=pdf|excel
+// ✅ GET /api/admin/reports/issues/download?period=all|daily|weekly|monthly&month=YYYY-MM&status=...&search=...&format=pdf|excel
 router.get("/download", async (req, res) => {
-  const { period = "daily", search = "", status = "", format = "pdf" } =
-    req.query;
+  const {
+    period = "daily",
+    month = "",
+    search = "",
+    status = "",
+    format = "pdf",
+  } = req.query;
 
   try {
-    const issues = await getFilteredIssues(period, search, status);
+    const issues = await getFilteredIssues(period, month, search, status);
 
+    // ✅ filename
+    const today = new Date().toISOString().split("T")[0];
+    let fileSuffix = period;
+
+    if (period === "monthly" && month) {
+      fileSuffix = `month_${month}`;
+    }
+
+    // ✅ EXCEL DOWNLOAD
     if (format === "excel") {
-      // Generate Excel
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Issues Report");
 
-      // Add headers
       worksheet.columns = [
+        { header: "S.No", key: "sno", width: 8 },
         { header: "ID", key: "id", width: 10 },
-        { header: "Issue Type", key: "issue_type", width: 15 },
-        { header: "Status", key: "status", width: 15 },
-        { header: "Area", key: "location_text", width: 30 },
-        { header: "Reported At", key: "created_at", width: 25 },
+        { header: "Issue Type", key: "issue_type", width: 18 },
+        { header: "Status", key: "status", width: 14 },
+        { header: "Area", key: "location_text", width: 35 },
+        { header: "Reported At", key: "created_at", width: 22 },
       ];
 
-      // Add rows
-      issues.forEach((issue) => {
+      issues.forEach((issue, index) => {
         worksheet.addRow({
+          sno: index + 1,
           id: issue.id,
           issue_type: issue.issue_type,
           status: issue.status,
@@ -76,12 +120,12 @@ router.get("/download", async (req, res) => {
         });
       });
 
-      // Set header styling
+      // ✅ header styling
       worksheet.getRow(1).font = { bold: true };
       worksheet.getRow(1).fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "FFD3D3D3" },
+        fgColor: { argb: "FFE5E7EB" },
       };
 
       res.setHeader(
@@ -90,58 +134,77 @@ router.get("/download", async (req, res) => {
       );
       res.setHeader(
         "Content-Disposition",
-        `attachment; filename="issues_report_${new Date()
-          .toISOString()
-          .split("T")[0]}.xlsx"`
+        `attachment; filename="issues_report_${fileSuffix}_${today}.xlsx"`
       );
 
       await workbook.xlsx.write(res);
-      res.end();
-    } else {
-      // Generate PDF
-      const doc = new PDFDocument();
+      return res.end();
+    }
 
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="issues_report_${new Date()
-          .toISOString()
-          .split("T")[0]}.pdf"`
+    // ✅ PDF DOWNLOAD
+    const doc = new PDFDocument({ margin: 30, size: "A4" });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="issues_report_${fileSuffix}_${today}.pdf"`
+    );
+
+    doc.pipe(res);
+
+    doc.fontSize(18).text("Issues Report", { align: "center" });
+    doc.moveDown(0.5);
+
+    doc.fontSize(10).text(`Generated: ${new Date().toLocaleString("en-IN")}`, {
+      align: "center",
+    });
+
+    doc
+      .fontSize(10)
+      .text(
+        `Period: ${period.toUpperCase()}${
+          period === "monthly" && month ? ` (${month})` : ""
+        } | Status: ${status || "All"} | Search: ${search || "None"}`,
+        { align: "center" }
       );
 
-      doc.pipe(res);
+    doc.moveDown(1);
 
-      doc.fontSize(16).text("Issues Report", { align: "center" });
-      doc.fontSize(10).text(`Generated: ${new Date().toLocaleString()}`, {
-        align: "center",
-      });
-      doc.text(`Period: ${period} | Status: ${status || "All"}\n`, {
-        align: "center",
-      });
+    doc.fontSize(11).text(`Total Records: ${issues.length}`, {
+      align: "left",
+    });
 
-      // Table headers
-      doc
-        .fontSize(10)
-        .text(
-          "ID | Type | Status | Area | Date",
-          { underline: true }
-        );
+    doc.moveDown(0.5);
 
-      // Table rows
-      issues.forEach((issue) => {
-        doc.fontSize(8).text(
-          `${issue.id} | ${issue.issue_type} | ${issue.status} | ${issue.location_text.substring(
-            0,
-            20
-          )}... | ${issue.created_at}`
-        );
-      });
+    // ✅ table header
+    doc.fontSize(10).text("S.No | ID | Type | Status | Area | Date", {
+      underline: true,
+    });
 
-      doc.end();
-    }
+    doc.moveDown(0.4);
+
+    // ✅ table rows
+    issues.forEach((issue, index) => {
+      const area =
+        issue.location_text && issue.location_text.length > 18
+          ? issue.location_text.substring(0, 18) + "..."
+          : issue.location_text || "-";
+
+      const dateText = issue.created_at
+        ? new Date(issue.created_at).toLocaleString("en-IN")
+        : "-";
+
+      doc.fontSize(9).text(
+        `${index + 1} | ${issue.id} | ${issue.issue_type} | ${
+          issue.status
+        } | ${area} | ${dateText}`
+      );
+    });
+
+    doc.end();
   } catch (err) {
     console.error("DOWNLOAD REPORT ERROR:", err);
-    res
+    return res
       .status(500)
       .json({ success: false, message: "Error generating report" });
   }

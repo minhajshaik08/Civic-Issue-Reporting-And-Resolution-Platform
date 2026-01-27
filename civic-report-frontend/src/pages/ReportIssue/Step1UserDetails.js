@@ -17,11 +17,19 @@ function Step1UserDetails({
   verifying,
   canResendIn,
   onSendOtp,
-  onVerifyNext
+
+  // ✅ NEW
+  onVerifyOtp,
+  otpVerified,
+  otpVerifyMsg,
+
+  // ✅ Next step
+  onNext,
 }) {
   return (
     <>
       <h5 className="mb-3">Your Information</h5>
+
       <Form>
         <Form.Group className="mb-3">
           <Form.Label>Full Name *</Form.Label>
@@ -51,7 +59,9 @@ function Step1UserDetails({
 
         <Form.Group className="mb-3">
           <Form.Label>Verify Phone Number</Form.Label>
+
           <div className="d-flex gap-2 align-items-center">
+            {/* Send OTP */}
             <Button
               variant="outline-success"
               type="button"
@@ -64,6 +74,8 @@ function Step1UserDetails({
                 ? `Resend OTP in ${canResendIn}s`
                 : "Send OTP"}
             </Button>
+
+            {/* OTP Input */}
             <Form.Control
               type="text"
               maxLength={6}
@@ -75,26 +87,45 @@ function Step1UserDetails({
                 setOtpError("");
               }}
               isInvalid={!!otpError}
+              disabled={!otpSent || otpVerified}
             />
+
+            {/* ✅ Verify OTP Button */}
+            <Button
+              variant="primary"
+              type="button"
+              onClick={onVerifyOtp}
+              disabled={!otpSent || verifying || otpVerified}
+            >
+              {otpVerified ? "Verified " : verifying ? "Verifying..." : "Verify"}
+            </Button>
           </div>
-          {otpError && (
-            <div className="invalid-feedback d-block">{otpError}</div>
-          )}
-          {otpSent && !otpError && (
+
+          {/* OTP Error */}
+          {otpError && <div className="invalid-feedback d-block">{otpError}</div>}
+
+          {/* OTP Sent */}
+          {otpSent && !otpError && !otpVerified && (
             <small className="text-success">
               OTP sent successfully to your mobile number.
             </small>
           )}
+
+          {/* ✅ Verified Message */}
+          {otpVerified && otpVerifyMsg && (
+            <small className="text-success d-block mt-1">{otpVerifyMsg}</small>
+          )}
         </Form.Group>
 
+        {/* ✅ Next Button */}
         <div className="text-end mt-4">
           <Button
             variant="success"
             type="button"
-            onClick={onVerifyNext}
-            disabled={verifying}
+            onClick={onNext}
+            disabled={!otpVerified}
           >
-            {verifying ? "Verifying..." : "Next →"}
+            Next →
           </Button>
         </div>
       </Form>

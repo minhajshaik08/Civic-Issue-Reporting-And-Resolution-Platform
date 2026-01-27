@@ -143,7 +143,7 @@ function ViewIssuePage() {
   return (
     <div className="view-issue-container">
       <div className="view-issue-card">
-        <h2>📋 View Your Reported Issues</h2>
+        <h2>View Your Reported Issues</h2>
 
         {!otpSent && issues.length === 0 && (
           <div className="auth-section">
@@ -190,7 +190,7 @@ function ViewIssuePage() {
                 📱 OTP sent to <strong>{normalizeIndianPhone(phone)}</strong>
               </p>
               <p className="otp-hint">
-                Check your backend terminal for the OTP code
+                Check your mobile for the OTP code
               </p>
             </div>
 
@@ -208,7 +208,7 @@ function ViewIssuePage() {
                 disabled={verifying}
                 className="otp-input"
               />
-              <small className="input-hint">6-digit code from terminal</small>
+              <small className="input-hint">6-digit code from mobile</small>
             </div>
 
             {canResendIn > 0 && (

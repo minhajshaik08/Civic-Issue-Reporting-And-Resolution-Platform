@@ -1,5 +1,3 @@
-// civic-report-frontend/src/pages/ReportIssue/ReportIssuePage.js
-
 import React, { useState } from "react";
 import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -16,11 +14,19 @@ function ReportIssuePage() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
+
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
+
   const [otpSent, setOtpSent] = useState(false);
   const [sending, setSending] = useState(false);
+
   const [verifying, setVerifying] = useState(false);
+
+  // ✅ NEW: OTP Verified Status
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpVerifyMsg, setOtpVerifyMsg] = useState("");
+
   const [canResendIn, setCanResendIn] = useState(0);
 
   // step 2 – problem
@@ -58,11 +64,13 @@ function ReportIssuePage() {
     }, 1000);
   };
 
+  // ✅ SEND OTP
   const handleSendOtp = async () => {
     if (!fullName.trim()) {
       alert("Please enter your full name before continuing.");
       return;
     }
+
     if (!isValidIndianMobile(phone)) {
       setPhoneError(
         "Please enter a valid Indian mobile number starting with 6/7/8/9."
@@ -72,6 +80,11 @@ function ReportIssuePage() {
 
     setPhoneError("");
     setOtpError("");
+
+    // ✅ reset verification status when sending OTP again
+    setOtpVerified(false);
+    setOtpVerifyMsg("");
+
     setSending(true);
 
     try {
@@ -100,21 +113,23 @@ function ReportIssuePage() {
     }
   };
 
-  const handleVerifyAndNext = async () => {
+  // ✅ VERIFY OTP BUTTON
+  const handleVerifyOtp = async () => {
     if (!fullName.trim()) {
       alert("Please enter your full name before continuing.");
       return;
     }
+
     if (!isValidIndianMobile(phone)) {
-      setPhoneError(
-        "Please enter a valid Indian mobile number starting with 6/7/8/9."
-      );
+      setPhoneError("Please enter a valid Indian mobile number.");
       return;
     }
+
     if (!otp) {
       setOtpError("Please enter the 6-digit OTP sent to your phone.");
       return;
     }
+
     if (!/^\d{6}$/.test(otp)) {
       setOtpError("OTP must be 6 digits.");
       return;
@@ -122,6 +137,7 @@ function ReportIssuePage() {
 
     setOtpError("");
     setVerifying(true);
+
     try {
       const normalized = normalizeIndianPhone(phone);
 
@@ -134,17 +150,31 @@ function ReportIssuePage() {
       const data = await res.json();
 
       if (data.success) {
-        setStep(2);
+        setOtpVerified(true);
+        setOtpVerifyMsg("✅ Successfully Verified");
       } else {
+        setOtpVerified(false);
+        setOtpVerifyMsg("");
         setOtpError(
-          "Incorrect or expired OTP. Please check the code and try again, or request a new OTP."
+          "❌ Incorrect or expired OTP. Please try again or resend OTP."
         );
       }
     } catch (e) {
-      setOtpError("Verification failed. Please try again.");
+      setOtpVerified(false);
+      setOtpVerifyMsg("");
+      setOtpError("❌ Verification failed. Please try again.");
     } finally {
       setVerifying(false);
     }
+  };
+
+  // ✅ NEXT BUTTON (only after verified)
+  const handleNextStep = () => {
+    if (!otpVerified) {
+      setOtpError("Please verify OTP before going to next step.");
+      return;
+    }
+    setStep(2);
   };
 
   const handleSubmitAll = async () => {
@@ -174,6 +204,7 @@ function ReportIssuePage() {
         method: "POST",
         body: formData,
       });
+
       const data = await res.json();
 
       if (!data.success) {
@@ -187,6 +218,7 @@ function ReportIssuePage() {
 
     alert("Report submitted successfully!");
 
+    // reset everything
     setFullName("");
     setPhone("");
     setPhoneError("");
@@ -196,11 +228,16 @@ function ReportIssuePage() {
     setSending(false);
     setVerifying(false);
     setCanResendIn(0);
+
+    setOtpVerified(false);
+    setOtpVerifyMsg("");
+
     setIssueType("");
     setDescription("");
     setLocationText("");
     setPhotoFiles([]);
     setMapPosition(null);
+
     setStep(1);
     navigate("/");
   };
@@ -211,12 +248,13 @@ function ReportIssuePage() {
       <style>{`
         .report-wrapper {
           background-color: #e0f4ef;
-          min-height: 100vh;
-          padding: 60px 0 40px;
+          min-height: 90vh;
+          padding: 40px 0 40px;
         }
 
         .report-container {
           max-width: 760px;
+          
         }
 
         .report-card {
@@ -317,8 +355,8 @@ function ReportIssuePage() {
               Report a Community Issue
             </h2>
             <p className="text-center report-subtitle">
-              Help keep your city clean and safe by reporting problems directly
-              to the authorities in just three simple steps.
+              keep your city clean and safe by reporting problems directly to the
+              authorities in just three steps.
             </p>
 
             <div className="step-indicator">
@@ -332,6 +370,7 @@ function ReportIssuePage() {
                 <div className="step-indicator-dot">1</div>
                 <div className="step-indicator-label">User Details</div>
               </div>
+
               <div
                 className={
                   step === 2
@@ -342,6 +381,7 @@ function ReportIssuePage() {
                 <div className="step-indicator-dot">2</div>
                 <div className="step-indicator-label">Problem Details</div>
               </div>
+
               <div
                 className={
                   step === 3
@@ -364,7 +404,12 @@ function ReportIssuePage() {
                   phoneError={phoneError}
                   setPhoneError={setPhoneError}
                   otp={otp}
-                  setOtp={setOtp}
+                  setOtp={(val) => {
+                    setOtp(val);
+                    setOtpError("");
+                    setOtpVerified(false);
+                    setOtpVerifyMsg("");
+                  }}
                   otpError={otpError}
                   setOtpError={setOtpError}
                   otpSent={otpSent}
@@ -372,7 +417,10 @@ function ReportIssuePage() {
                   verifying={verifying}
                   canResendIn={canResendIn}
                   onSendOtp={handleSendOtp}
-                  onVerifyNext={handleVerifyAndNext}
+                  onVerifyOtp={handleVerifyOtp}
+                  otpVerified={otpVerified}
+                  otpVerifyMsg={otpVerifyMsg}
+                  onNext={handleNextStep}
                 />
               )}
 

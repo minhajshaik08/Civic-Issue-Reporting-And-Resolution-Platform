@@ -31,7 +31,7 @@ function Step2ProblemDetails({
             value={issueType}
             onChange={(e) => setIssueType(e.target.value)}
           >
-            <option value="">-- Select issue type --</option>
+            <option value="">Select issue type</option>
             <option value="Garbage">Garbage</option>
             <option value="Road Damage">Road Damage</option>
             <option value="Street Light">Street Light</option>

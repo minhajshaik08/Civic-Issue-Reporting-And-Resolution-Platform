@@ -7,8 +7,9 @@ export default function EditMiddleAdminForm() {
   const existingAdmin = location.state?.admin || null;
 
   const [username, setUsername] = useState(existingAdmin?.username || "");
-  const [email] = useState(existingAdmin?.email || ""); // usually not editable
+  const [email] = useState(existingAdmin?.email || ""); // ✅ read-only
   const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -68,67 +69,195 @@ export default function EditMiddleAdminForm() {
   };
 
   if (!existingAdmin) {
-    return <p style={{ color: "red" }}>{error || "No admin selected."}</p>;
+    return (
+      <div style={{ padding: "20px", color: "red", fontWeight: "600" }}>
+        {error || "No admin selected."}
+      </div>
+    );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-4 rounded shadow-sm bg-white"
-      style={{ maxWidth: "450px" }}
-    >
-      <h3 className="mb-3">Edit Middle Admin</h3>
-      {error && <p className="text-danger mb-2">{error}</p>}
+    <>
+      {/* ✅ CSS inside same file */}
+      <style>{`
+        .edit-wrapper {
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #f6fbfb;
+          padding: 10px;
+        }
 
-      <div className="mb-3">
-        <label className="form-label">Username *</label>
-        <input
-          type="text"
-          className="form-control"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          disabled={loading}
-          required
-        />
-      </div>
+        .edit-form-card {
+          width: 100%;
+          max-width: 480px;
+          background: white;
+          border-radius: 16px;
+          padding: 24px;
+          box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.08);
+        }
 
-      <div className="mb-3">
-        <label className="form-label">Email (read-only)</label>
-        <input type="email" className="form-control" value={email} disabled />
-      </div>
+        .edit-title {
+          font-size: 22px;
+          font-weight: 800;
+          text-align: center;
+          color: #111827;
+          margin-bottom: 6px;
+        }
 
-      <div className="mb-3">
-        <label className="form-label">New Password (optional)</label>
-        <input
-          type="password"
-          className="form-control"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={loading}
-          minLength={6}
-        />
-        <small className="text-muted">
-          Leave blank to keep the current password.
-        </small>
-      </div>
+        .edit-subtitle {
+          text-align: center;
+          color: #6b7280;
+          font-size: 14px;
+          margin-bottom: 16px;
+        }
 
-      <div className="mt-3 d-flex gap-2">
-        <button
-          type="submit"
-          className="btn btn-success"
-          disabled={loading}
-        >
-          {loading ? "Saving..." : "Save"}
-        </button>
-        <button
-          type="button"
-          className="btn btn-outline-secondary"
-          disabled={loading}
-          onClick={() => navigate("/admin/welcome/middle-admins/edit-list")}
-        >
-          Cancel
-        </button>
+        .edit-label {
+          font-weight: 700;
+          font-size: 14px;
+          margin-bottom: 6px;
+          display: block;
+          color: #111827;
+        }
+
+        .edit-input {
+          width: 100%;
+          padding: 10px 12px;
+          border-radius: 10px;
+          border: 1px solid #d1d5db;
+          outline: none;
+          font-size: 14px;
+        }
+
+        .edit-input:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .helper-text {
+          font-size: 12px;
+          color: #6b7280;
+          margin-top: 6px;
+        }
+
+        .error-box {
+          background: #fee2e2;
+          color: #991b1b;
+          padding: 10px 12px;
+          border-radius: 10px;
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 12px;
+        }
+
+        .btn-row {
+          display: flex;
+          gap: 10px;
+          margin-top: 18px;
+        }
+
+        .btn-save {
+          width: 50%;
+          background: #16a34a;
+          color: white;
+          border: none;
+          padding: 10px 12px;
+          border-radius: 10px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .btn-save:hover {
+          opacity: 0.9;
+        }
+
+        .btn-cancel {
+          width: 50%;
+          background: transparent;
+          border: 1px solid #9ca3af;
+          padding: 10px 12px;
+          border-radius: 10px;
+          font-weight: 700;
+          cursor: pointer;
+          color: #111827;
+        }
+
+        .btn-cancel:hover {
+          background: #f3f4f6;
+        }
+
+        .btn-save:disabled,
+        .btn-cancel:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      `}</style>
+
+      {/* ✅ Center Form */}
+      <div className="edit-wrapper">
+        <form className="edit-form-card" onSubmit={handleSubmit}>
+          <div className="edit-title">Edit Middle Admin</div>
+          <div className="edit-subtitle">
+            Update username or password (optional)
+          </div>
+
+          {error && <div className="error-box">{error}</div>}
+
+          {/* ✅ Username */}
+          <div style={{ marginBottom: "14px" }}>
+            <label className="edit-label">Username *</label>
+            <input
+              type="text"
+              className="edit-input"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={loading}
+              required
+            />
+          </div>
+
+          {/* ✅ Email */}
+          <div style={{ marginBottom: "14px" }}>
+            <label className="edit-label">Email (Read-only)</label>
+            <input type="email" className="edit-input" value={email} disabled />
+          </div>
+
+          {/* ✅ New Password */}
+          <div style={{ marginBottom: "6px" }}>
+            <label className="edit-label">New Password (Optional)</label>
+            <input
+              type="password"
+              className="edit-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              minLength={6}
+              placeholder="Leave blank to keep existing password"
+              autoComplete="new-password"
+            />
+            <div className="helper-text">
+              Leave blank to keep the current password.
+            </div>
+          </div>
+
+          {/* ✅ Buttons */}
+          <div className="btn-row">
+            <button type="submit" className="btn-save" disabled={loading}>
+              {loading ? "Saving..." : "Save"}
+            </button>
+
+            <button
+              type="button"
+              className="btn-cancel"
+              disabled={loading}
+              onClick={() => navigate("/admin/welcome/middle-admins/list")}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </>
   );
 }

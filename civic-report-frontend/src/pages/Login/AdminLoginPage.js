@@ -67,7 +67,8 @@ function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/login/login", {
+      // ✅ YOUR BACKEND LOGIN URL (correct)
+      const res = await fetch("http://localhost:5000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -94,23 +95,21 @@ function AdminLoginPage() {
         setError(
           "Access denied. Only Admin, Middle Admin, and Officer accounts have dashboard access."
         );
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         return;
       }
 
-      // ✅ IMPORTANT: Clear old sessionStorage (avoid conflicts)
+      // ✅ Clear old session storage
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("user");
 
-      // ✅ Save in LOCAL storage (persistent across sessions)
+      // ✅ Save new login details
       localStorage.setItem("token", jwt);
-
-      // ✅ Store ID also (needed for officer issues/reports)
       localStorage.setItem(
         "user",
         JSON.stringify({
-          id: user?.id,          // ✅ added
+          id: user?.id,
           email: user?.email,
           role: role,
           username: user?.username || "",
@@ -129,7 +128,7 @@ function AdminLoginPage() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError("Login failed. Please try again.");
+      setError("Login failed. Backend not reachable.");
     } finally {
       setLoading(false);
     }
@@ -144,9 +143,9 @@ function AdminLoginPage() {
       <Container style={{ maxWidth: "480px" }}>
         <Card className="shadow-sm">
           <Card.Body>
-            <h3 className="mb-3 text-center">Admin Login</h3>
+            <h3 className="mb-3 text-center">Login</h3>
             <p className="text-muted text-center mb-4">
-              Only authorized administrators can access the dashboard.
+              Super Admin / Middle Admin / Officer access only.
             </p>
 
             {error && (

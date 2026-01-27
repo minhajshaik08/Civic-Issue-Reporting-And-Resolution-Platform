@@ -1,5 +1,5 @@
-require('dotenv').config(); // ✅ LOAD .env FIRST
-console.log('✅ JWT_SECRET loaded:', !!process.env.JWT_SECRET);
+require("dotenv").config();
+console.log("✅ JWT_SECRET loaded:", !!process.env.JWT_SECRET);
 
 const express = require("express");
 const cors = require("cors");
@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ CRITICAL: STATIC FILES MUST BE FIRST (before any API routes)
+// ✅ STATIC FILES
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /**
@@ -18,10 +18,14 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
  */
 const loginRoutes = require("./routes/login");
 app.use("/api/login", loginRoutes);
-// Add this line with other routes (around line 20-30)
-const phoneOtpRoutes = require('./routes/auth/phoneOtp');
-app.use('/api/auth', phoneOtpRoutes);
 
+// ✅ OTP
+const phoneOtpRoutes = require("./routes/auth/phoneOtp");
+app.use("/api/auth", phoneOtpRoutes);
+
+// ✅ Admin dashboard
+const dashboardRoute = require("./routes/admin/dashboard");
+app.use("/api/admin/dashboard", dashboardRoute);
 
 /**
  * CONTACT FORM
@@ -164,29 +168,20 @@ app.use("/api/officer/reports", officerIssuesReportsRouter);
 app.use("/api/officer/reports", officerIssuesReportsDownloadRouter);
 
 /**
- * ✅ JWT AUTH MIDDLEWARE - Test Protected Route
- */
-const { authMiddleware } = require("./middleware/authMiddleware");
-app.get("/api/test-auth", authMiddleware, (req, res) => {
-  res.json({ success: true, message: "Token valid!", user: req.user });
-
-
-});
-
-
-const galleryRoutes = require('./routes/gallery/galleryRoutes');
-// ...
-app.use('/api/gallery', galleryRoutes);
-
-
-/**
  * HEALTH CHECK
  */
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+/**
+ * ✅ Avoid HTML (send JSON for wrong APIs)
+ */
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: "API route not found" });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(` Backend running at http://localhost:${PORT}`);
+  console.log(`✅ Backend running at http://localhost:${PORT}`);
 });

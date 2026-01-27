@@ -20,8 +20,12 @@
 }
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ================= MAP / LEAFLET ================= */
@@ -89,7 +93,7 @@ body {
 }
 
 .custom-nav-link::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 50%;
@@ -130,20 +134,15 @@ body {
 }
 
 /* ================= HERO SECTION ================= */
-
-/* ================= HERO SECTION ================= */
-
-
-/* ================= HERO SECTION ================= */
 .hero-wrapper {
   padding: 10px 0 0px;
   background: linear-gradient(135deg, #e3f1ea 0%, #f4faf7 100%);
-  position: relative;          /* needed for absolute highlight box */
+  position: relative;
   overflow: hidden;
 }
 
 .hero-wrapper::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -40%;
   right: -40%;
@@ -154,44 +153,43 @@ body {
   pointer-events: none;
 }
 
-/* HEADLINE: single line, left, +1cm margin */
+/* HEADLINE */
 .hero-title {
-  font-size: clamp(2.2rem, 5vw, 3.2rem);
-  font-weight: 900;
+  font-size: clamp(2.2rem, 5vw, 2.8rem);
+  font-weight: 890;
   color: #0f172a;
   line-height: 1.15;
   margin-bottom: 1rem;
   letter-spacing: -0.06em;
-  white-space: nowrap;      /* keep in one line */
-  margin-left: 1cm;         /* left offset */
+  white-space: nowrap;
+  margin-left: 0.6cm;
 }
 
-/* SUBTITLE: left, +1cm margin, justified, shorter width */
+/* SUBTITLE under main heading */
 .hero-subtitle {
   font-size: 1.1rem;
   color: #475569;
   line-height: 1.7;
   margin-bottom: 1.4rem;
   font-weight: 600;
-  margin-left: 1cm;         /* align with title */
-  max-width: 73%;           /* end before right box */
-  text-align: justify;      /* justify the text */
+  margin-left: 0.6cm;
+  max-width: 95%;
+  text-align: justify;
 }
 
-/* ACTION BUTTONS: align with title & subtitle (1cm) */
+/* ACTION BUTTONS */
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.95rem;
   margin-bottom: 1.3rem;
-  margin-left: 1cm;         /* same as title & subtitle */
+  margin-left: 0.6cm;
   justify-content: flex-start;
 }
 
 .hero-primary-btn {
   padding: 0.7rem 1.4rem;
   border-radius: 999px;
-  margin-left: 0;           /* no extra shift; use hero-actions margin */
   border: none;
   background: #16a34a;
   color: white;
@@ -226,34 +224,52 @@ body {
   border-color: #9ca3af;
 }
 
-/* RIGHT-SIDE HIGHLIGHT BOX – placed in empty top-right area */
+/* RIGHT-SIDE HIGHLIGHT BOX – like reference image */
 .hero-right-highlight {
-  position: absolute;        /* MUST be here */
-  top: -175px;                /* adjust up/down */
-  right:-1250px;               /* adjust left/right */
+  position: relative;
   background: #fef8ec;
   border-radius: 18px;
-  padding: 1.2rem 1.3rem;
+  padding: 1.1rem 1.3rem;
   box-shadow: 0 16px 32px rgba(148, 163, 184, 0.35);
-  text-align: left;
   border: 1px solid rgba(251, 191, 36, 0.35);
-  max-width: 280px;
+  max-width: 1180px;
   width: 100%;
-  z-index: 10;
+  margin-left: 0.6cm;
 }
 
-.hero-right-highlight h4 {
-  font-size: 0.98rem;
+/* icon circle on the left */
+.hero-highlight-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #22c55e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* text block on the right */
+.hero-highlight-title {
+  font-size: 0.95rem;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 0.45rem;
 }
 
-.hero-right-highlight p {
-  font-size: 0.9rem;
+/* bullet list */
+.hero-highlight-list {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
   color: #4b5563;
-  margin: 0;
 }
+
+.hero-highlight-list li {
+  margin-bottom: 0.15rem;
+}
+
 
 /* animation keep */
 @keyframes slideInRight {
@@ -267,11 +283,12 @@ body {
   }
 }
 
-
+/* ================= SECTION SPACING ================= */
 /* ================= SECTION SPACING ================= */
 .section-wrapper {
-  padding: 0px 0 60px;
+  padding: 20px 0 60px;
   background: linear-gradient(135deg, #e3f1ea 0%, #f4faf7 100%);
+  
 }
 
 .section-inner {
@@ -284,17 +301,34 @@ body {
   font-size: clamp(1.8rem, 4vw, 2.1rem);
   font-weight: 900;
   color: #0f172a;
-  margin-bottom: 0.4rem;
+  margin-bottom: 1rem;
   letter-spacing: -0.02em;
+  text-align: center;
 }
 
-/* REMOVED max-width: 560px - subtitle can be any length now */
+
+/* shared centered subtitle (How It Works + About Our Mission) */
 .section-subtitle {
   font-size: 0.96rem;
   color: #64748b;
   margin: 0 auto 1.8rem;
   line-height: 1.6;
   font-weight: 500;
+  text-align: center;
+  max-width: 840px;
+}
+
+/* single-line subtitle for Why This Matters */
+.section-subtitle-single {
+  font-size: 0.96rem;
+  color: #64748b;
+  margin: 0 auto 1.8rem;
+  line-height: 1.6;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 /* ================= GENERIC FEATURE CARD ================= */
@@ -306,7 +340,7 @@ body {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   height: 100%;
   max-width: 380px;
-  margin-left: auto;
+  margin-left: 0.6cm;
   margin-right: auto;
   position: relative;
   overflow: hidden;
@@ -316,13 +350,18 @@ body {
 }
 
 .feature-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(34, 197, 74, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(34, 197, 74, 0.1),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -340,12 +379,12 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 70px;          /* bigger circle */
-  height: 70px;         /* bigger circle */
+  width: 70px;
+  height: 70px;
   border-radius: 999px;
   background: rgba(34, 197, 94, 0.08);
   color: #16a34a;
-  font-size: 3rem;    /* bigger icon */
+  font-size: 3rem;
   margin-bottom: -4rem;
 }
 
@@ -371,8 +410,6 @@ body {
 }
 
 /* ================= STAT / HOW-IT-WORKS CARDS ================= */
-
-/* row of cards – reduced gap */
 .stat-row,
 .steps-row {
   display: flex;
@@ -382,13 +419,11 @@ body {
   column-gap: 16px;
 }
 
-/* wrapper for each col */
 .stat-col {
   display: flex;
   justify-content: center;
 }
 
-/* SAME SIZE cards (like screenshot) - UNIFORM SIZE KEPT */
 .stat-card,
 .step-card {
   padding: 1.1rem 1.2rem;
@@ -408,10 +443,9 @@ body {
   overflow: hidden;
 }
 
-/* keep original hover "lift" effect */
 .stat-card::before,
 .step-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -436,7 +470,6 @@ body {
   background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
 }
 
-/* number at top: 01, 02 */
 .step-number {
   font-size: 0.9rem;
   font-weight: 700;
@@ -446,7 +479,6 @@ body {
   margin-bottom: 0.3rem;
 }
 
-/* title line */
 .step-title,
 .stat-card h5,
 .stat-card strong {
@@ -456,7 +488,6 @@ body {
   margin-bottom: 0.25rem;
 }
 
-/* description text */
 .step-desc,
 .stat-card p {
   font-size: 0.9rem;
@@ -466,7 +497,6 @@ body {
   font-weight: 500;
 }
 
-/* big number for stat */
 .stat-card h3 {
   font-size: 1.8rem;
   font-weight: 900;
@@ -476,7 +506,6 @@ body {
   text-align: center;
 }
 
-/* icon row at bottom */
 .step-icon-row,
 .stat-icon-row {
   display: flex;
@@ -487,17 +516,16 @@ body {
 
 .step-icon,
 .stat-icon {
-  width: 40px;          /* bigger circle */
+  width: 40px;
   height: 40px;
   border-radius: 999px;
   background: rgba(22, 163, 74, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;    /* bigger icon */
+  font-size: 1.4rem;
   color: #15803d;
 }
-
 
 /* ================= QUOTE CARD ================= */
 .hero-quote-card {
@@ -681,13 +709,25 @@ body[data-theme="extra-dark"] .footer-section {
     min-width: 230px;
     height: 176px;
   }
+
+  .hero-title {
+    font-size: 1.8rem;
+    white-space: normal;
+    margin-left: 0;
+  }
+
+  .hero-subtitle,
+  .hero-actions {
+    margin-left: 0;
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
   .hero-title {
     font-size: 1.8rem;
-    white-space: normal; /* allow wrap on very small screens */
-    margin-left: 0;      /* remove big cm offset on mobile */
+    white-space: normal;
+    margin-left: 0;
   }
 
   .hero-subtitle,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import LocationMap from "./LocationMap";
 
@@ -20,10 +20,13 @@ function Step3LocationPhoto({
       try {
         const { lat, lng } = mapPosition;
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+
         const res = await fetch(url, {
           headers: { "User-Agent": "civic-report-demo" },
         });
+
         const data = await res.json();
+
         if (data && data.display_name) {
           const parts = data.display_name.split(",");
           const cleaned = parts[0].trim();
@@ -43,16 +46,14 @@ function Step3LocationPhoto({
       alert("Please enter the location details.");
       return;
     }
-
     onSubmit();
   };
 
   const handleFilesChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    // append to existing files
+
     setPhotoFiles((prev) => [...prev, ...files]);
-    // reset input so same file can be chosen again if needed
     e.target.value = "";
   };
 
@@ -82,20 +83,25 @@ function Step3LocationPhoto({
 
         <Form.Group className="mb-3">
           <Form.Label>Pick Location on Map</Form.Label>
+
+          {/* ✅ FIXED MAP WRAPPER HEIGHT */}
           <div
             style={{
               border: "1px dashed #ced4da",
-              borderRadius: "6px",
+              borderRadius: "8px",
               overflow: "hidden",
+              height: "350px", // ✅ MUST
+              width: "100%",
             }}
           >
             <LocationMap position={mapPosition} setPosition={setMapPosition} />
           </div>
+
           <div
             style={{
               fontSize: "0.85rem",
               color: "#6c757d",
-              marginTop: "4px",
+              marginTop: "6px",
             }}
           >
             Click on the map to mark the exact location.
@@ -211,9 +217,7 @@ function Step3LocationPhoto({
                 variant="success"
                 type="button"
                 size="sm"
-                onClick={() =>
-                  document.getElementById("photoInput").click()
-                }
+                onClick={() => document.getElementById("photoInput").click()}
               >
                 Choose Photos
               </Button>
@@ -225,11 +229,7 @@ function Step3LocationPhoto({
           <Button variant="outline-secondary" type="button" onClick={onPrev}>
             ← Previous
           </Button>
-          <Button
-            variant="success"
-            type="button"
-            onClick={handleSubmitClick}
-          >
+          <Button variant="success" type="button" onClick={handleSubmitClick}>
             Submit Report
           </Button>
         </div>

@@ -1,6 +1,8 @@
 // App.js
 import React from "react";
 import "./App.css";
+import "leaflet/dist/leaflet.css";
+
 
 import { Container, Row, Col, Button } from "react-bootstrap";
 import {
@@ -12,7 +14,7 @@ import {
 } from "react-router-dom";
 
 import RequireAuth from "./components/RequireAuth";
-import './utils/axiosConfig';
+import "./utils/axiosConfig";
 
 // 1) Public / common
 import ReportIssuePage from "./pages/ReportIssue/ReportIssuePage";
@@ -94,9 +96,9 @@ import MiddleAdminAssignIssuesPage from "./pages/middle-admin/issues/MiddleAdmin
 
 // m-a-reports
 import MiddleAdminReportsHomePage from "./pages/middle-admin/reports/MiddleAdminReportsHomePage";
-import MiddleAdminAreaDetailsPage from "./pages/middle-admin/reports/MiddleAdminAreaDetailsPage"
+import MiddleAdminAreaDetailsPage from "./pages/middle-admin/reports/MiddleAdminAreaDetailsPage";
 import MiddleAdminAreasReportPage from "./pages/middle-admin/reports/MiddleAdminAreasReportPage";
-import MiddleAdminIssuesReportPage from "./pages/middle-admin/reports/MiddleAdminIssuesReportPage"
+import MiddleAdminIssuesReportPage from "./pages/middle-admin/reports/MiddleAdminIssuesReportPage";
 import MiddleAdminOfficerPerformancePage from "./pages/middle-admin/reports/MiddleAdminOfficerPerformancePage";
 
 // m-a-settings
@@ -138,108 +140,120 @@ function HomePage() {
               <p className="hero-subtitle">
                 A smart platform that connects citizens and authorities to
                 resolve civic problems like potholes, garbage, drainage, and
-                streetlights with real-time updates and full transparency.
-                By improving communication between the public and civic bodies, the platform helps reduce response time and enhances the overall quality
-                of urban services. It encourages active citizen participation and supports the development of cleaner, safer, and more sustainable cities.
+                streetlights with real-time updates and full transparency. By
+                improving communication between the public and civic bodies, the
+                platform helps reduce response time and enhances the overall
+                quality of urban services. It encourages active citizen
+                participation and supports the development of cleaner, safer,
+                and more sustainable cities.
               </p>
               <div className="hero-actions">
-  <Button
-    size="lg"
-    className="hero-primary-btn"
-    onClick={() => navigate("/report")}
-  >
-    Report an Issue
-  </Button>
-  <Button
-    size="lg"
-    className="hero-secondary-btn"
-    onClick={() => navigate("/view-issues")}
-  >
-    View Reported Issues
-  </Button>
-</div>
-
-              
+                <Button
+                  size="lg"
+                  className="hero-primary-btn"
+                  onClick={() => navigate("/report")}
+                >
+                  Report an Issue
+                </Button>
+                <Button
+                  size="lg"
+                  className="hero-secondary-btn"
+                  onClick={() => navigate("/view-issues")}
+                >
+                  View Reported Issues
+                </Button>
+              </div>
             </Col>
 
+            {/* RIGHT HERO HIGHLIGHT LIKE IMAGE */}
             <Col md={5} className="mt-4 mt-md-0 hero-right-col">
-  <div className="feature-card hero-right-highlight">
-    <h4 className="mb-3">
-      24/7 System Available. 100% Secure &amp; Private. Real‑Time Status Updates.
-    </h4>
-    <p className="mb-0 text-muted">
-      Citizens can report any civic issue anytime and track the
-      status from submission to resolution with complete
-      transparency.
-    </p>
-  </div>
-</Col>
-
+              <div className="hero-right-highlight d-flex align-items-start">
+                <div className="hero-highlight-icon me-3">
+                  {/* simple shield/check icon */}
+                  <span>✅</span>
+                </div>
+                <div className="hero-highlight-content">
+                  <h4 className="mb-2 hero-highlight-title">
+                    24/7 System Available. 100% Secure &amp; Private. Real‑Time Updates.
+                    
+                  </h4>
+                  <ul className="hero-highlight-list mb-0">
+                    <li>
+                      Citizens can report any civic issue anytime.
+                    </li>
+                    <li>
+                      Receive updates and track issue status in real time.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </Col>
           </Row>
         </Container>
       </section>
 
-     {/* HOW IT WORKS */}
-<section className="section-wrapper how-works-section" id="how">
-  <Container fluid className="px-3 px-md-4">
-    <h2 className="section-title">How It Works</h2>
-    <p className="section-subtitle">
-      Our streamlined process ensures your civic issues are handled efficiently from report to resolution.
-    </p>
-    <Row className="g-4">
-      {[
-        {
-          step: "01",
-          title: "Report an Issue",
-          text:
-            "Submit details with description, photo, and location through our simple form.",
-          icon: "📝",
-        },
-        {
-          step: "02",
-          title: "Stored in System",
-          text:
-            "Issue is recorded in a centralized database for tracking and management.",
-          icon: "🗄️",
-        },
-        {
-          step: "03",
-          title: "Authorities Take Action",
-          text:
-            "Concerned department is automatically notified and assigned the issue.",
-          icon: "👤",   // person icon
-        },
-        {
-          step: "04",
-          title: "Track & Resolve",
-          text:
-            "Citizen receives real-time updates until the issue is completely resolved.",
-          icon: "✅",   // tick symbol
-        },
-      ].map((item) => (
-        <Col md={3} sm={6} key={item.step}>
-          <div className="feature-card text-center">
-            <div className="feature-icon">{item.icon}</div>
-            <div className="fw-bold text-success mb-2">{item.step}</div>
-            <h5>{item.title}</h5>
-            <p className="mb-0 text-muted">{item.text}</p>
-          </div>
-        </Col>
-      ))}
-    </Row>
-  </Container>
-</section>
-
+      {/* HOW IT WORKS */}
+      <section className="section-wrapper how-works-section" id="how">
+        <Container fluid className="px-3 px-md-4">
+          <h2 className="section-title">How It Works</h2>
+          <p className="section-subtitle">
+            Our streamlined process ensures your civic issues are handled
+            efficiently from report to resolution.
+          </p>
+          <Row className="g-4">
+            {[
+              {
+                step: "01",
+                title: "Report an Issue",
+                text:
+                  "Submit details with description, photo, and location through our simple form.",
+                icon: "📝",
+              },
+              {
+                step: "02",
+                title: "Stored in System",
+                text:
+                  "Issue is recorded in a centralized database for tracking and management.",
+                icon: "🗄️",
+              },
+              {
+                step: "03",
+                title: "Authorities Take Action",
+                text:
+                  "Concerned department is automatically notified and assigned the issue.",
+                icon: "👤",
+              },
+              {
+                step: "04",
+                title: "Track & Resolve",
+                text:
+                  "Citizen receives real-time updates until the issue is completely resolved.",
+                icon: "✅",
+              },
+            ].map((item) => (
+              <Col md={3} sm={6} key={item.step}>
+                <div className="feature-card text-center">
+                  <div className="feature-icon">{item.icon}</div>
+                  <div className="fw-bold text-success mb-2">{item.step}</div>
+                  <h5>{item.title}</h5>
+                  <p className="mb-0 text-muted">{item.text}</p>
+                </div>
+              </Col>
+            ))}
+          </Row>
+        </Container>
+      </section>
 
       {/* ABOUT OUR MISSION */}
       <section className="section-wrapper about-mission-section" id="about">
         <Container fluid className="px-3 px-md-4">
           <h2 className="section-title">About Our Mission</h2>
+          {/* subtitle moved here so it shows centered under heading */}
           <p className="section-subtitle">
-            Our Civic Issue Reporting &amp; Resolution System is designed to promote clean and green cities by enabling citizens to report
-            problems online and helping authorities resolve them efficiently.
+            We empower citizens to build cleaner, safer, and stronger
+            communities.
           </p>
-          <Row className="g-4">
+          <Row className="g-5">
             {[
               {
                 title: "Clean & Green",
@@ -277,12 +291,11 @@ function HomePage() {
       <section className="section-wrapper why-matters-section">
         <Container fluid className="px-3 px-md-4">
           <h2 className="section-title">Why This Matters</h2>
-          <p className="section-subtitle">
-            A clean and well-managed city is every citizen&apos;s right. This
-            platform reduces the gap between people and government by creating a
-            transparent and efficient complaint resolution process.
+          {/* keep single-line variant here */}
+          <p className="section-subtitle-single">
+            A clean and well-managed city is every citizen&apos;s right.
           </p>
-          <Row className="g-4">
+          <Row className="g-5">
             {[
               {
                 title: "Quality of Life",
@@ -316,80 +329,15 @@ function HomePage() {
         </Container>
       </section>
 
-      {/* POWERFUL FEATURES */}
-      <section className="section-wrapper powerful-features-section" id="features">
-        <Container fluid className="px-3 px-md-4">
-          <h2 className="section-title">Powerful Features</h2>
-          <p className="section-subtitle">
-            Everything you need to report, track, and resolve civic issues
-            efficiently and transparently.
-          </p>
-          <Row className="g-4">
-            {[
-              "Simple Reporting Form",
-              "Location & Photo Submissions",
-              "Real-Time Status Tracking",
-              "Admin Dashboard",
-              "Smart Notifications",
-              "Secure & Reliable",
-            ].map((title) => (
-              <Col md={4} sm={6} key={title}>
-                <div className="feature-card">
-                  <h5>{title}</h5>
-                  <p className="mb-0 text-muted">
-                    Short description about how this feature helps citizens and
-                    authorities work better.
-                  </p>
-                </div>
-              </Col>
-            ))}
-          </Row>
-        </Container>
-      </section>
-
-      {/* LIVE STATISTICS + QUOTE */}
-      <section className="section-wrapper live-stats-section" id="stats">
-        <Container fluid className="px-3 px-md-4">
-          <h2 className="section-title">Live Statistics</h2>
-          <p className="section-subtitle">
-            Real-time data showing the impact of our civic reporting system in
-            building a better community.
-          </p>
-          <Row className="g-4 mb-4">
-            {[
-              { value: "120", label: "Total Issues Reported" },
-              { value: "85", label: "Issues Resolved" },
-              { value: "25", label: "Issues In Progress" },
-              { value: "10", label: "Pending Issues" },
-            ].map((item) => (
-              <Col md={3} sm={6} key={item.label}>
-                <div className="stat-card">
-                  <h3>{item.value}</h3>
-                  <p className="mb-0">{item.label}</p>
-                </div>
-              </Col>
-            ))}
-          </Row>
-
-          <div className="hero-quote-card text-center">
-            <h4 className="mb-2">
-              When citizens and government work together transparently,
-              extraordinary things happen for our communities.
-            </h4>
-            <p className="mb-0">Join thousands of citizens making a difference.</p>
-          </div>
-        </Container>
-      </section>
-
       {/* FOOTER */}
       <footer className="footer-section" id="contact">
         <Container fluid className="px-3 px-md-4">
-          <Row className="gy-4">
+          <Row className="g-5">
             <Col md={4}>
               <h5>Civic Report</h5>
               <p className="mb-2">
-                Building cleaner, greener cities through transparent civic issue
-                reporting and resolution.
+                Building cleaner, greener cities through transparent civic
+                issue reporting and resolution.
               </p>
               <Button size="sm" variant="warning" className="footer-btn">
                 Learn More
@@ -445,10 +393,7 @@ function App() {
 
             {/* Right side - Only Login button */}
             <div className="d-flex gap-2 custom-login-buttons">
-              <Link
-                to="/Login"
-                className="btn btn-sm custom-login-btn"
-              >
+              <Link to="/Login" className="btn btn-sm custom-login-btn">
                 Login
               </Link>
             </div>
@@ -481,7 +426,10 @@ function App() {
             {/* officers */}
             <Route path="officers" element={<MiddleAdminOfficerOptionsPage />} />
             <Route path="officers/add" element={<MiddleAdminAddOfficerForm />} />
-            <Route path="officers/edit" element={<MiddleAdminOfficerListEdit />} />
+            <Route
+              path="officers/edit"
+              element={<MiddleAdminOfficerListEdit />}
+            />
             <Route
               path="officers/editform"
               element={<MiddleAdminEditOfficerForm />}
@@ -490,19 +438,28 @@ function App() {
               path="officers/manage"
               element={<MiddleAdminManageOfficersPage />}
             />
-            <Route path="officers/list" element={<MiddleAdminOfficerListPage />} />
+            <Route
+              path="officers/list"
+              element={<MiddleAdminOfficerListPage />}
+            />
 
             {/* users */}
             <Route path="users" element={<MiddleAdminUserOptionsPage />} />
             <Route path="users/manage" element={<MiddleAdminManageUsersPage />} />
-            <Route path="users/activity" element={<MiddleAdminUserActivityPage />} />
+            <Route
+              path="users/activity"
+              element={<MiddleAdminUserActivityPage />}
+            />
             <Route path="users/list" element={<MiddleAdminUserListPage />} />
 
             {/* issues */}
             <Route path="issues" element={<MiddleAdminIssuesOptions />} />
             <Route path="issues/:id" element={<MiddleAdminIssueDetails />} />
             <Route path="issues/list" element={<MiddleAdminIssuesList />} />
-            <Route path="issues/assign" element={<MiddleAdminAssignIssuesPage />} />
+            <Route
+              path="issues/assign"
+              element={<MiddleAdminAssignIssuesPage />}
+            />
 
             {/* reports */}
             <Route path="reports" element={<MiddleAdminReportsHomePage />} />
@@ -510,8 +467,14 @@ function App() {
               path="reports/areas/details"
               element={<MiddleAdminAreaDetailsPage />}
             />
-            <Route path="reports/areas" element={<MiddleAdminAreasReportPage />} />
-            <Route path="reports/issues" element={<MiddleAdminIssuesReportPage />} />
+            <Route
+              path="reports/areas"
+              element={<MiddleAdminAreasReportPage />}
+            />
+            <Route
+              path="reports/issues"
+              element={<MiddleAdminIssuesReportPage />}
+            />
             <Route
               path="reports/officers/performance"
               element={<MiddleAdminOfficerPerformancePage />}
@@ -546,15 +509,24 @@ function App() {
             <Route path="settings" element={<OfficerSettingsPage />} />
 
             {/* Separate pages, not children of OfficerSettingsPage */}
-            <Route path="settings/profile" element={<OfficerProfileSettingsPage />} />
-            <Route path="settings/security" element={<OfficerSecuritySettingsPage />} />
+            <Route
+              path="settings/profile"
+              element={<OfficerProfileSettingsPage />}
+            />
+            <Route
+              path="settings/security"
+              element={<OfficerSecuritySettingsPage />}
+            />
             <Route
               path="settings/appearance"
               element={<OfficerAppearanceSettingsPage />}
             />
             <Route path="gallery-upload" element={<GalleryOptionsPage />} />
             <Route path="gallery-upload/list" element={<GalleryListPage />} />
-            <Route path="gallery-upload/new" element={<OfficerGalleryUploadPage />} />
+            <Route
+              path="gallery-upload/new"
+              element={<OfficerGalleryUploadPage />}
+            />
           </Route>
         </Route>
 
@@ -571,8 +543,14 @@ function App() {
             {/* Middle admin routes */}
             <Route path="middle-admins" element={<MiddleAdminpageoptions />} />
             <Route path="middle-admins/add" element={<AddMiddleAdminForm />} />
-            <Route path="middle-admins/list" element={<ViewMiddleAdminsList />} />
-            <Route path="middle-admins/edit" element={<EditMiddleAdminForm />} />
+            <Route
+              path="middle-admins/list"
+              element={<ViewMiddleAdminsList />}
+            />
+            <Route
+              path="middle-admins/edit"
+              element={<EditMiddleAdminForm />}
+            />
             <Route
               path="middle-admins/edit-list"
               element={<EditMiddleAdminsList />}
@@ -599,7 +577,10 @@ function App() {
             {/* Settings routes */}
             <Route path="settings" element={<AdminSettingsPage />} />
             <Route path="settings/profile" element={<ProfileSettingsPage />} />
-            <Route path="settings/security" element={<SecuritySettingsPage />} />
+            <Route
+              path="settings/security"
+              element={<SecuritySettingsPage />}
+            />
             <Route
               path="settings/appearance"
               element={<AppearanceSettingsPage />}
@@ -609,7 +590,10 @@ function App() {
             <Route path="reports" element={<ReportsHomePage />} />
             <Route path="reports/issues" element={<IssuesReportPage />} />
             <Route path="reports/areas" element={<AreasReportPage />} />
-            <Route path="reports/areas/details" element={<AreaDetailsPage />} />
+            <Route
+              path="reports/areas/details"
+              element={<AreaDetailsPage />}
+            />
             <Route
               path="reports/officers/performance"
               element={<OfficerPerformancePage />}
