@@ -1,5 +1,5 @@
 // App.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
 
@@ -359,6 +359,34 @@ function HomePage() {
   );
 }
 
+// RedirectIfAuth: wrap public pages to prevent authenticated users
+// from reaching public routes via browser back/forward buttons.
+function RedirectIfAuth({ children }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const role = (user && user.role) || null;
+
+    if (token && role) {
+      const normalizedRole = String(role).toLowerCase();
+
+      if (normalizedRole === "super_admin") {
+        navigate("/admin/welcome", { replace: true });
+      } else if (normalizedRole === "middle_admin") {
+        navigate("/middle-admin/dashboard", { replace: true });
+      } else if (normalizedRole === "officer") {
+        navigate("/officer/dashboard", { replace: true });
+      }
+    }
+    // run on location change so back/forward will trigger this
+  }, [navigate, location.pathname]);
+
+  return children;
+}
+
 function App() {
   return (
     <Router>
@@ -439,12 +467,47 @@ function AppRoutes() {
       )}
 
       <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/report" element={<ReportIssuePage />} />
-        <Route path="/view-issues" element={<ViewIssuePage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/gallery" element={<MainGalleryPage />} />
+        {/* Public routes (wrapped to prevent access when authenticated) */}
+        <Route
+          path="/"
+          element={
+            <RedirectIfAuth>
+              <HomePage />
+            </RedirectIfAuth>
+          }
+        />
+        <Route
+          path="/report"
+          element={
+            <RedirectIfAuth>
+              <ReportIssuePage />
+            </RedirectIfAuth>
+          }
+        />
+        <Route
+          path="/view-issues"
+          element={
+            <RedirectIfAuth>
+              <ViewIssuePage />
+            </RedirectIfAuth>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <RedirectIfAuth>
+              <ContactPage />
+            </RedirectIfAuth>
+          }
+        />
+        <Route
+          path="/gallery"
+          element={
+            <RedirectIfAuth>
+              <MainGalleryPage />
+            </RedirectIfAuth>
+          }
+        />
 
         {/* Login routes using /Login */}
         <Route path="/Login" element={<AdminLoginPage />} />
