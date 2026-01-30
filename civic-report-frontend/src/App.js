@@ -16,6 +16,7 @@ import {
 
 import RequireAuth from "./components/RequireAuth";
 import "./utils/axiosConfig";
+import HamburgerSidebar from "./components/HamburgerSidebar";
 
 // 1) Public / common
 import ReportIssuePage from "./pages/ReportIssue/ReportIssuePage";
@@ -384,10 +385,21 @@ function AppRoutes() {
     path.startsWith("/middle-admin/dashboard") ||
     path.startsWith("/admin/welcome");
 
+  // Public site menu (used on home/contact/report/view/gallery)
+  const publicMenuItems = [
+    { to: "/", label: "Home", icon: "🏠" },
+    { to: "/gallery", label: "Gallery", icon: "🖼️" },
+    { to: "/report", label: "Report Issue", icon: "📝" },
+    { to: "/view-issues", label: "View Issues", icon: "📋" },
+    { to: "/contact", label: "Contact", icon: "📞" },
+    { to: "/Login", label: "Login", icon: "🔐" },
+  ];
+
   return (
     <>
+      {/* Horizontal navbar - Desktop only */}
       {!hideNav && (
-        <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm custom-navbar">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm custom-navbar d-none d-lg-block">
           <div className="container-fluid px-3 px-md-4">
             <Link to="/" className="navbar-brand custom-navbar-brand">
               Civic Report
@@ -403,7 +415,7 @@ function AppRoutes() {
                   Report Issue
                 </Link>
                 <Link to="/view-issues" className="nav-link custom-nav-link">
-                  View Issues
+                  View Reported Issues
                 </Link>
                 <Link to="/contact" className="nav-link custom-nav-link">
                   Contact
@@ -419,6 +431,20 @@ function AppRoutes() {
             </div>
           </div>
         </nav>
+      )}
+
+      {/* Hamburger sidebar - Mobile only */}
+      {!hideNav && (
+        <div className="d-lg-none">
+          <HamburgerSidebar
+            user={""}
+            photoUrl={null}
+            initial={"U"}
+            menuItems={publicMenuItems}
+            onLogout={() => {}}
+            role={null}
+          />
+        </div>
       )}
 
       <Routes>

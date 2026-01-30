@@ -59,33 +59,46 @@ function HamburgerSidebar({
 
       {/* ✅ Sidebar - Fixed desktop, slide on mobile */}
       <div className={`hamburger-sidebar ${isOpen ? "open" : ""}`}>
-        <div className="sidebar-header">
-          {/* Close button for mobile */}
-          {isMobile && (
-            <button
-              className="close-btn"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close menu"
-            >
-              ✕
-            </button>
-          )}
-
-          {/* Avatar */}
-          <div className="sidebar-avatar">
-            {photoUrl ? (
-              <img src={photoUrl} alt="Profile" />
-            ) : (
-              <span>{initial.toUpperCase()}</span>
+        {/* Show profile header only for logged-in users (dashboards) */}
+        {user && (
+          <div className="sidebar-header">
+            {/* Close button for mobile */}
+            {isMobile && (
+              <button
+                className="close-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close menu"
+              >
+                ✕
+              </button>
             )}
-          </div>
 
-          {/* User info */}
-          <div className="sidebar-user-info">
-            <div className="user-name">{user}</div>
-            {role && <div className="user-role">{role.replace("_", " ")}</div>}
+            {/* Avatar */}
+            <div className="sidebar-avatar">
+              {photoUrl ? (
+                <img src={photoUrl} alt="Profile" />
+              ) : (
+                <span>{initial.toUpperCase()}</span>
+              )}
+            </div>
+
+            {/* User info */}
+            <div className="sidebar-user-info">
+              <div className="user-name">{user}</div>
+              {role && <div className="user-role">{role.replace("_", " ")}</div>}
+            </div>
           </div>
-        </div>
+        )}
+        {/* Close button for mobile (when no user profile) */}
+        {!user && isMobile && (
+          <button
+            className="close-btn"
+            onClick={() => setIsOpen(false)}
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
+        )}
 
         {/* Menu Items */}
         <div className="sidebar-menu-wrapper">
@@ -108,20 +121,22 @@ function HamburgerSidebar({
           </ListGroup>
         </div>
 
-        {/* Logout Button */}
-        <div className="sidebar-footer">
-          <button
-            className="logout-btn"
-            onClick={() => {
-              setIsOpen(false);
-              onLogout();
-            }}
-            title="Logout"
-          >
-            <span className="menu-icon">⤴️</span>
-            <span className="menu-text">Logout</span>
-          </button>
-        </div>
+        {/* Logout Button - Show only for logged-in users */}
+        {user && (
+          <div className="sidebar-footer">
+            <button
+              className="logout-btn"
+              onClick={() => {
+                setIsOpen(false);
+                onLogout();
+              }}
+              title="Logout"
+            >
+              <span className="menu-icon">⤴️</span>
+              <span className="menu-text">Logout</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ✅ Overlay - Click to close menu on mobile */}
