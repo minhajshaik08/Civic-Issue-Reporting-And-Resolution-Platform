@@ -125,10 +125,15 @@ export default function ManageOfficersPage() {
     if (!window.confirm(`Are you sure to delete ${officer.name}?`)) return;
 
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(
         `http://localhost:5000/api/admin/officers/${officer.id}`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 

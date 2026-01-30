@@ -1,8 +1,6 @@
 require("dotenv").config();
 // Loads environment variables from .env file
 
-console.log("✅ JWT_SECRET loaded:", !!process.env.JWT_SECRET);
-
 const express = require("express");
 const cors = require("cors");
 const path = require("path");

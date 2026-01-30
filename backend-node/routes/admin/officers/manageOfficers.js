@@ -1,5 +1,6 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
+const { authMiddleware } = require("../../../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -40,13 +41,24 @@ router.patch("/block/:id", async (req, res) => {
 });
 
 // DELETE /api/admin/officers/:id
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
 
   try {
     const connection = await mysql.createConnection(dbConfig);
 
-    // TODO: Add dependency checks for open issues later.
+    // ✅ SELECT before delete to capture deleted record info
+    const [rows] = await connection.execute(
+      "SELECT id, email, employee_id FROM officers WHERE id = ? LIMIT 1",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      await connection.end();
+      return res.json({ success: false, message: "Officer not found" });
+    }
+
+    const deletedRow = rows[0];
 
     const [result] = await connection.execute(
       "DELETE FROM officers WHERE id = ?",
@@ -59,7 +71,15 @@ router.delete("/:id", async (req, res) => {
       return res.json({ success: false, message: "Officer not found" });
     }
 
-    return res.json({ success: true, message: "Officer deleted" });
+    // ✅ Log deletion to audit_logs
+    try {
+      const { logDeletion } = require("../../../utils/audit");
+      await logDeletion(req, deletedRow, "officers", "admins");
+    } catch (e) {
+      console.error("❌ Audit log error:", e.message);
+    }
+
+    return res.json({ success: true, message: "Officer deleted ✅" });
   } catch (err) {
     console.error("Delete officer error:", err);
     return res.json({ success: false, message: "Database error" });

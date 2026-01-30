@@ -97,10 +97,15 @@ export default function DeleteBlockUnblockMiddleAdmins() {
       return;
 
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(
         `http://localhost:5000/api/admin/middle-admins/${admin.id}`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 

@@ -21,27 +21,16 @@ const authMiddleware = async (req, res, next) => {
 
     if (!email || !id) return res.status(401).json({ success: false, message: "Invalid token data" });
 
-    const connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.execute(
-      "SELECT id, email FROM officers WHERE email = ? LIMIT 1",
-      [email]
-    );
-    
-    if (rows.length === 0) {
-      await connection.end();
-      return res.status(401).json({ success: false, message: "Officer not found" });
-    }
-
-    await connection.end();
-    
-    // ✅ Attach email + id to req.user
+    // ✅ Don't check officers table - token is already verified by JWT
+    // The user could be admin, middle_admin, or officer
+    // Just attach email + id to req.user for audit logging
     req.user = {
       id: id,
       email: email,
       username: decoded.username
     };
 
-    console.log('✅ Auth OK:', { id, email });
+    // auth successful (no terminal output of user data)
     next();
 
   } catch (err) {

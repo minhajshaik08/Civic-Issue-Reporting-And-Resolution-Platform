@@ -72,8 +72,8 @@ router.post(
   "/upload",
   authMiddleware,
   upload.fields([
-    { name: "beforeImages", maxCount: 10 },
-    { name: "afterImages", maxCount: 10 },
+    { name: "beforeImages", maxCount: 5 },
+    { name: "afterImages", maxCount: 5 },
   ]),
   async (req, res) => {
     try {
@@ -95,6 +95,13 @@ router.post(
         return res.status(400).json({
           success: false,
           message: "Before & After images required",
+        });
+      }
+
+      if (beforeImages.length > 5 || afterImages.length > 5) {
+        return res.status(400).json({
+          success: false,
+          message: "You can upload only up to 5 images per section (Before & After)",
         });
       }
 
@@ -122,6 +129,26 @@ router.post(
         id: result.insertId,
       });
     } catch (err) {
+      // Handle multer specific errors
+      if (err.code === "LIMIT_FILE_COUNT") {
+        return res.status(400).json({
+          success: false,
+          message: "You can upload only up to 5 images per section (Before & After)",
+        });
+      }
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({
+          success: false,
+          message: "File size exceeds 5MB limit",
+        });
+      }
+      if (err.code === "UNEXPECTED_FILE") {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid form field. Use 'beforeImages' and 'afterImages' fields only",
+        });
+      }
+      
       console.error("UPLOAD ERROR:", err);
       res.status(500).json({ success: false, message: err.message });
     }
@@ -164,10 +191,12 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const employee_id = await getEmployeeIdFromEmail(req.user.email);
     if (!employee_id) {
-      return res.status(404).json({ success: false, message: "Officer not found" });
+      return res.json({ success: false, message: "Officer not found" });
     }
 
     const connection = await mysql.createConnection(dbConfig);
+
+    // ✅ Delete gallery image
     const [result] = await connection.execute(
       "DELETE FROM gallary_images WHERE id = ? AND employee_id = ?",
       [req.params.id, employee_id]
@@ -175,12 +204,21 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     await connection.end();
 
     if (!result.affectedRows) {
-      return res.status(404).json({ success: false, message: "Not found" });
+      return res.json({ success: false, message: "Gallery not found" });
+    }
+
+    // ✅ Log deletion to audit_logs
+    const deletedRow = { email: req.user.email, employee_id };
+    try {
+      const { logDeletion } = require("../../../utils/audit");
+      await logDeletion(req, deletedRow, "gallary_images", "officers");
+    } catch (e) {
+      console.error("❌ Audit log error:", e.message);
     }
 
     res.json({ success: true, message: "Deleted successfully" });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.json({ success: false, message: err.message });
   }
 });
 

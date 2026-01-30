@@ -18,8 +18,10 @@ router.post("/send-otp", async (req, res) => {
     // Store OTP
     otpStore.set(phone, otp);
 
-    // Show in terminal
-    console.log(`✅ OTP for ${phone} is: ${otp}`);
+    // Print OTP in terminal only when no SMS provider configured (development)
+    if (!process.env.FAST2SMS_KEY) {
+      console.log(`✅ Dev OTP for ${phone}: ${otp}`);
+    }
 
     // Send real SMS (if Fast2SMS key exists)
     if (process.env.FAST2SMS_KEY) {
@@ -29,7 +31,8 @@ router.post("/send-otp", async (req, res) => {
         message: `Your OTP is ${otp}. Valid for 10 minutes.`,
         numbers: phone
       });
-      console.log(`📱 SMS sent to ${phone}`);
+      // Optionally log that an SMS request was sent (without OTP)
+      console.log(`📱 SMS request sent to ${phone}`);
     }
 
     res.json({ success: true, message: "OTP sent" });
