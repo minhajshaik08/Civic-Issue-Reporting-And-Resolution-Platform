@@ -18,6 +18,23 @@ export default function MiddleAdminAddOfficerForm() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /* ================= VALIDATIONS ================= */
+
+  // ✅ Gmail-only validation
+  const isValidGmail = (email) => {
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return gmailRegex.test(email);
+  };
+
+  // ✅ Strong password validation
+  const isStrongPassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    return passwordRegex.test(password);
+  };
+
+  /* ================= HANDLERS ================= */
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -27,7 +44,7 @@ export default function MiddleAdminAddOfficerForm() {
     setError("");
     setSuccess("");
 
-    // ✅ validation (same behavior as Add Officer)
+    // ✅ Required fields
     if (
       !form.name.trim() ||
       !form.email.trim() ||
@@ -38,8 +55,17 @@ export default function MiddleAdminAddOfficerForm() {
       return;
     }
 
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    // ✅ Gmail validation
+    if (!isValidGmail(form.email.trim())) {
+      setError("Please enter a valid Gmail address (example@gmail.com).");
+      return;
+    }
+
+    // ✅ Strong password validation
+    if (!isStrongPassword(form.password.trim())) {
+      setError(
+        "Password must be at least 6 characters and include 1 uppercase letter, 1 number, and 1 special character."
+      );
       return;
     }
 
@@ -89,7 +115,7 @@ export default function MiddleAdminAddOfficerForm() {
 
   return (
     <>
-      {/* ✅ SAME STYLING AS ADD OFFICER */}
+      {/* ✅ SAME STYLING */}
       <style>{`
         .officer-page {
           min-height: 100vh;
@@ -222,14 +248,10 @@ export default function MiddleAdminAddOfficerForm() {
       `}</style>
 
       <div className="officer-page">
-        <form
-          className="officer-card"
-          onSubmit={handleSubmit}
-          autoComplete="off"
-        >
-          {/* 🚫 BLOCK BROWSER AUTOFILL */}
-          <input type="text" name="fakeuser" style={{ display: "none" }} />
-          <input type="password" name="fakepass" style={{ display: "none" }} />
+        <form className="officer-card" onSubmit={handleSubmit} autoComplete="off">
+          {/* 🚫 Block browser autofill */}
+          <input type="text" style={{ display: "none" }} />
+          <input type="password" style={{ display: "none" }} />
 
           <div className="officer-title">Add Officer (Middle Admin)</div>
           <div className="officer-subtitle">
@@ -246,7 +268,7 @@ export default function MiddleAdminAddOfficerForm() {
               ["Department", "department"],
               ["Zone", "zone"],
               ["Mobile *", "mobile"],
-              ["Email *", "email"],
+              ["Gmail *", "email"],
               ["Employee ID *", "employeeId"],
               ["Role", "role"],
             ].map(([label, name]) => (
@@ -259,6 +281,14 @@ export default function MiddleAdminAddOfficerForm() {
                   onChange={handleChange}
                   disabled={loading}
                   autoComplete="off"
+                  {...(name === "email"
+                    ? {
+                        type: "email",
+                        pattern:
+                          "^[a-zA-Z0-9._%+-]+@gmail\\.com$",
+                        title: "Only Gmail addresses are allowed",
+                      }
+                    : {})}
                 />
               </div>
             ))}
@@ -275,7 +305,9 @@ export default function MiddleAdminAddOfficerForm() {
               disabled={loading}
               autoComplete="new-password"
             />
-            <div className="helper">Minimum 6 characters.</div>
+            <div className="helper">
+              Min 6 chars, 1 uppercase, 1 number, 1 special character.
+            </div>
           </div>
 
           <div className="btn-row">

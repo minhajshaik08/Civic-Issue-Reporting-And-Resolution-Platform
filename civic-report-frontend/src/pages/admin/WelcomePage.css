@@ -3,6 +3,7 @@
   height: 100vh;
   overflow: hidden;
   width: 100%;
+
 }
 
 .dashboard-content-wrapper {
@@ -215,4 +216,7 @@
     font-size: 12px;
   }
 }
+
+/* Hero section styles (restored to match screenshot) */
+/* Hero styles intentionally not defined here to avoid overriding global site styles in App.css */
 

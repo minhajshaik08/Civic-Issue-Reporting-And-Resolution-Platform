@@ -18,6 +18,23 @@ export default function AddOfficerForm() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /* ================= VALIDATIONS ================= */
+
+  // ✅ Gmail-only validation
+  const isValidGmail = (email) => {
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return gmailRegex.test(email);
+  };
+
+  // ✅ Strong password validation
+  const isStrongPassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    return passwordRegex.test(password);
+  };
+
+  /* ================= HANDLERS ================= */
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -27,7 +44,7 @@ export default function AddOfficerForm() {
     setError("");
     setSuccess("");
 
-    // ✅ validation (Department mandatory)
+    // ✅ Required fields
     if (
       !form.name.trim() ||
       !form.email.trim() ||
@@ -39,8 +56,17 @@ export default function AddOfficerForm() {
       return;
     }
 
-    if (form.password.trim().length < 6) {
-      setError("Password must be at least 6 characters.");
+    // ✅ Gmail validation
+    if (!isValidGmail(form.email.trim())) {
+      setError("Please enter a valid Gmail address (example@gmail.com).");
+      return;
+    }
+
+    // ✅ Strong password validation
+    if (!isStrongPassword(form.password.trim())) {
+      setError(
+        "Password must be at least 6 characters and include 1 uppercase letter, 1 number, and 1 special character."
+      );
       return;
     }
 
@@ -51,7 +77,7 @@ export default function AddOfficerForm() {
 
       setSuccess("✅ Officer added successfully!");
 
-      // ✅ clear form on success
+      // ✅ Clear form
       setForm({
         name: "",
         designation: "",
@@ -89,7 +115,7 @@ export default function AddOfficerForm() {
 
   return (
     <>
-      {/* ✅ CSS inside same file */}
+      {/* ✅ CSS */}
       <style>{`
         .officer-page {
           min-height: 100vh;
@@ -214,11 +240,6 @@ export default function AddOfficerForm() {
           color: #111827;
         }
 
-        .btn-save:hover,
-        .btn-cancel:hover {
-          opacity: 0.9;
-        }
-
         .btn-save:disabled,
         .btn-cancel:disabled {
           opacity: 0.6;
@@ -227,22 +248,10 @@ export default function AddOfficerForm() {
       `}</style>
 
       <div className="officer-page">
-        <form
-          className="officer-card"
-          onSubmit={handleSubmit}
-          autoComplete="off"
-        >
-          {/* ✅ Hidden inputs to stop Chrome autofill */}
-          <input
-            type="text"
-            name="fakeusernameremembered"
-            style={{ display: "none" }}
-          />
-          <input
-            type="password"
-            name="fakepasswordremembered"
-            style={{ display: "none" }}
-          />
+        <form className="officer-card" onSubmit={handleSubmit} autoComplete="off">
+          {/* 🔒 Block Chrome autofill */}
+          <input type="text" style={{ display: "none" }} />
+          <input type="password" style={{ display: "none" }} />
 
           <div className="officer-title">Add Officer</div>
           <div className="officer-subtitle">
@@ -253,82 +262,33 @@ export default function AddOfficerForm() {
           {success && <div className="success-box">{success}</div>}
 
           <div className="form-grid">
-            {/* ✅ Name */}
             <div className="field">
               <label className="label">Name *</label>
-              <input
-                type="text"
-                className="input"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                disabled={loading}
-                required
-                autoComplete="off"
-              />
+              <input className="input" name="name" value={form.name} onChange={handleChange} disabled={loading} required />
             </div>
 
-            {/* ✅ Designation */}
             <div className="field">
               <label className="label">Designation</label>
-              <input
-                type="text"
-                className="input"
-                name="designation"
-                value={form.designation}
-                onChange={handleChange}
-                disabled={loading}
-                autoComplete="off"
-              />
+              <input className="input" name="designation" value={form.designation} onChange={handleChange} disabled={loading} />
             </div>
 
-            {/* ✅ Department (MANDATORY ✅) */}
             <div className="field">
               <label className="label">Department *</label>
-              <input
-                type="text"
-                className="input"
-                name="department"
-                value={form.department}
-                onChange={handleChange}
-                disabled={loading}
-                required
-                autoComplete="off"
-              />
+              <input className="input" name="department" value={form.department} onChange={handleChange} disabled={loading} required />
             </div>
 
-            {/* ✅ Zone */}
             <div className="field">
               <label className="label">Zone</label>
-              <input
-                type="text"
-                className="input"
-                name="zone"
-                value={form.zone}
-                onChange={handleChange}
-                disabled={loading}
-                autoComplete="off"
-              />
+              <input className="input" name="zone" value={form.zone} onChange={handleChange} disabled={loading} />
             </div>
 
-            {/* ✅ Mobile */}
             <div className="field">
               <label className="label">Mobile *</label>
-              <input
-                type="tel"
-                className="input"
-                name="mobile"
-                value={form.mobile}
-                onChange={handleChange}
-                disabled={loading}
-                required
-                autoComplete="off"
-              />
+              <input className="input" name="mobile" value={form.mobile} onChange={handleChange} disabled={loading} required />
             </div>
 
-            {/* ✅ Email */}
             <div className="field">
-              <label className="label">Email *</label>
+              <label className="label">Gmail *</label>
               <input
                 type="email"
                 className="input"
@@ -337,41 +297,22 @@ export default function AddOfficerForm() {
                 onChange={handleChange}
                 disabled={loading}
                 required
-                autoComplete="off"
+                pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                title="Only Gmail addresses are allowed"
               />
             </div>
 
-            {/* ✅ Employee ID */}
             <div className="field">
               <label className="label">Employee ID *</label>
-              <input
-                type="text"
-                className="input"
-                name="employeeId"
-                value={form.employeeId}
-                onChange={handleChange}
-                disabled={loading}
-                required
-                autoComplete="off"
-              />
+              <input className="input" name="employeeId" value={form.employeeId} onChange={handleChange} disabled={loading} required />
             </div>
 
-            {/* ✅ Role */}
             <div className="field">
               <label className="label">Role</label>
-              <input
-                type="text"
-                className="input"
-                name="role"
-                value={form.role}
-                onChange={handleChange}
-                disabled={loading}
-                autoComplete="off"
-              />
+              <input className="input" name="role" value={form.role} onChange={handleChange} disabled={loading} />
             </div>
           </div>
 
-          {/* ✅ Password full row */}
           <div className="field" style={{ marginTop: "14px" }}>
             <label className="label">Password *</label>
             <input
@@ -382,24 +323,19 @@ export default function AddOfficerForm() {
               onChange={handleChange}
               disabled={loading}
               required
-              minLength={6}
               autoComplete="new-password"
             />
-            <div className="helper">Minimum 6 characters.</div>
+            <div className="helper">
+              Min 6 chars, 1 uppercase, 1 number, 1 special character.
+            </div>
           </div>
 
-          {/* ✅ Buttons */}
           <div className="btn-row">
             <button type="submit" className="btn-save" disabled={loading}>
               {loading ? "Saving..." : "Save"}
             </button>
 
-            <button
-              type="button"
-              className="btn-cancel"
-              disabled={loading}
-              onClick={handleCancel}
-            >
+            <button type="button" className="btn-cancel" disabled={loading} onClick={handleCancel}>
               Cancel
             </button>
           </div>

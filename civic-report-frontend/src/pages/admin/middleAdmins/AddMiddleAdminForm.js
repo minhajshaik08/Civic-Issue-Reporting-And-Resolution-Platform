@@ -12,6 +12,23 @@ export default function AddMiddleAdminForm() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /* ================= VALIDATIONS ================= */
+
+  // ✅ Gmail only validation
+  const isValidGmail = (email) => {
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return gmailRegex.test(email);
+  };
+
+  // ✅ Strong password validation
+  const isStrongPassword = (password) => {
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    return passwordRegex.test(password);
+  };
+
+  /* ================= SUBMIT ================= */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -22,8 +39,15 @@ export default function AddMiddleAdminForm() {
       return;
     }
 
-    if (password.trim().length < 6) {
-      setError("Password must be at least 6 characters.");
+    if (!isValidGmail(email.trim())) {
+      setError("Please enter a valid Gmail address (example@gmail.com).");
+      return;
+    }
+
+    if (!isStrongPassword(password.trim())) {
+      setError(
+        "Password must be at least 6 characters and include 1 uppercase letter, 1 number, and 1 special character."
+      );
       return;
     }
 
@@ -47,7 +71,6 @@ export default function AddMiddleAdminForm() {
       } else {
         setSuccess("✅ Middle admin created successfully!");
 
-        // ✅ Clear fields
         setUsername("");
         setEmail("");
         setPassword("");
@@ -63,6 +86,8 @@ export default function AddMiddleAdminForm() {
     setLoading(false);
   };
 
+  /* ================= UI ================= */
+
   return (
     <div
       className="d-flex justify-content-center align-items-center"
@@ -74,13 +99,9 @@ export default function AddMiddleAdminForm() {
         style={{ width: "100%", maxWidth: "480px" }}
         autoComplete="off"
       >
-        {/* ✅ Hidden fields to block Chrome autofill */}
-        <input type="text" name="fakeusernameremembered" style={{ display: "none" }} />
-        <input
-          type="password"
-          name="fakepasswordremembered"
-          style={{ display: "none" }}
-        />
+        {/* 🔒 Hidden fields to block Chrome autofill */}
+        <input type="text" name="fakeuser" style={{ display: "none" }} />
+        <input type="password" name="fakepass" style={{ display: "none" }} />
 
         <h3 className="fw-bold text-center mb-2">Add Middle Admin</h3>
         <p className="text-muted text-center mb-4" style={{ fontSize: "14px" }}>
@@ -99,7 +120,7 @@ export default function AddMiddleAdminForm() {
           </div>
         )}
 
-        {/* ✅ Username */}
+        {/* Username */}
         <div className="mb-3">
           <label className="form-label fw-semibold">Username *</label>
           <input
@@ -115,23 +136,25 @@ export default function AddMiddleAdminForm() {
           />
         </div>
 
-        {/* ✅ Email */}
+        {/* Email */}
         <div className="mb-3">
-          <label className="form-label fw-semibold">Email *</label>
+          <label className="form-label fw-semibold">Gmail *</label>
           <input
             type="email"
             className="form-control"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
-            placeholder="Enter email"
+            placeholder="example@gmail.com"
             required
             autoComplete="off"
             name="middle_admin_email"
+            pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+            title="Only Gmail addresses are allowed"
           />
         </div>
 
-        {/* ✅ Password */}
+        {/* Password */}
         <div className="mb-3">
           <label className="form-label fw-semibold">Password *</label>
           <input
@@ -140,16 +163,18 @@ export default function AddMiddleAdminForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
-            placeholder="Enter password"
+            placeholder="Enter strong password"
             required
-            minLength={6}
             autoComplete="new-password"
             name="middle_admin_new_password"
+            minLength={6}
           />
-          <small className="text-muted">Minimum 6 characters.</small>
+          <small className="text-muted">
+            Min 6 chars, 1 uppercase, 1 number, 1 special character.
+          </small>
         </div>
 
-        {/* ✅ Buttons */}
+        {/* Buttons */}
         <div className="mt-4 d-flex gap-2">
           <button
             type="submit"

@@ -165,32 +165,23 @@ function HomePage() {
                   View Reported Issues
                 </Button>
               </div>
-            </Col>
-            
-
-            {/* RIGHT HERO HIGHLIGHT LIKE IMAGE */}
-            <Col md={5} className="mt-4 mt-md-0 hero-right-col">
-              <div className="hero-right-highlight d-flex align-items-start">
+              {/* RIGHT HERO HIGHLIGHT moved below buttons to match layout */}
+              <div className="hero-right-highlight d-flex align-items-start mt-3">
                 <div className="hero-highlight-icon me-3">
-                  {/* simple shield/check icon */}
                   <span>✅</span>
                 </div>
                 <div className="hero-highlight-content">
                   <h4 className="mb-2 hero-highlight-title">
                     24/7 System Available. 100% Secure &amp; Private. Real‑Time Updates.
-                    
                   </h4>
                   <ul className="hero-highlight-list mb-0">
-                    <li>
-                      Citizens can report any civic issue anytime.
-                    </li>
-                    <li>
-                      Receive updates and track issue status in real time.
-                    </li>
+                    <li>Citizens can report any civic issue anytime.</li>
+                    <li>Receive updates and track issue status in real time.</li>
                   </ul>
                 </div>
               </div>
             </Col>
+            
           </Row>
         </Container>
       </section>
