@@ -37,17 +37,24 @@
   object-fit: cover;
 }
 
+/* 🔥 FIXED SIZES */
 .profile-name {
   font-weight: 600;
   color: #fff;
-  font-size: 1rem;
-  margin-bottom: 4px;
+  font-size: 1.1rem;   /* increased */
+  margin-bottom: 6px;
 }
 
 .profile-role {
-  font-size: 0.85rem;
+  font-size: 0.95rem;  /* increased */
   color: #9ca3af;
   text-transform: capitalize;
+}
+.profile-name {
+  font-size: 1.2rem !important;
+}
+.profile-role {
+  font-size: 1rem !important;
 }
 
 /* Navigation Menu */
@@ -60,7 +67,7 @@
 }
 
 .sidebar-nav::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 .sidebar-nav::-webkit-scrollbar-track {
@@ -81,7 +88,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0.75rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   color: #d1d5db;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -210,9 +217,7 @@
   z-index: 999;
 }
 
-.sidebar-overlay.active {
-  display: block;
-}
+
 
 /* Mobile Sidebar Positioning */
 .sidebar-mobile {

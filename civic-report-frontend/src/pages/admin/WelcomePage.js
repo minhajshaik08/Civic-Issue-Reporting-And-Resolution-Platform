@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Row, Col, ListGroup, Card, Button } from "react-bootstrap";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Container, Row, Col, Card } from "react-bootstrap";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import HamburgerSidebar from "../../components/HamburgerSidebar";
 import "./WelcomePage.css";
 
 function WelcomePage() {
@@ -110,246 +111,128 @@ function WelcomePage() {
     }
   };
 
+  // ✅ Menu Items for Admin
+  const menuItems = [
+    { to: "/admin/welcome", label: "Home", icon: "🏠" },
+    { to: "/admin/welcome/middle-admins", label: "Admins", icon: "🧑‍💼" },
+    { to: "/admin/welcome/officers", label: "Officers", icon: "👮" },
+    { to: "/admin/welcome/users", label: "Users", icon: "👥" },
+    { to: "/admin/welcome/issues", label: "Issues", icon: "📋" },
+    { to: "/admin/welcome/reports", label: "Reports", icon: "📈" },
+    { to: "/admin/welcome/settings", label: "Settings", icon: "⚙️" },
+  ];
+
   return (
-    <Container fluid className="p-0 dashboard-layout">
-      <Row className="g-0">
-        {/* ✅ Sidebar */}
-        <Col md={2} className="bg-dark text-white min-vh-100 d-flex flex-column sidebar-fixed">
-          <div className="p-3">
-            {/* Avatar */}
-            <div
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                backgroundColor: "#6c757d",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 32,
-                fontWeight: "bold",
-                color: "#fff",
-                overflow: "hidden",
-                marginBottom: 8,
-              }}
-            >
-              {photoUrl ? (
-                <img
-                  src={photoUrl}
-                  alt="Profile"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <span>{initial.toUpperCase()}</span>
-              )}
-            </div>
+    <div className="dashboard-layout-wrapper">
+      <HamburgerSidebar
+        user={fullName || email || "User"}
+        photoUrl={photoUrl}
+        initial={initial}
+        menuItems={menuItems}
+        onLogout={handleLogout}
+        role={role}
+      />
 
-            {/* Name + role */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 600 }}>
-                {fullName || email || "User"}
+      <div className="dashboard-content-wrapper">
+        {isDashboard && (
+          <div className="p-4 dashboard-bg">
+            {/* ✅ Stat Cards (4 in single row) */}
+            <Row className="g-3 mb-4">
+              <Col md={3} sm={6} xs={12}>
+                <Card className="stat-card">
+                  <div className="stat-left">
+                    <div className="stat-icon blue">
+                      {getIcon("Total Issues")}
+                    </div>
+                    <div>
+                      <div className="stat-title">Total Issues</div>
+                      <div className="stat-value">{stats.totalIssues}</div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+
+              <Col md={3} sm={6} xs={12}>
+                <Card className="stat-card">
+                  <div className="stat-left">
+                    <div className="stat-icon green">
+                      {getIcon("Registered Users")}
+                    </div>
+                    <div>
+                      <div className="stat-title">Registered Users</div>
+                      <div className="stat-value">{stats.registeredUsers}</div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+
+              <Col md={3} sm={6} xs={12}>
+                <Card className="stat-card">
+                  <div className="stat-left">
+                    <div className="stat-icon yellow">
+                      {getIcon("On-duty Officers")}
+                    </div>
+                    <div>
+                      <div className="stat-title">On-duty Officers</div>
+                      <div className="stat-value">{stats.onDutyOfficers}</div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+
+              <Col md={3} sm={6} xs={12}>
+                <Card className="stat-card">
+                  <div className="stat-left">
+                    <div className="stat-icon orange">
+                      {getIcon("Resolved Issues")}
+                    </div>
+                    <div>
+                      <div className="stat-title">Resolved Issues</div>
+                      <div className="stat-value">{stats.resolvedIssues}</div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            </Row>
+
+            {/* ✅ Recent Issues */}
+            <Card className="recent-card">
+              <div className="recent-header">
+                <h5 className="mb-0">Recent Issues</h5>
               </div>
-              {role && (
-                <div style={{ fontSize: 12, color: "#d1d5db" }}>
-                  {role.replace("_", " ")}
-                </div>
-              )}
-            </div>
 
-            {/* Menu */}
-            <ListGroup variant="flush">
-              <div className="sidebar-menu">
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/admin/welcome"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">🏠</span>
-                    <span className="menu-text">Home</span>
-                  </Link>
-                </ListGroup.Item>
+              <div className="recent-list">
+                {recentIssues.length === 0 ? (
+                  <div style={{ padding: "10px", color: "#6b7280" }}>
+                    No recent issues found.
+                  </div>
+                ) : (
+                  recentIssues.map((issue) => (
+                    <div key={issue.id} className="recent-item">
+                      <div className="recent-badge warning">⚠</div>
 
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/admin/welcome/middle-admins"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/middle-admins') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">🧑‍💼</span>
-                    <span className="menu-text">Middle Admins</span>
-                  </Link>
-                </ListGroup.Item>
+                      <div className="recent-text">
+                        <div className="recent-title">
+                          {issue.issue_type}
+                        </div>
+                        <div className="recent-desc">{issue.description}</div>
+                      </div>
 
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/admin/welcome/officers"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/officers') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">👮</span>
-                    <span className="menu-text">Officers</span>
-                  </Link>
-                </ListGroup.Item>
-
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/admin/welcome/users"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/users') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">👥</span>
-                    <span className="menu-text">Users</span>
-                  </Link>
-                </ListGroup.Item>
-
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/admin/welcome/issues"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/issues') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">📋</span>
-                    <span className="menu-text">Issues</span>
-                  </Link>
-                </ListGroup.Item>
-
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/admin/welcome/reports"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/reports') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">📈</span>
-                    <span className="menu-text">Reports</span>
-                  </Link>
-                </ListGroup.Item>
-
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/admin/welcome/settings"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/settings') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">⚙️</span>
-                    <span className="menu-text">Settings</span>
-                  </Link>
-                </ListGroup.Item>
+                      {/* ✅ TIME (if today) else DATE */}
+                      <div className="recent-time">
+                        {formatIssueTime(issue.created_at)}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-            </ListGroup>
+            </Card>
           </div>
+        )}
 
-          {/* Logout */}
-          <div className="mt-auto p-3">
-            <Button
-              variant="outline-light"
-              size="sm"
-              className="w-50"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
-          </div>
-        </Col>
-
-        {/* ✅ Main Content */}
-        <Col md={10} className="p-4 dashboard-bg dashboard-content">
-          {isDashboard && (
-            <>
-              {/* ✅ Stat Cards (4 in single row) */}
-              <Row className="g-3 mb-4">
-                <Col md={3}>
-                  <Card className="stat-card">
-                    <div className="stat-left">
-                      <div className="stat-icon blue">
-                        {getIcon("Total Issues")}
-                      </div>
-                      <div>
-                        <div className="stat-title">Total Issues</div>
-                        <div className="stat-value">{stats.totalIssues}</div>
-                      </div>
-                    </div>
-                  </Card>
-                </Col>
-
-                <Col md={3}>
-                  <Card className="stat-card">
-                    <div className="stat-left">
-                      <div className="stat-icon green">
-                        {getIcon("Registered Users")}
-                      </div>
-                      <div>
-                        <div className="stat-title">Registered Users</div>
-                        <div className="stat-value">{stats.registeredUsers}</div>
-                      </div>
-                    </div>
-                  </Card>
-                </Col>
-
-                <Col md={3}>
-                  <Card className="stat-card">
-                    <div className="stat-left">
-                      <div className="stat-icon yellow">
-                        {getIcon("On-duty Officers")}
-                      </div>
-                      <div>
-                        <div className="stat-title">On-duty Officers</div>
-                        <div className="stat-value">{stats.onDutyOfficers}</div>
-                      </div>
-                    </div>
-                  </Card>
-                </Col>
-
-                <Col md={3}>
-                  <Card className="stat-card">
-                    <div className="stat-left">
-                      <div className="stat-icon orange">
-                        {getIcon("Resolved Issues")}
-                      </div>
-                      <div>
-                        <div className="stat-title">Resolved Issues</div>
-                        <div className="stat-value">{stats.resolvedIssues}</div>
-                      </div>
-                    </div>
-                  </Card>
-                </Col>
-              </Row>
-
-              {/* ✅ Recent Issues */}
-              <Card className="recent-card">
-                <div className="recent-header">
-                  <h5 className="mb-0">Recent Issues</h5>
-                  <Link to="/admin/welcome/issues" className="view-all-link">
-                    View All →
-                  </Link>
-                </div>
-
-                <div className="recent-list">
-                  {recentIssues.length === 0 ? (
-                    <div style={{ padding: "10px", color: "#6b7280" }}>
-                      No recent issues found.
-                    </div>
-                  ) : (
-                    recentIssues.map((issue) => (
-                      <div key={issue.id} className="recent-item">
-                        <div className="recent-badge warning">⚠</div>
-
-                        <div className="recent-text">
-                          <div className="recent-title">
-                            {issue.issue_type}
-                          </div>
-                          <div className="recent-desc">{issue.description}</div>
-                        </div>
-
-                        {/* ✅ TIME (if today) else DATE */}
-                        <div className="recent-time">
-                          {formatIssueTime(issue.created_at)}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </Card>
-            </>
-          )}
-
-          <Outlet />
-        </Col>
-      </Row>
-    </Container> 
+        <Outlet />
+      </div>
+    </div>
   );
 }
 

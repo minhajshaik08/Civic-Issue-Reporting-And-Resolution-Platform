@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col, ListGroup, Card, Button } from "react-bootstrap";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import HamburgerSidebar from "../../components/HamburgerSidebar";
+import "./OfficerDashboardPage.css";
 
 function OfficerDashboardPage() {
   const location = useLocation();
@@ -38,156 +40,44 @@ function OfficerDashboardPage() {
   }, [storedUser]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // ✅ REMOVE TOKEN
-    localStorage.removeItem("user");  // ✅ REMOVE USER
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login", { replace: true });
   };
 
-  const isActive = (to) => {
-    return location.pathname === to || location.pathname.startsWith(to);
-  };
+  // ✅ Menu Items for Officer
+  const menuItems = [
+    { to: "/officer/dashboard", label: "Home", icon: "🏠" },
+    { to: "/officer/dashboard/issues", label: "Issues", icon: "📋" },
+    { to: "/officer/dashboard/reports", label: "Reports", icon: "📈" },
+    { to: "/officer/dashboard/gallery-upload", label: "Gallery", icon: "🖼️" },
+    { to: "/officer/dashboard/settings", label: "Settings", icon: "⚙️" },
+  ];
 
   return (
-    <Container fluid className="p-0 dashboard-layout">
-      <Row className="g-0">
-        {/* Sidebar */}
-        <Col
-          md={2}
-          className="bg-dark text-white min-vh-100 d-flex flex-column justify-content-between sidebar-fixed"
-        >
-          <div className="p-3">
-            {/* Logo / Avatar */}
-            <div
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                backgroundColor: "#6c757d",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 32,
-                fontWeight: "bold",
-                color: "#fff",
-                overflow: "hidden",
-                marginBottom: 8,
-              }}
-            >
-              {photoUrl ? (
-                <img
-                  src={photoUrl}
-                  alt="Profile"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <span>{initial.toUpperCase()}</span>
-              )}
+    <div className="dashboard-layout-wrapper">
+      <HamburgerSidebar
+        user={fullName || email || "User"}
+        photoUrl={photoUrl}
+        initial={initial}
+        menuItems={menuItems}
+        onLogout={handleLogout}
+        role={role}
+      />
+
+      <div className="dashboard-content-wrapper">
+        {isDashboard && (
+          <div className="p-4 dashboard-bg">
+            <div className="welcome-section">
+              <h2>Welcome, {fullName || email || "Officer"}! 👋</h2>
+              <p>Here's your dashboard overview</p>
             </div>
-
-            {/* Role / name text */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 600 }}>
-                {fullName || email || "User"}
-              </div>
-              {role && (
-                <div style={{ fontSize: 12, color: "#d1d5db" }}>
-                  {role.replace("_", " ")}
-                </div>
-              )}
-            </div>
-
-            <ListGroup variant="flush">
-              {/* Officer dashboard main sections with icons */}
-              <div className="sidebar-menu">
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/officer/dashboard"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">🏠</span>
-                    <span className="menu-text">Home</span>
-                  </Link>
-                </ListGroup.Item>
-                
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/officer/dashboard/issues"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard/issues') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">📋</span>
-                    <span className="menu-text">Issues</span>
-                  </Link>
-                </ListGroup.Item>
-                
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/officer/dashboard/reports"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard/reports') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">📈</span>
-                    <span className="menu-text">Reports</span>
-                  </Link>
-                </ListGroup.Item>
-                
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/officer/dashboard/settings"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard/settings') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">⚙️</span>
-                    <span className="menu-text">Settings</span>
-                  </Link>
-                </ListGroup.Item>
-                
-                {/* Gallery Upload link to nested route */}
-                <ListGroup.Item className="bg-dark border-0 p-2">
-                  <Link
-                    to="/officer/dashboard/gallery-upload"
-                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard/gallery-upload') ? 'active-menu' : ''}`}
-                  >
-                    <span className="menu-icon">🖼️</span>
-                    <span className="menu-text">Gallery Upload</span>
-                  </Link>
-                </ListGroup.Item>
-                
-              </div>
-            </ListGroup>
           </div>
+        )}
 
-          {/* Logout near bottom, slightly above edge */}
-          <div style={{ padding: "1rem", marginBottom: "96px" }}>
-            <Button
-              variant="outline-light"
-              size="sm"
-              className="w-100"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
-          </div>
-        </Col>
-
-        {/* Main Content */}
-        <Col md={10} className="p-4 dashboard-content">
-          {/* Default 4 boxes only on /officer/dashboard */}
-          {isDashboard && (
-            <Row className="mb-4">
-              {[1, 2, 3, 4].map((item) => (
-                <Col md={3} key={item} className="mb-3">
-                  <Card className="shadow-sm text-center p-3">
-                    <h5>Box {item}</h5>
-                    <p>Placeholder</p>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          )}
-
-          {/* Nested route content renders here */}
-          <Outlet />
-        </Col>
-      </Row>
-    </Container>
+        <Outlet />
+      </div>
+    </div>
   );
 }
 
