@@ -1,5 +1,5 @@
 // App.js
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
 
@@ -11,6 +11,7 @@ import {
   Route,
   Link,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 
 import RequireAuth from "./components/RequireAuth";
@@ -164,6 +165,7 @@ function HomePage() {
                 </Button>
               </div>
             </Col>
+            
 
             {/* RIGHT HERO HIGHLIGHT LIKE IMAGE */}
             <Col md={5} className="mt-4 mt-md-0 hero-right-col">
@@ -368,38 +370,56 @@ function HomePage() {
 function App() {
   return (
     <Router>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm custom-navbar">
-        <div className="container-fluid px-3 px-md-4">
-          <Link to="/" className="navbar-brand custom-navbar-brand">
-            Civic Report
-          </Link>
+      <AppRoutes />
+    </Router>
+  );
+}
 
-          <div className="collapse navbar-collapse">
-            {/* Left nav links */}
-            <div className="navbar-nav me-auto custom-nav-links">
-              <Link to="/gallery" className="nav-link custom-nav-link">
-                Gallery
-              </Link>
-              <Link to="/report" className="nav-link custom-nav-link">
-                Report Issue
-              </Link>
-              <Link to="/view-issues" className="nav-link custom-nav-link">
-                View Issues
-              </Link>
-              <Link to="/contact" className="nav-link custom-nav-link">
-                Contact
-              </Link>
-            </div>
+function AppRoutes() {
+  const [navOpen, setNavOpen] = useState(false);
+  const location = useLocation();
+  const path = location.pathname || "";
+  const hideNav =
+    path.startsWith("/officer/dashboard") ||
+    path.startsWith("/middle-admin/dashboard") ||
+    path.startsWith("/admin/welcome");
 
-            {/* Right side - Only Login button */}
-            <div className="d-flex gap-2 custom-login-buttons">
-              <Link to="/Login" className="btn btn-sm custom-login-btn">
-                Login
-              </Link>
+  return (
+    <>
+      {!hideNav && (
+        <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm custom-navbar">
+          <div className="container-fluid px-3 px-md-4">
+            <Link to="/" className="navbar-brand custom-navbar-brand">
+              Civic Report
+            </Link>
+
+            <div className="collapse navbar-collapse">
+              {/* Left nav links */}
+              <div className="navbar-nav me-auto custom-nav-links">
+                <Link to="/gallery" className="nav-link custom-nav-link">
+                  Gallery
+                </Link>
+                <Link to="/report" className="nav-link custom-nav-link">
+                  Report Issue
+                </Link>
+                <Link to="/view-issues" className="nav-link custom-nav-link">
+                  View Issues
+                </Link>
+                <Link to="/contact" className="nav-link custom-nav-link">
+                  Contact
+                </Link>
+              </div>
+
+              {/* Right side - Only Login button */}
+              <div className="d-flex gap-2 custom-login-buttons">
+                <Link to="/Login" className="btn btn-sm custom-login-btn">
+                  Login
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       <Routes>
         {/* Public routes */}
@@ -601,7 +621,7 @@ function App() {
           </Route>
         </Route>
       </Routes>
-    </Router>
+    </>
   );
 }
 

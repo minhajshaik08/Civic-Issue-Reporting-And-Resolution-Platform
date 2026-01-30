@@ -72,6 +72,10 @@ function WelcomePage() {
     navigate("/login", { replace: true });
   };
 
+  const isActive = (to) => {
+    return location.pathname === to || location.pathname.startsWith(to);
+  };
+
   const getIcon = (label) => {
     if (label === "Total Issues") return "📋";
     if (label === "Registered Users") return "👥";
@@ -107,10 +111,10 @@ function WelcomePage() {
   };
 
   return (
-    <Container fluid className="p-0">
+    <Container fluid className="p-0 dashboard-layout">
       <Row className="g-0">
         {/* ✅ Sidebar */}
-        <Col md={2} className="bg-dark text-white min-vh-100 d-flex flex-column">
+        <Col md={2} className="bg-dark text-white min-vh-100 d-flex flex-column sidebar-fixed">
           <div className="p-3">
             {/* Avatar */}
             <div
@@ -154,59 +158,77 @@ function WelcomePage() {
 
             {/* Menu */}
             <ListGroup variant="flush">
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/admin/welcome/middle-admins"
-                  className="text-white text-decoration-none"
-                >
-                  Middle Admins
-                </Link>
-              </ListGroup.Item>
+              <div className="sidebar-menu">
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/admin/welcome"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">🏠</span>
+                    <span className="menu-text">Home</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/admin/welcome/officers"
-                  className="text-white text-decoration-none"
-                >
-                  Officers
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/admin/welcome/middle-admins"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/middle-admins') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">🧑‍💼</span>
+                    <span className="menu-text">Middle Admins</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/admin/welcome/users"
-                  className="text-white text-decoration-none"
-                >
-                  Users
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/admin/welcome/officers"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/officers') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">👮</span>
+                    <span className="menu-text">Officers</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/admin/welcome/issues"
-                  className="text-white text-decoration-none"
-                >
-                  Issues
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/admin/welcome/users"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/users') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">👥</span>
+                    <span className="menu-text">Users</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/admin/welcome/reports"
-                  className="text-white text-decoration-none"
-                >
-                  Reports
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/admin/welcome/issues"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/issues') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">📋</span>
+                    <span className="menu-text">Issues</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/admin/welcome/settings"
-                  className="text-white text-decoration-none"
-                >
-                  Settings
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/admin/welcome/reports"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/reports') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">📈</span>
+                    <span className="menu-text">Reports</span>
+                  </Link>
+                </ListGroup.Item>
+
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/admin/welcome/settings"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/admin/welcome/settings') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">⚙️</span>
+                    <span className="menu-text">Settings</span>
+                  </Link>
+                </ListGroup.Item>
+              </div>
             </ListGroup>
           </div>
 
@@ -224,7 +246,7 @@ function WelcomePage() {
         </Col>
 
         {/* ✅ Main Content */}
-        <Col md={10} className="p-4 dashboard-bg">
+        <Col md={10} className="p-4 dashboard-bg dashboard-content">
           {isDashboard && (
             <>
               {/* ✅ Stat Cards (4 in single row) */}

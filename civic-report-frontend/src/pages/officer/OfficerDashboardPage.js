@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col, ListGroup, Card, Button } from "react-bootstrap";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 function OfficerDashboardPage() {
   const location = useLocation();
@@ -43,13 +43,17 @@ function OfficerDashboardPage() {
     navigate("/login", { replace: true });
   };
 
+  const isActive = (to) => {
+    return location.pathname === to || location.pathname.startsWith(to);
+  };
+
   return (
-    <Container fluid className="p-0">
+    <Container fluid className="p-0 dashboard-layout">
       <Row className="g-0">
         {/* Sidebar */}
         <Col
           md={2}
-          className="bg-dark text-white min-vh-100 d-flex flex-column justify-content-between"
+          className="bg-dark text-white min-vh-100 d-flex flex-column justify-content-between sidebar-fixed"
         >
           <div className="p-3">
             {/* Logo / Avatar */}
@@ -93,43 +97,60 @@ function OfficerDashboardPage() {
             </div>
 
             <ListGroup variant="flush">
-              {/* Officer dashboard main sections */}
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/officer/dashboard/issues"
-                  className="text-white text-decoration-none"
-                >
-                  Issues
-                </Link>
-              </ListGroup.Item>
-
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/officer/dashboard/reports"
-                  className="text-white text-decoration-none"
-                >
-                  Reports
-                </Link>
-              </ListGroup.Item>
-
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/officer/dashboard/settings"
-                  className="text-white text-decoration-none"
-                >
-                  Settings
-                </Link>
-              </ListGroup.Item>
-
-              {/* Gallery Upload link to nested route */}
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/officer/dashboard/gallery-upload"
-                  className="text-white text-decoration-none"
-                >
-                  Gallery Upload
-                </Link>
-              </ListGroup.Item>
+              {/* Officer dashboard main sections with icons */}
+              <div className="sidebar-menu">
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/officer/dashboard"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">🏠</span>
+                    <span className="menu-text">Home</span>
+                  </Link>
+                </ListGroup.Item>
+                
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/officer/dashboard/issues"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard/issues') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">📋</span>
+                    <span className="menu-text">Issues</span>
+                  </Link>
+                </ListGroup.Item>
+                
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/officer/dashboard/reports"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard/reports') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">📈</span>
+                    <span className="menu-text">Reports</span>
+                  </Link>
+                </ListGroup.Item>
+                
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/officer/dashboard/settings"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard/settings') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">⚙️</span>
+                    <span className="menu-text">Settings</span>
+                  </Link>
+                </ListGroup.Item>
+                
+                {/* Gallery Upload link to nested route */}
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/officer/dashboard/gallery-upload"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/officer/dashboard/gallery-upload') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">🖼️</span>
+                    <span className="menu-text">Gallery Upload</span>
+                  </Link>
+                </ListGroup.Item>
+                
+              </div>
             </ListGroup>
           </div>
 
@@ -147,7 +168,7 @@ function OfficerDashboardPage() {
         </Col>
 
         {/* Main Content */}
-        <Col md={10} className="p-4">
+        <Col md={10} className="p-4 dashboard-content">
           {/* Default 4 boxes only on /officer/dashboard */}
           {isDashboard && (
             <Row className="mb-4">

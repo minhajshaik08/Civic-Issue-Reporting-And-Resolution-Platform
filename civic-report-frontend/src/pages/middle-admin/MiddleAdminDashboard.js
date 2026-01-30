@@ -71,6 +71,10 @@ function MiddleAdminDashboardPage() {
     navigate("/login", { replace: true });
   };
 
+  const isActive = (to) => {
+    return location.pathname === to || location.pathname.startsWith(to);
+  };
+
   const getIcon = (label) => {
     if (label === "Total Issues") return "📋";
     if (label === "Registered Users") return "👥";
@@ -80,10 +84,10 @@ function MiddleAdminDashboardPage() {
   };
 
   return (
-    <Container fluid className="p-0">
+    <Container fluid className="p-0 dashboard-layout">
       <Row className="g-0">
         {/* ===== SIDEBAR ===== */}
-        <Col md={2} className="bg-dark text-white min-vh-100 d-flex flex-column">
+        <Col md={2} className="bg-dark text-white min-vh-100 d-flex flex-column sidebar-fixed">
           <div className="p-3">
             {/* Avatar */}
             <div
@@ -127,50 +131,67 @@ function MiddleAdminDashboardPage() {
 
             {/* Menu */}
             <ListGroup variant="flush">
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/middle-admin/dashboard/officers"
-                  className="text-white text-decoration-none"
-                >
-                  Officers
-                </Link>
-              </ListGroup.Item>
+              <div className="sidebar-menu">
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/middle-admin/dashboard"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/middle-admin/dashboard') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">🏠</span>
+                    <span className="menu-text">Home</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/middle-admin/dashboard/users"
-                  className="text-white text-decoration-none"
-                >
-                  Users
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/middle-admin/dashboard/officers"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/middle-admin/dashboard/officers') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">👮</span>
+                    <span className="menu-text">Officers</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/middle-admin/dashboard/issues"
-                  className="text-white text-decoration-none"
-                >
-                  Issues
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/middle-admin/dashboard/users"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/middle-admin/dashboard/users') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">👥</span>
+                    <span className="menu-text">Users</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/middle-admin/dashboard/reports"
-                  className="text-white text-decoration-none"
-                >
-                  Reports
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/middle-admin/dashboard/issues"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/middle-admin/dashboard/issues') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">📋</span>
+                    <span className="menu-text">Issues</span>
+                  </Link>
+                </ListGroup.Item>
 
-              <ListGroup.Item className="bg-dark border-0 p-2">
-                <Link
-                  to="/middle-admin/dashboard/settings"
-                  className="text-white text-decoration-none"
-                >
-                  Settings
-                </Link>
-              </ListGroup.Item>
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/middle-admin/dashboard/reports"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/middle-admin/dashboard/reports') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">📈</span>
+                    <span className="menu-text">Reports</span>
+                  </Link>
+                </ListGroup.Item>
+
+                <ListGroup.Item className="bg-dark border-0 p-2">
+                  <Link
+                    to="/middle-admin/dashboard/settings"
+                    className={`text-white text-decoration-none d-flex align-items-center ${isActive('/middle-admin/dashboard/settings') ? 'active-menu' : ''}`}
+                  >
+                    <span className="menu-icon">⚙️</span>
+                    <span className="menu-text">Settings</span>
+                  </Link>
+                </ListGroup.Item>
+              </div>
             </ListGroup>
           </div>
 
@@ -187,7 +208,7 @@ function MiddleAdminDashboardPage() {
         </Col>
 
         {/* ===== MAIN CONTENT ===== */}
-        <Col md={10} className="p-4 dashboard-bg">
+        <Col md={10} className="p-4 dashboard-bg dashboard-content">
           {isDashboard && (
             <>
               {/* ===== STAT CARDS ===== */}
