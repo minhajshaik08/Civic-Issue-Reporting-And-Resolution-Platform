@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { showToast } from "../../../components/Toast";
 
 export default function EditOfficerForm() {
   const location = useLocation();
@@ -101,8 +102,8 @@ export default function EditOfficerForm() {
       if (!data.success) {
         setError(data.message || "Failed to update officer.");
       } else {
-        alert("✅ Officer updated successfully.");
-        navigate("/admin/welcome/officers/edit");
+        showToast("✅ Officer updated successfully.", "success");
+        setTimeout(() => navigate("/admin/welcome/officers/edit"), 1500);
       }
     } catch {
       setError("Network error while updating officer.");

@@ -1,6 +1,7 @@
 // src/pages/middle-admin/officers/MiddleAdminEditOfficerForm.js
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { showToast } from "../../../components/Toast";
 
 export default function MiddleAdminEditOfficerForm() {
   const location = useLocation();
@@ -102,8 +103,8 @@ export default function MiddleAdminEditOfficerForm() {
       if (!data.success) {
         setError(data.message || "Failed to update officer.");
       } else {
-        alert("✅ Officer updated successfully.");
-        navigate("/middle-admin/dashboard/officers/edit");
+        showToast("✅ Officer updated successfully.", "success");
+        setTimeout(() => navigate("/middle-admin/dashboard/officers/edit"), 1500);
       }
     } catch {
       setError("Network error while updating officer.");

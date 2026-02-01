@@ -1,6 +1,7 @@
 // src/pages/admin/issues/IssueDetails.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { showToast } from "../../../components/Toast";
 
 const IssueDetails = () => {
   const { id } = useParams();
@@ -41,7 +42,7 @@ const IssueDetails = () => {
     const newStatus = e.target.value;
 
     if (!currentUser) {
-      alert("No logged-in user found");
+      showToast("No logged-in user found", "error");
       return;
     }
 
@@ -65,13 +66,14 @@ const IssueDetails = () => {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        alert(data.message || "Failed to update status");
+        showToast(data.message || "Failed to update status", "error");
         return;
       }
 
       setIssue((prev) => ({ ...prev, status: newStatus }));
+      showToast("Status updated successfully", "success");
     } catch (err) {
-      alert("Error updating status");
+      showToast("Error updating status", "error");
     } finally {
       setUpdating(false);
     }

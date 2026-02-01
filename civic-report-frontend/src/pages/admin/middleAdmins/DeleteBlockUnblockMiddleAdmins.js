@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { showToast } from "../../../components/Toast";
+import { confirm } from "../../../components/Confirm";
 
 export default function DeleteBlockUnblockMiddleAdmins() {
   const [admins, setAdmins] = useState([]);
@@ -79,22 +81,26 @@ export default function DeleteBlockUnblockMiddleAdmins() {
       const data = await res.json();
 
       if (!data.success) {
-        alert(data.message || "Failed to change block status");
+        showToast(data.message || "Failed to change block status", "error");
       } else {
         // ✅ Update instantly using returned admin row
         setAdmins((prev) =>
           prev.map((a) => (a.id === admin.id ? data.admin : a))
         );
+        showToast(admin.is_blocked ? "Admin blocked successfully" : "Admin unblocked successfully", "success");
       }
     } catch {
-      alert("Network error");
+      showToast("Network error", "error");
     }
   };
 
   // ✅ Delete admin
   const deleteAdmin = async (admin) => {
-    if (!window.confirm(`Are you sure you want to delete ${admin.username}?`))
-      return;
+    const confirmed = await confirm(
+      `Are you sure you want to delete ${admin.username}?`,
+      "Delete Admin"
+    );
+    if (!confirmed) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -112,13 +118,14 @@ export default function DeleteBlockUnblockMiddleAdmins() {
       const data = await res.json();
 
       if (!data.success) {
-        alert(data.message || "Failed to delete admin");
+        showToast(data.message || "Failed to delete admin", "error");
       } else {
         // ✅ Remove instantly from UI
         setAdmins((prev) => prev.filter((a) => a.id !== admin.id));
+        showToast("Admin deleted successfully", "success");
       }
     } catch {
-      alert("Network error");
+      showToast("Network error", "error");
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { showToast } from "../../../components/Toast";
 
 export default function EditMiddleAdminForm() {
   const navigate = useNavigate();
@@ -59,7 +60,8 @@ export default function EditMiddleAdminForm() {
       if (!data.success) {
         setError(data.message || "Failed to update middle admin.");
       } else {
-        navigate("/admin/welcome/middle-admins/list");
+        showToast("✅ Middle admin updated successfully.", "success");
+        setTimeout(() => navigate("/admin/welcome/middle-admins/list"), 1500);
       }
     } catch {
       setError("Network error.");

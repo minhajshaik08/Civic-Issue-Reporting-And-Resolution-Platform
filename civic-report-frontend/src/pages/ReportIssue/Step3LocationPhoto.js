@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
+import { showToast } from "../../components/Toast";
 import LocationMap from "./LocationMap";
 
 function Step3LocationPhoto({
@@ -43,7 +44,7 @@ function Step3LocationPhoto({
 
   const handleSubmitClick = () => {
     if (!locationText.trim()) {
-      alert("Please enter the location details.");
+      showToast("Please enter the location details.", "error");
       return;
     }
     onSubmit();

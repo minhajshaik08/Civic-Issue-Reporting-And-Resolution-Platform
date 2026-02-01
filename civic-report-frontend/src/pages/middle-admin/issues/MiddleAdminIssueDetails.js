@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { showToast } from "../../../components/Toast";
 
 const MiddleAdminIssueDetails = () => {
   const { id } = useParams();
@@ -42,7 +43,7 @@ const MiddleAdminIssueDetails = () => {
     const newStatus = e.target.value;
 
     if (!currentUser || !currentUser.id) {
-      alert("No logged-in user found");
+      showToast("No logged-in user found", "error");
       return;
     }
 
@@ -67,13 +68,14 @@ const MiddleAdminIssueDetails = () => {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        alert(data.message || "Failed to update status");
+        showToast(data.message || "Failed to update status", "error");
         return;
       }
 
       setIssue((prev) => ({ ...prev, status: newStatus }));
+      showToast("Status updated successfully", "success");
     } catch {
-      alert("Error updating status");
+      showToast("Error updating status", "error");
     } finally {
       setUpdating(false);
     }

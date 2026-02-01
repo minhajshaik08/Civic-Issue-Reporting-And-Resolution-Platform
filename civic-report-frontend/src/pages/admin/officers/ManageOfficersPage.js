@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { showToast } from "../../../components/Toast";
+import { confirm } from "../../../components/Confirm";
 
 export default function ManageOfficersPage() {
   const [officers, setOfficers] = useState([]);
@@ -101,12 +103,12 @@ export default function ManageOfficersPage() {
       const data = await safeJson(res);
 
       if (!res.ok) {
-        alert(data.message || "Server error while blocking/unblocking");
+        showToast(data.message || "Server error while blocking/unblocking", "error");
         return;
       }
 
       if (!data.success) {
-        alert(data.message || "Failed to change block status");
+        showToast(data.message || "Failed to change block status", "error");
       } else {
         // ✅ update instantly in UI
         setOfficers((prev) =>
@@ -114,15 +116,20 @@ export default function ManageOfficersPage() {
             o.id === officer.id ? { ...o, status: newBlockStatus ? 1 : 0 } : o
           )
         );
+        showToast(newBlockStatus ? "Officer blocked successfully" : "Officer unblocked successfully", "success");
       }
     } catch {
-      alert("❌ Backend not reachable. Check server running on port 5000.");
+      showToast("❌ Backend not reachable. Check server running on port 5000.", "error");
     }
   };
 
   // ✅ Delete officer
   const deleteOfficer = async (officer) => {
-    if (!window.confirm(`Are you sure to delete ${officer.name}?`)) return;
+    const confirmed = await confirm(
+      `Are you sure you want to delete ${officer.name}?`,
+      "Delete Officer"
+    );
+    if (!confirmed) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -140,18 +147,19 @@ export default function ManageOfficersPage() {
       const data = await safeJson(res);
 
       if (!res.ok) {
-        alert(data.message || "Server error while deleting");
+        showToast(data.message || "Server error while deleting", "error");
         return;
       }
 
       if (!data.success) {
-        alert(data.message || "Failed to delete officer");
+        showToast(data.message || "Failed to delete officer", "error");
       } else {
         // ✅ remove instantly
         setOfficers((prev) => prev.filter((o) => o.id !== officer.id));
+        showToast("Officer deleted successfully", "success");
       }
     } catch {
-      alert("❌ Backend not reachable. Check server running on port 5000.");
+      showToast("❌ Backend not reachable. Check server running on port 5000.", "error");
     }
   };
 

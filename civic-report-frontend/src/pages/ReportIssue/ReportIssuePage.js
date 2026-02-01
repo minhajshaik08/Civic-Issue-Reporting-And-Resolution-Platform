@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "../../components/Toast";
+import { confirm } from "../../components/Confirm";
 
 import Step1UserDetails from "./Step1UserDetails";
 import Step2ProblemDetails from "./Step2ProblemDetails";
@@ -67,7 +69,7 @@ function ReportIssuePage() {
   // ✅ SEND OTP
   const handleSendOtp = async () => {
     if (!fullName.trim()) {
-      alert("Please enter your full name before continuing.");
+      showToast("Please enter your full name before continuing.", "error");
       return;
     }
 
@@ -116,7 +118,7 @@ function ReportIssuePage() {
   // ✅ VERIFY OTP BUTTON
   const handleVerifyOtp = async () => {
     if (!fullName.trim()) {
-      alert("Please enter your full name before continuing.");
+      showToast("Please enter your full name before continuing.", "error");
       return;
     }
 
@@ -181,13 +183,20 @@ function ReportIssuePage() {
     const normalized = normalizeIndianPhone(phone);
 
     if (!mapPosition) {
-      alert("Please select the location on the map.");
+      showToast("Please select the location on the map.", "error");
       return;
     }
     if (!photoFiles || photoFiles.length === 0) {
-      alert("Please upload at least one photo.");
+      showToast("Please upload at least one photo.", "error");
       return;
     }
+
+    // ✅ Confirm before submitting
+    const confirmed = await confirm(
+      "Are you sure you want to submit this issue report?",
+      "Submit Report"
+    );
+    if (!confirmed) return;
 
     const formData = new FormData();
     formData.append("fullName", fullName);
@@ -208,15 +217,15 @@ function ReportIssuePage() {
       const data = await res.json();
 
       if (!data.success) {
-        alert(data.message || "Failed to save issue");
+        showToast(data.message || "Failed to save issue", "error");
         return;
       }
     } catch (e) {
-      alert("Network error while saving issue");
+      showToast("Network error while saving issue", "error");
       return;
     }
 
-    alert("Report submitted successfully!");
+    showToast("Report submitted successfully!", "success");
 
     // reset everything
     setFullName("");

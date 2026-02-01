@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Spinner, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "../../../components/Toast";
 
 const OfficerIssuesReportPage = () => {
   const [statusFilter, setStatusFilter] = useState("");
@@ -64,7 +65,7 @@ const OfficerIssuesReportPage = () => {
       );
 
       if (!res.ok) {
-        alert("Failed to download report");
+        showToast("Failed to download report", "error");
         return;
       }
 
@@ -77,8 +78,9 @@ const OfficerIssuesReportPage = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      showToast("Report downloaded successfully", "success");
     } catch {
-      alert("Download error");
+      showToast("Download error", "error");
     } finally {
       setDownloadLoading(false);
     }

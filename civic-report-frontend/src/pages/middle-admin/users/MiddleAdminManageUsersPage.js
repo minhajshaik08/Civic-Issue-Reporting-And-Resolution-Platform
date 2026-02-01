@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { showToast } from "../../../components/Toast";
+import { confirm } from "../../../components/Confirm";
 
 export default function MiddleAdminManageUsersPage() {
   const [users, setUsers] = useState([]);
@@ -52,7 +54,11 @@ export default function MiddleAdminManageUsersPage() {
 
   const toggleBlock = async (user) => {
     const action = user.is_blocked ? "Unblock" : "Block";
-    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
+    const confirmed = await confirm(
+      `Are you sure you want to ${action} this user?`,
+      `${action} User`
+    );
+    if (!confirmed) return;
 
     try {
       const res = await fetch(
@@ -75,11 +81,12 @@ export default function MiddleAdminManageUsersPage() {
               : u
           )
         );
+        showToast(user.is_blocked ? "User unblocked successfully" : "User blocked successfully", "success");
       } else {
-        alert(data.message || "Failed to update status");
+        showToast(data.message || "Failed to update status", "error");
       }
     } catch {
-      alert("Network error");
+      showToast("Network error", "error");
     }
   };
 

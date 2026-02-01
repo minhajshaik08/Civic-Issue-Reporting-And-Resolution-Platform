@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { showToast } from "../../components/Toast";
 
 function AdminSignupPage() {
   const [username, setUsername] = useState("");
@@ -19,18 +20,19 @@ function AdminSignupPage() {
     e.preventDefault();
 
     if (!username.trim()) {
-      alert("Please enter a username.");
+      showToast("Please enter a username.", "error");
       return;
     }
 
     if (!isValidEmail(email)) {
-      alert("Please enter a valid email address.");
+      showToast("Please enter a valid email address.", "error");
       return;
     }
 
     if (!isValidPassword(password)) {
-      alert(
-        "Password must be at least 6 characters and contain at least one uppercase letter, one number, and one special character."
+      showToast(
+        "Password must be at least 6 characters and contain at least one uppercase letter, one number, and one special character.",
+        "error"
       );
       return;
     }
@@ -45,13 +47,13 @@ function AdminSignupPage() {
       const data = await response.json();
 
       if (data.success) {
-        alert("Account created and saved in database.");
-        navigate("/admin/login");
+        showToast("Account created successfully!", "success");
+        setTimeout(() => navigate("/admin/login"), 1500);
       } else {
-        alert(data.error || "Signup failed.");
+        showToast(data.error || "Signup failed.", "error");
       }
     } catch (err) {
-      alert("Network error. Please check if backend is running on port 5000.");
+      showToast("Network error. Please check if backend is running on port 5000.", "error");
     }
   };
 

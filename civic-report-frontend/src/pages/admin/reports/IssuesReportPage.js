@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Form, Spinner } from "react-bootstrap";
+import { showToast } from "../../../components/Toast";
 
 const IssuesReportPage = () => {
   const [period, setPeriod] = useState("daily"); // all | daily | weekly | monthly
@@ -87,7 +88,7 @@ const IssuesReportPage = () => {
       );
 
       if (!res.ok) {
-        alert("Failed to download report");
+        showToast("Failed to download report", "error");
         return;
       }
 
@@ -108,8 +109,9 @@ const IssuesReportPage = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      showToast("Report downloaded successfully", "success");
     } catch (err) {
-      alert("Error downloading report");
+      showToast("Error downloading report", "error");
     }
   };
 

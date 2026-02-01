@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Button } from "react-bootstrap";
+import { showToast } from "../../components/Toast";
 
 function Step2ProblemDetails({
   issueType,
@@ -11,11 +12,11 @@ function Step2ProblemDetails({
 }) {
   const handleNext = () => {
     if (!issueType) {
-      alert("Please select the type of issue.");
+      showToast("Please select the type of issue.", "error");
       return;
     }
     if (!description.trim()) {
-      alert("Please enter the problem description.");
+      showToast("Please enter the problem description.", "error");
       return;
     }
     onNext(); // go to Step 3 only if both are valid
