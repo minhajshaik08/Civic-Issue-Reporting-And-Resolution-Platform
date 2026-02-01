@@ -3,13 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const mysql = require("mysql2/promise");
 const jwt = require("jsonwebtoken");
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const dbConfig = require("../config/database");
 
 async function getConnection() {
   return mysql.createConnection(dbConfig);

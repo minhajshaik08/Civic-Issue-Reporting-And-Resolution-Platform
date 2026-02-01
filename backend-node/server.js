@@ -273,14 +273,7 @@ app.use("/api/officer/reports", officerIssuesReportsDownloadRouter);
 
 /* ================= HEALTH CHECK ================= */
 
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-// Simple API health check
-
-/* ================= 404 HANDLER ================= */
-
-app.use((req, res) => {
+ app.use((req, res) => {
   res.status(404).json({ success: false, message: "API route not found" });
 });
 // Ensures frontend never receives HTML

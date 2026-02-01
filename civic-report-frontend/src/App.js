@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Container, Row, Col, Button } from "react-bootstrap";
 import {
@@ -438,206 +439,144 @@ function AppRoutes() {
         </div>
       )}
 
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/report" element={<ReportIssuePage />} />
-        <Route path="/view-issues" element={<ViewIssuePage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/gallery" element={<MainGalleryPage />} />
+     <Routes>
 
-        {/* Login routes using /Login */}
-        <Route path="/Login" element={<AdminLoginPage />} />
-        <Route path="/Login/login" element={<AdminLoginPage />} />
-        <Route path="/Login/forgot-password" element={<AdminForgotPassword />} />
-        <Route path="/Login/reset-password" element={<AdminResetPassword />} />
+  {/* ================= PUBLIC ROUTES (WRAPPED) ================= */}
+  <Route element={<RequireAuth />}>
+    <Route path="/" element={<HomePage />} />
+    <Route path="/report" element={<ReportIssuePage />} />
+    <Route path="/view-issues" element={<ViewIssuePage />} />
+    <Route path="/contact" element={<ContactPage />} />
+    <Route path="/gallery" element={<MainGalleryPage />} />
 
-        {/* MIDDLE ADMIN DASHBOARD (protected) */}
-        <Route element={<RequireAuth allowedRoles={["middle_admin"]} />}>
-          <Route
-            path="/middle-admin/dashboard"
-            element={<MiddleAdminDashboardPage />}
-          >
-            <Route index element={<></>} />
+    {/* Login routes */}
+    <Route path="/Login" element={<AdminLoginPage />} />
+    <Route path="/Login/login" element={<AdminLoginPage />} />
+    <Route path="/Login/forgot-password" element={<AdminForgotPassword />} />
+    <Route path="/Login/reset-password" element={<AdminResetPassword />} />
+  </Route>
 
-            {/* officers */}
-            <Route path="officers" element={<MiddleAdminOfficerOptionsPage />} />
-            <Route path="officers/add" element={<MiddleAdminAddOfficerForm />} />
-            <Route
-              path="officers/edit"
-              element={<MiddleAdminOfficerListEdit />}
-            />
-            <Route
-              path="officers/editform"
-              element={<MiddleAdminEditOfficerForm />}
-            />
-            <Route
-              path="officers/manage"
-              element={<MiddleAdminManageOfficersPage />}
-            />
-            <Route
-              path="officers/list"
-              element={<MiddleAdminOfficerListPage />}
-            />
 
-            {/* users */}
-            <Route path="users" element={<MiddleAdminUserOptionsPage />} />
-            <Route path="users/manage" element={<MiddleAdminManageUsersPage />} />
-            <Route
-              path="users/activity"
-              element={<MiddleAdminUserActivityPage />}
-            />
-            <Route path="users/list" element={<MiddleAdminUserListPage />} />
+  {/* ================= MIDDLE ADMIN DASHBOARD ================= */}
+  <Route element={<RequireAuth allowedRoles={["middle_admin"]} />}>
+    <Route
+      path="/middle-admin/dashboard"
+      element={<MiddleAdminDashboardPage />}
+    >
+      <Route index element={<></>} />
 
-            {/* issues */}
-            <Route path="issues" element={<MiddleAdminIssuesOptions />} />
-            <Route path="issues/:id" element={<MiddleAdminIssueDetails />} />
-            <Route path="issues/list" element={<MiddleAdminIssuesList />} />
-            <Route
-              path="issues/assign"
-              element={<MiddleAdminAssignIssuesPage />}
-            />
+      {/* officers */}
+      <Route path="officers" element={<MiddleAdminOfficerOptionsPage />} />
+      <Route path="officers/add" element={<MiddleAdminAddOfficerForm />} />
+      <Route path="officers/edit" element={<MiddleAdminOfficerListEdit />} />
+      <Route path="officers/editform" element={<MiddleAdminEditOfficerForm />} />
+      <Route path="officers/manage" element={<MiddleAdminManageOfficersPage />} />
+      <Route path="officers/list" element={<MiddleAdminOfficerListPage />} />
 
-            {/* reports */}
-            <Route path="reports" element={<MiddleAdminReportsHomePage />} />
-            <Route
-              path="reports/areas/details"
-              element={<MiddleAdminAreaDetailsPage />}
-            />
-            <Route
-              path="reports/areas"
-              element={<MiddleAdminAreasReportPage />}
-            />
-            <Route
-              path="reports/issues"
-              element={<MiddleAdminIssuesReportPage />}
-            />
-            <Route
-              path="reports/officers/performance"
-              element={<MiddleAdminOfficerPerformancePage />}
-            />
+      {/* users */}
+      <Route path="users" element={<MiddleAdminUserOptionsPage />} />
+      <Route path="users/manage" element={<MiddleAdminManageUsersPage />} />
+      <Route path="users/activity" element={<MiddleAdminUserActivityPage />} />
+      <Route path="users/list" element={<MiddleAdminUserListPage />} />
 
-            {/* settings */}
-            <Route path="settings" element={<MiddleAdminSettingsPage />} />
-            <Route
-              path="settings/appearance"
-              element={<MiddleAdminAppearanceSettingsPage />}
-            />
-            <Route
-              path="settings/profile"
-              element={<MiddleAdminProfileSettingsPage />}
-            />
-            <Route
-              path="settings/security"
-              element={<MiddleAdminSecuritySettingsPage />}
-            />
-          </Route>
-        </Route>
+      {/* issues */}
+      <Route path="issues" element={<MiddleAdminIssuesOptions />} />
+      <Route path="issues/:id" element={<MiddleAdminIssueDetails />} />
+      <Route path="issues/list" element={<MiddleAdminIssuesList />} />
+      <Route path="issues/assign" element={<MiddleAdminAssignIssuesPage />} />
 
-        {/* OFFICER DASHBOARD (protected) */}
-        <Route element={<RequireAuth allowedRoles={["officer"]} />}>
-          <Route path="/officer/dashboard" element={<OfficerDashboardPage />}>
-            <Route index element={<div>Officer dashboard home</div>} />
-            <Route path="issues" element={<OfficerIssuesList />} />
-            <Route path="issues/:id" element={<OfficerIssueDetails />} />
-            <Route path="reports" element={<OfficerIssuesReportPage />} />
+      {/* reports */}
+      <Route path="reports" element={<MiddleAdminReportsHomePage />} />
+      <Route path="reports/areas/details" element={<MiddleAdminAreaDetailsPage />} />
+      <Route path="reports/areas" element={<MiddleAdminAreasReportPage />} />
+      <Route path="reports/issues" element={<MiddleAdminIssuesReportPage />} />
+      <Route
+        path="reports/officers/performance"
+        element={<MiddleAdminOfficerPerformancePage />}
+      />
 
-            {/* Settings main page with 3 cards */}
-            <Route path="settings" element={<OfficerSettingsPage />} />
+      {/* settings */}
+      <Route path="settings" element={<MiddleAdminSettingsPage />} />
+      <Route path="settings/appearance" element={<MiddleAdminAppearanceSettingsPage />} />
+      <Route path="settings/profile" element={<MiddleAdminProfileSettingsPage />} />
+      <Route path="settings/security" element={<MiddleAdminSecuritySettingsPage />} />
+    </Route>
+  </Route>
 
-            {/* Separate pages, not children of OfficerSettingsPage */}
-            <Route
-              path="settings/profile"
-              element={<OfficerProfileSettingsPage />}
-            />
-            <Route
-              path="settings/security"
-              element={<OfficerSecuritySettingsPage />}
-            />
-            <Route
-              path="settings/appearance"
-              element={<OfficerAppearanceSettingsPage />}
-            />
-            <Route path="gallery-upload" element={<GalleryOptionsPage />} />
-            <Route path="gallery-upload/list" element={<GalleryListPage />} />
-            <Route
-              path="gallery-upload/new"
-              element={<OfficerGalleryUploadPage />}
-            />
-          </Route>
-        </Route>
 
-        {/* ADMIN DASHBOARD (protected) */}
-        <Route element={<RequireAuth allowedRoles={["super_admin"]} />}>
-          <Route path="/admin/welcome" element={<WelcomePage />}>
-            <Route index element={<></>} />
+  {/* ================= OFFICER DASHBOARD ================= */}
+  <Route element={<RequireAuth allowedRoles={["officer"]} />}>
+    <Route path="/officer/dashboard" element={<OfficerDashboardPage />}>
+      <Route index element={<div>Officer dashboard home</div>} />
+      <Route path="issues" element={<OfficerIssuesList />} />
+      <Route path="issues/:id" element={<OfficerIssueDetails />} />
+      <Route path="reports" element={<OfficerIssuesReportPage />} />
 
-            {/* Issues routes */}
-            <Route path="issues" element={<Issuesoptions />} />
-            <Route path="issues/list" element={<Issueslist />} />
-            <Route path="issues/:id" element={<IssueDetails />} />
+      <Route path="settings" element={<OfficerSettingsPage />} />
+      <Route path="settings/profile" element={<OfficerProfileSettingsPage />} />
+      <Route path="settings/security" element={<OfficerSecuritySettingsPage />} />
+      <Route path="settings/appearance" element={<OfficerAppearanceSettingsPage />} />
 
-            {/* Middle admin routes */}
-            <Route path="middle-admins" element={<MiddleAdminpageoptions />} />
-            <Route path="middle-admins/add" element={<AddMiddleAdminForm />} />
-            <Route
-              path="middle-admins/list"
-              element={<ViewMiddleAdminsList />}
-            />
-            <Route
-              path="middle-admins/edit"
-              element={<EditMiddleAdminForm />}
-            />
-            <Route
-              path="middle-admins/edit-list"
-              element={<EditMiddleAdminsList />}
-            />
-            <Route
-              path="middle-admins/manage"
-              element={<DeleteBlockUnblockMiddleAdmins />}
-            />
+      <Route path="gallery-upload" element={<GalleryOptionsPage />} />
+      <Route path="gallery-upload/list" element={<GalleryListPage />} />
+      <Route path="gallery-upload/new" element={<OfficerGalleryUploadPage />} />
+    </Route>
+  </Route>
 
-            {/* Officer routes */}
-            <Route path="officers" element={<OfficerOptionsPage />} />
-            <Route path="officers/add" element={<AddOfficerForm />} />
-            <Route path="officers/list" element={<OfficerListPage />} />
-            <Route path="officers/manage" element={<ManageOfficersPage />} />
-            <Route path="officers/edit" element={<OfficerListEdit />} />
-            <Route path="officers/editform" element={<EditOfficerForm />} />
 
-            {/* User routes */}
-            <Route path="users" element={<UserOptionsPage />} />
-            <Route path="users/list" element={<UserListPage />} />
-            <Route path="users/manage" element={<ManageUsersPage />} />
-            <Route path="users/activity" element={<UserActivityPage />} />
+  {/* ================= SUPER ADMIN DASHBOARD ================= */}
+  <Route element={<RequireAuth allowedRoles={["super_admin"]} />}>
+    <Route path="/admin/welcome" element={<WelcomePage />}>
+      <Route index element={<></>} />
 
-            {/* Settings routes */}
-            <Route path="settings" element={<AdminSettingsPage />} />
-            <Route path="settings/profile" element={<ProfileSettingsPage />} />
-            <Route
-              path="settings/security"
-              element={<SecuritySettingsPage />}
-            />
-            <Route
-              path="settings/appearance"
-              element={<AppearanceSettingsPage />}
-            />
+      {/* issues */}
+      <Route path="issues" element={<Issuesoptions />} />
+      <Route path="issues/list" element={<Issueslist />} />
+      <Route path="issues/:id" element={<IssueDetails />} />
 
-            {/* Reports routes */}
-            <Route path="reports" element={<ReportsHomePage />} />
-            <Route path="reports/issues" element={<IssuesReportPage />} />
-            <Route path="reports/areas" element={<AreasReportPage />} />
-            <Route
-              path="reports/areas/details"
-              element={<AreaDetailsPage />}
-            />
-            <Route
-              path="reports/officers/performance"
-              element={<OfficerPerformancePage />}
-            />
-          </Route>
-        </Route>
-      </Routes>
+      {/* middle admins */}
+      <Route path="middle-admins" element={<MiddleAdminpageoptions />} />
+      <Route path="middle-admins/add" element={<AddMiddleAdminForm />} />
+      <Route path="middle-admins/list" element={<ViewMiddleAdminsList />} />
+      <Route path="middle-admins/edit" element={<EditMiddleAdminForm />} />
+      <Route path="middle-admins/edit-list" element={<EditMiddleAdminsList />} />
+      <Route path="middle-admins/manage" element={<DeleteBlockUnblockMiddleAdmins />} />
+
+      {/* officers */}
+      <Route path="officers" element={<OfficerOptionsPage />} />
+      <Route path="officers/add" element={<AddOfficerForm />} />
+      <Route path="officers/list" element={<OfficerListPage />} />
+      <Route path="officers/manage" element={<ManageOfficersPage />} />
+      <Route path="officers/edit" element={<OfficerListEdit />} />
+      <Route path="officers/editform" element={<EditOfficerForm />} />
+
+      {/* users */}
+      <Route path="users" element={<UserOptionsPage />} />
+      <Route path="users/list" element={<UserListPage />} />
+      <Route path="users/manage" element={<ManageUsersPage />} />
+      <Route path="users/activity" element={<UserActivityPage />} />
+
+      {/* settings */}
+      <Route path="settings" element={<AdminSettingsPage />} />
+      <Route path="settings/profile" element={<ProfileSettingsPage />} />
+      <Route path="settings/security" element={<SecuritySettingsPage />} />
+      <Route path="settings/appearance" element={<AppearanceSettingsPage />} />
+
+      {/* reports */}
+      <Route path="reports" element={<ReportsHomePage />} />
+      <Route path="reports/issues" element={<IssuesReportPage />} />
+      <Route path="reports/areas" element={<AreasReportPage />} />
+      <Route path="reports/areas/details" element={<AreaDetailsPage />} />
+      <Route
+        path="reports/officers/performance"
+        element={<OfficerPerformancePage />}
+      />
+    </Route>
+  </Route>
+
+</Routes>
+
+      <ToastContainer />
     </>
   );
 }

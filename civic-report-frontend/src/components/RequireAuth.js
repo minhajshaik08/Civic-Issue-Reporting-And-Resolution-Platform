@@ -28,7 +28,7 @@ function RequireAuth({ allowedRoles }) {
 
     setIsLoading(false);
 
-  }, [location.key]);   // 👈 reacts on back / forward also
+  }, [location.key]);
 
   // loading
   if (isLoading) {
@@ -42,9 +42,10 @@ function RequireAuth({ allowedRoles }) {
     );
   }
 
-  /* ----------------------------------------
-     PUBLIC ROUTES  (NO allowedRoles)
-  ---------------------------------------- */
+  /* -------------------------------------------------
+     PUBLIC ROUTES  (no allowedRoles)
+     Logged-in user must NEVER see public pages
+  ------------------------------------------------- */
   if (!allowedRoles) {
 
     if (isAuthenticated && role) {
@@ -60,14 +61,15 @@ function RequireAuth({ allowedRoles }) {
       if (role === "officer") {
         return <Navigate to="/officer/dashboard" replace />;
       }
+
     }
 
     return <Outlet />;
   }
 
-  /* ----------------------------------------
-     PROTECTED ROUTES  (allowedRoles present)
-  ---------------------------------------- */
+  /* -------------------------------------------------
+     PROTECTED ROUTES
+  ------------------------------------------------- */
 
   if (!isAuthenticated) {
     return <Navigate to="/Login" replace />;
@@ -86,6 +88,7 @@ function RequireAuth({ allowedRoles }) {
     if (role === "officer") {
       return <Navigate to="/officer/dashboard" replace />;
     }
+
   }
 
   return <Outlet />;
