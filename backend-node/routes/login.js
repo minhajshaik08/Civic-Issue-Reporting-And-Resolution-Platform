@@ -1,13 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
-const mysql = require("mysql2/promise");
 const jwt = require("jsonwebtoken");
-const dbConfig = require("../config/database");
-
-async function getConnection() {
-  return mysql.createConnection(dbConfig);
-}
+const pool = require("../config/database");
 
 // ✅ POST http://localhost:5000/api/login
 router.post("/", async (req, res) => {
@@ -18,7 +13,7 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const connection = await getConnection();
+    const connection = await pool.getConnection();
 
     // ✅ 1) CHECK MIDDLE ADMINS FIRST
     let [rows] = await connection.execute(
@@ -31,7 +26,7 @@ router.post("/", async (req, res) => {
 
       // ✅ BLOCK CHECK (middle_admins.is_blocked = 1 means blocked)
       if (Number(user.is_blocked) === 1) {
-        await connection.end();
+        connection.release();
         return res.status(403).json({
           success: false,
           message: "Your account is blocked. Please contact admin.",
@@ -40,14 +35,14 @@ router.post("/", async (req, res) => {
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        await connection.end();
+        connection.release();
         return res.status(401).json({
           success: false,
           message: "Invalid email or password",
         });
       }
 
-      await connection.end();
+      connection.release();
 
       const token = jwt.sign(
         {
@@ -86,7 +81,7 @@ router.post("/", async (req, res) => {
 
       // ✅ BLOCK CHECK (officers.status = 1 means blocked)
       if (Number(user.status) === 1) {
-        await connection.end();
+        connection.release();
         return res.status(403).json({
           success: false,
           message: "Your account is blocked. Please contact admin.",
@@ -95,7 +90,7 @@ router.post("/", async (req, res) => {
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        await connection.end();
+        connection.release();
         return res.status(401).json({
           success: false,
           message: "Invalid email or password",
@@ -108,7 +103,7 @@ router.post("/", async (req, res) => {
         [user.id]
       );
 
-      await connection.end();
+      connection.release();
 
       const token = jwt.sign(
         {
@@ -150,14 +145,14 @@ router.post("/", async (req, res) => {
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        await connection.end();
+        connection.release();
         return res.status(401).json({
           success: false,
           message: "Invalid email or password",
         });
       }
 
-      await connection.end();
+      connection.release();
 
       const token = jwt.sign(
         {
@@ -186,14 +181,15 @@ router.post("/", async (req, res) => {
     }
 
     // ❌ Not found in any table
-    await connection.end();
+    connection.release();
     return res.status(401).json({
       success: false,
       message: "Invalid email or password",
     });
   } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    return res.status(500).json({ success: false, message: "Server error" });
+    console.error("❌ LOGIN ERROR:", err.message);
+    console.error("Stack:", err.stack);
+    return res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
 });
 

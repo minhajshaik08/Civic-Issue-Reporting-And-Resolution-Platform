@@ -1,14 +1,8 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // PATCH /api/middle-admin/users/block/:mobile
 router.patch("/block/:mobile", async (req, res) => {
@@ -16,7 +10,7 @@ router.patch("/block/:mobile", async (req, res) => {
   const { block, reason } = req.body;
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     if (block) {
       await connection.execute(
@@ -30,7 +24,7 @@ router.patch("/block/:mobile", async (req, res) => {
       );
     }
 
-    await connection.end();
+    connection.release();
 
     return res.json({
       success: true,

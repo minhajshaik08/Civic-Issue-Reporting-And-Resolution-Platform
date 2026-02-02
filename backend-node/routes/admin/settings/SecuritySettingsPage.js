@@ -1,16 +1,8 @@
 const express = require("express");
-const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 const bcrypt = require("bcryptjs");
 
 const router = express.Router();
-
-/* ================= DB CONFIG ================= */
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 /* =========================================================
    POST: Change Password (ADMINS ONLY)
@@ -26,7 +18,7 @@ router.post("/change-password", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     // 1️⃣ Get existing password hash
     const [rows] = await connection.execute(
@@ -35,7 +27,7 @@ router.post("/change-password", async (req, res) => {
     );
 
     if (rows.length === 0) {
-      await connection.end();
+      connection.release();
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
@@ -50,7 +42,7 @@ router.post("/change-password", async (req, res) => {
     );
 
     if (!isMatch) {
-      await connection.end();
+      connection.release();
       return res.status(401).json({
         success: false,
         message: "Current password is incorrect",
@@ -66,7 +58,7 @@ router.post("/change-password", async (req, res) => {
       [newHashedPassword, userId]
     );
 
-    await connection.end();
+    connection.release();
 
     res.json({ success: true });
   } catch (err) {

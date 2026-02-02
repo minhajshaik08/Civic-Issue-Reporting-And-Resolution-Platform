@@ -271,12 +271,24 @@ app.use("/api/officer/reports", officerIssuesReportsRouter);
 app.use("/api/officer/reports", officerIssuesReportsDownloadRouter);
 // Officer download reports
 
-/* ================= HEALTH CHECK ================= */
+/* ================= ERROR HANDLING MIDDLEWARE ================= */
 
- app.use((req, res) => {
+// 404 Handler
+app.use((req, res) => {
   res.status(404).json({ success: false, message: "API route not found" });
 });
-// Ensures frontend never receives HTML
+
+// Global Error Handler (must be last)
+app.use((err, req, res, next) => {
+  console.error("❌ Error:", err.message);
+  console.error("Stack:", err.stack);
+  
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+    error: process.env.NODE_ENV === "development" ? err : {}
+  });
+});
 
 /* ================= SERVER START ================= */
 

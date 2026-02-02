@@ -5,6 +5,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs").promises;
 const { authMiddleware } = require("../../../middleware/authMiddleware");
+const pool = require("../../../config/database");
 
 /* ================= PATH ================= */
 const UPLOAD_PATH = path.join(__dirname, "../../../uploads/gallary");
@@ -30,22 +31,14 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-/* ================= DB ================= */
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
-
 /* ================= HELPERS ================= */
 const getEmployeeIdFromEmail = async (email) => {
-  const connection = await mysql.createConnection(dbConfig);
+  const connection = await pool.getConnection();
   const [rows] = await connection.execute(
     "SELECT employee_id FROM officers WHERE email = ? LIMIT 1",
     [email]
   );
-  await connection.end();
+  connection.release();
   return rows.length ? rows[0].employee_id : null;
 };
 
@@ -105,7 +98,7 @@ router.post(
         });
       }
 
-      const connection = await mysql.createConnection(dbConfig);
+      const connection = await pool.getConnection();
 
       const [result] = await connection.execute(
         `INSERT INTO gallary_images
@@ -121,7 +114,7 @@ router.post(
         ]
       );
 
-      await connection.end();
+      connection.release();
 
       res.json({
         success: true,
@@ -163,7 +156,7 @@ router.get("/list", authMiddleware, async (req, res) => {
       return res.status(404).json({ success: false, message: "Officer not found" });
     }
 
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
     const [rows] = await connection.execute(
       `SELECT id, headline, imagepaths, beforesolve,
               afteresolve, afterimagepath, created_at
@@ -172,7 +165,7 @@ router.get("/list", authMiddleware, async (req, res) => {
        ORDER BY created_at DESC`,
       [employee_id]
     );
-    await connection.end();
+    connection.release();
 
     const galleries = rows.map(r => ({
       ...r,
@@ -194,14 +187,14 @@ router.delete("/:id", authMiddleware, async (req, res) => {
       return res.json({ success: false, message: "Officer not found" });
     }
 
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     // ✅ Delete gallery image
     const [result] = await connection.execute(
       "DELETE FROM gallary_images WHERE id = ? AND employee_id = ?",
       [req.params.id, employee_id]
     );
-    await connection.end();
+    connection.release();
 
     if (!result.affectedRows) {
       return res.json({ success: false, message: "Gallery not found" });

@@ -1,14 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const mysql = require("mysql2/promise");
-
-/* ================= DB ================= */
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const pool = require("../../config/database");
 
 /**
  * PUBLIC GALLERY
@@ -16,7 +8,7 @@ const dbConfig = {
  */
 router.get("/", async (req, res) => {
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const [rows] = await connection.execute(
       `SELECT 
@@ -31,7 +23,7 @@ router.get("/", async (req, res) => {
        LIMIT 50`
     );
 
-    await connection.end();
+    connection.release();
 
     const galleries = rows.map((r) => ({
       id: r.id,

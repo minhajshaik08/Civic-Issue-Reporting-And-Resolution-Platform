@@ -1,15 +1,8 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 router.post("/add", async (req, res) => {
   const {
@@ -32,7 +25,7 @@ router.post("/add", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const hashed = await bcrypt.hash(password.trim(), 10);
 
@@ -53,7 +46,7 @@ router.post("/add", async (req, res) => {
       ]
     );
 
-    await connection.end();
+    connection.release();
 
     return res.json({ success: true, message: "Officer added", id: result.insertId });
   } catch (err) {

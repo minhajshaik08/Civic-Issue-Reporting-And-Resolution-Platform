@@ -1,15 +1,9 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // Middle Admin: EDIT OFFICER
 // PUT /api/middle-admin/officers/edit/:id
@@ -35,7 +29,7 @@ router.put("/edit/:id", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     let query =
       "UPDATE officers SET name = ?, designation = ?, department = ?, zone = ?, mobile = ?, email = ?, employee_id = ?, role = ? WHERE id = ?";
@@ -70,7 +64,7 @@ router.put("/edit/:id", async (req, res) => {
     }
 
     const [result] = await connection.execute(query, params);
-    await connection.end();
+    connection.release();
 
     if (result.affectedRows === 0) {
       return res.json({ success: false, message: "Officer not found" });

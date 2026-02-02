@@ -1,16 +1,9 @@
 const express = require("express");
-const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
 
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // ✅ Helper: get filtered issues based on period, month, search, status
 const getFilteredIssues = async (
@@ -19,7 +12,7 @@ const getFilteredIssues = async (
   search = "",
   status = ""
 ) => {
-  const connection = await mysql.createConnection(dbConfig);
+  const connection = await pool.getConnection();
 
   let sql = `
     SELECT id, issue_type, status, location_text, full_name, created_at
@@ -69,7 +62,7 @@ const getFilteredIssues = async (
   sql += ` ORDER BY created_at DESC `;
 
   const [rows] = await connection.execute(sql, params);
-  await connection.end();
+  connection.release();
 
   return rows;
 };

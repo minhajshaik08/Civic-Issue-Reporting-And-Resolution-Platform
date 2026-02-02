@@ -1,24 +1,17 @@
 const express = require("express");
-const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 
 const router = express.Router();
 
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
-
 router.get("/list", async (req, res) => {
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const [rows] = await connection.execute(
       "SELECT id, name, designation, department, zone, mobile, email, employee_id, role, status, last_login, created_at FROM officers ORDER BY id DESC"
     );
 
-    await connection.end();
+    connection.release();
 
     return res.json({ success: true, officers: rows });
   } catch (err) {

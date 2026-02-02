@@ -1,19 +1,13 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // GET /api/middle-admin/users/list
 router.get("/list", async (req, res) => {
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const [rows] = await connection.execute(
       `SELECT
@@ -35,7 +29,7 @@ router.get("/list", async (req, res) => {
        ORDER BY last_report_at DESC`
     );
 
-    await connection.end();
+    connection.release();
 
     // ✅ SAME city parsing logic as Admin
     const users = rows.map((r) => {

@@ -2,19 +2,13 @@
 const express = require("express");
 const router = express.Router();
 const mysql = require("mysql2/promise");
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const pool = require("../../../config/database");
 
 // GET /api/middle-admin/reports/officers/performance
 router.get("/performance", async (req, res) => {
   let conn;
   try {
-    conn = await mysql.createConnection(dbConfig);
+    conn = await pool.getConnection();
 
     const [rows] = await conn.execute(
       `SELECT 
@@ -37,7 +31,7 @@ router.get("/performance", async (req, res) => {
       .json({ success: false, message: "Error loading performance" });
   } finally {
     if (conn) {
-      await conn.end();
+      conn.release();
     }
   }
 });

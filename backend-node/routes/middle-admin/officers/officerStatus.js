@@ -1,15 +1,9 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 const { authMiddleware } = require("../../../middleware/authMiddleware");
 
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // PATCH /api/middle-admin/officers/block/:id
 router.patch("/block/:id", async (req, res) => {
@@ -17,14 +11,14 @@ router.patch("/block/:id", async (req, res) => {
   const { block } = req.body; // true = block, false = unblock
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const [result] = await connection.execute(
       "UPDATE officers SET status = ? WHERE id = ?",
       [block ? 1 : 0, id]
     );
 
-    await connection.end();
+    connection.release();
 
     if (result.affectedRows === 0) {
       return res.json({ success: false, message: "Officer not found" });
@@ -45,7 +39,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     // ✅ SELECT before delete to capture deleted record info
     const [rows] = await connection.execute(
@@ -54,7 +48,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     );
 
     if (rows.length === 0) {
-      await connection.end();
+      connection.release();
       return res.json({ success: false, message: "Officer not found" });
     }
 
@@ -65,7 +59,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
       [id]
     );
 
-    await connection.end();
+    connection.release();
 
     if (result.affectedRows === 0) {
       return res.json({ success: false, message: "Officer not found" });

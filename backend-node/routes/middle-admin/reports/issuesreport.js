@@ -1,13 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // ✅ SAME LOGIC AS ADMIN
 // GET /api/middle-admin/reports/issues?period=all|daily|weekly|monthly&search=&status=&month=YYYY-MM
@@ -15,7 +9,7 @@ router.get("/", async (req, res) => {
   const { period = "daily", search = "", status = "", month = "" } = req.query;
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     let sql = `
       SELECT id, issue_type, status, location_text, full_name, created_at
@@ -66,7 +60,7 @@ router.get("/", async (req, res) => {
     sql += ` ORDER BY created_at DESC `;
 
     const [rows] = await connection.execute(sql, params);
-    await connection.end();
+    connection.release();
 
     return res.json({ success: true, issues: rows });
   } catch (err) {

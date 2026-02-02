@@ -1,13 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const pool = require("../../../config/database");
 
 // GET /api/officer/issues/:id?officer_id=6 -> single issue (only if assigned to this officer)
 router.get("/:id", async (req, res) => {
@@ -22,7 +16,7 @@ router.get("/:id", async (req, res) => {
 
   let connection;
   try {
-    connection = await mysql.createConnection(dbConfig);
+    connection = await pool.getConnection();
     const [rows] = await connection.execute(
       "SELECT * FROM report_issues WHERE id = ? AND assigned_officer_id = ?",
       [id, officer_id]
@@ -42,7 +36,7 @@ router.get("/:id", async (req, res) => {
       .status(500)
       .json({ success: false, message: "Error fetching issue details" });
   } finally {
-    if (connection) await connection.end();
+    if (connection) connection.release();
   }
 });
 

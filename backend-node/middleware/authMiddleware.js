@@ -1,12 +1,4 @@
 const jwt = require('jsonwebtoken');
-const mysql = require("mysql2/promise");
-
-const dbConfig = {
-  host: "localhost",
-  user: "root", 
-  password: "Chandana@1435",
-  database: "civicreport"
-};
 
 const authMiddleware = async (req, res, next) => {
   try {

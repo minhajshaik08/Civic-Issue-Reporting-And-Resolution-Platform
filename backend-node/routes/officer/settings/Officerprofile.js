@@ -1,15 +1,8 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 
 const router = express.Router();
-
-/* ================= DB CONFIG ================= */
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 /* =========================================================
    GET: Check username availability (OFFICERS)
@@ -23,7 +16,7 @@ router.get("/check-username", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const [rows] = await connection.execute(
       `
@@ -36,7 +29,7 @@ router.get("/check-username", async (req, res) => {
       [username.trim(), excludeId || 0]
     );
 
-    await connection.end();
+    connection.release();
 
     res.json({ available: rows.length === 0 });
   } catch (err) {
@@ -53,7 +46,7 @@ router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const [rows] = await connection.execute(
       `
@@ -75,7 +68,7 @@ router.get("/:id", async (req, res) => {
       [id]
     );
 
-    await connection.end();
+    connection.release();
 
     if (rows.length === 0) {
       return res.status(404).json({
@@ -113,7 +106,7 @@ router.put("/", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const fields = [];
     const values = [];
@@ -134,7 +127,7 @@ router.put("/", async (req, res) => {
     }
 
     if (fields.length === 0) {
-      await connection.end();
+      connection.release();
       return res.json({ success: true });
     }
 
@@ -147,7 +140,7 @@ router.put("/", async (req, res) => {
     values.push(id);
 
     const [result] = await connection.execute(sql, values);
-    await connection.end();
+    connection.release();
 
     if (result.affectedRows === 0) {
       return res.status(404).json({

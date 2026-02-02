@@ -1,25 +1,19 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // GET /api/middle-admin/issues/:id -> single issue
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
     const [rows] = await connection.execute(
       "SELECT * FROM report_issues WHERE id = ?",
       [id]
     );
-    await connection.end();
+    connection.release();
 
     if (rows.length === 0) {
       return res
@@ -49,7 +43,7 @@ router.patch("/:id/status", async (req, res) => {
   let connection;
 
   try {
-    connection = await mysql.createConnection(dbConfig);
+    connection = await pool.getConnection();
 
     // 1) get old status
     const [rows] = await connection.execute(
@@ -58,7 +52,7 @@ router.patch("/:id/status", async (req, res) => {
     );
 
     if (rows.length === 0) {
-      await connection.end();
+      connection.release();
       return res
         .status(404)
         .json({ success: false, message: "Issue not found" });
@@ -80,11 +74,11 @@ router.patch("/:id/status", async (req, res) => {
       [id, oldStatus, status, finalOfficerId, finalOfficerName, finalOfficerEmail]
     );
 
-    await connection.end();
+    connection.release();
 
     res.json({ success: true, message: "Status updated" });
   } catch (err) {
-    if (connection) await connection.end();
+    if (connection) connection.release();
     console.error("MIDDLE-ADMIN ISSUE STATUS UPDATE ERROR:", err);
     res
       .status(500)

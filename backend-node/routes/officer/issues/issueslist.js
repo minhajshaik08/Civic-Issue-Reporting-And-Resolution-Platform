@@ -1,13 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const pool = require("../../../config/database");
 
 // GET /api/officer/issues?officer_id=1&status=NEW
 router.get("/", async (req, res) => {
@@ -21,7 +15,7 @@ router.get("/", async (req, res) => {
 
   let connection;
   try {
-    connection = await mysql.createConnection(dbConfig);
+    connection = await pool.getConnection();
 
     let sql = `
       SELECT r.*
@@ -45,7 +39,7 @@ router.get("/", async (req, res) => {
       .json({ success: false, message: "Error fetching officer issues" });
   } finally {
     if (connection) {
-      await connection.end();
+      connection.release();
     }
   }
 });

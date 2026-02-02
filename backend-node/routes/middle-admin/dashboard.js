@@ -1,19 +1,12 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
 const router = express.Router();
-
-// ✅ Your DB Config
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const pool = require("../../config/database");
 
 // ✅ GET ADMIN DASHBOARD SUMMARY (Stats + Recent Issues)
 router.get("/summary", async (req, res) => {
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     // ✅ Total Issues
     const [totalIssuesRows] = await connection.execute(
@@ -55,7 +48,7 @@ router.get("/summary", async (req, res) => {
        LIMIT 5`
     );
 
-    await connection.end();
+    connection.release();
 
     return res.json({
       stats: {

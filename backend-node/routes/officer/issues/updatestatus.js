@@ -1,13 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const pool = require("../../../config/database");
 
 // PUT /api/officer/issues/:id/status  { status, officer_id }
 router.put("/:id/status", async (req, res) => {
@@ -23,7 +17,7 @@ router.put("/:id/status", async (req, res) => {
 
   let connection;
   try {
-    connection = await mysql.createConnection(dbConfig);
+    connection = await pool.getConnection();
 
     // Ensure this issue belongs to this officer
     const [checkRows] = await connection.execute(
@@ -59,7 +53,7 @@ router.put("/:id/status", async (req, res) => {
       .status(500)
       .json({ success: false, message: "Error updating status" });
   } finally {
-    if (connection) await connection.end();
+    if (connection) connection.release();
   }
 });
 

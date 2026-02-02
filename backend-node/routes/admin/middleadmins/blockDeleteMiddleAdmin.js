@@ -1,15 +1,8 @@
 const express = require("express");
-const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 const { authMiddleware } = require("../../../middleware/authMiddleware");
 
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // ✅ PATCH -> Block / Unblock middle admin
 // URL: /api/admin/middle-admins/block/:id
@@ -18,7 +11,7 @@ router.patch("/block/:id", async (req, res) => {
   const { block } = req.body; // true=block, false=unblock
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     // ✅ Update block status in DB
     const [result] = await connection.execute(
@@ -27,7 +20,7 @@ router.patch("/block/:id", async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      await connection.end();
+      connection.release();
       return res
         .status(404)
         .json({ success: false, message: "Middle admin not found" });
@@ -39,7 +32,7 @@ router.patch("/block/:id", async (req, res) => {
       [id]
     );
 
-    await connection.end();
+    connection.release();
 
     return res.json({
       success: true,
@@ -58,7 +51,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     // ✅ SELECT before delete to capture deleted record info
     const [rows] = await connection.execute(
@@ -67,7 +60,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     );
 
     if (rows.length === 0) {
-      await connection.end();
+      connection.release();
       return res
         .status(404)
         .json({ success: false, message: "Middle admin not found" });
@@ -80,7 +73,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
       [id]
     );
 
-    await connection.end();
+    connection.release();
 
     if (result.affectedRows === 0) {
       return res

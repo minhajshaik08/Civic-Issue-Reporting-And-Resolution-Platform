@@ -1,13 +1,6 @@
 const express = require("express");
-const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // GET /api/admin/reports/areas/details?area=...
 // Returns: counts per status for a given area
@@ -20,7 +13,7 @@ router.get("/details", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const sql = `
       SELECT
@@ -32,7 +25,7 @@ router.get("/details", async (req, res) => {
     `;
 
     const [rows] = await connection.execute(sql, [area]);
-    await connection.end();
+    connection.release();
 
     // Build an object with all statuses, default 0
     const statuses = ["NEW", "VIEWED", "VERIFIED", "IN_PROGRESS", "SOLVED"];

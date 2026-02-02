@@ -3,14 +3,8 @@ const express = require("express");
 const mysql = require("mysql2/promise");
 const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
+const pool = require("../../../config/database");
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // Helper: get filtered issues based on period, search, status
 const getFilteredIssues = async (period = "daily", search = "", status = "") => {
@@ -18,7 +12,7 @@ const getFilteredIssues = async (period = "daily", search = "", status = "") => 
   if (period === "weekly") days = 7;
   if (period === "monthly") days = 30;
 
-  const connection = await mysql.createConnection(dbConfig);
+  const connection = await pool.getConnection();
 
   let sql =
     "SELECT * FROM report_issues WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)";
@@ -39,7 +33,7 @@ const getFilteredIssues = async (period = "daily", search = "", status = "") => 
   sql += " ORDER BY created_at DESC";
 
   const [rows] = await connection.execute(sql, params);
-  await connection.end();
+  connection.release();
 
   return rows;
 };

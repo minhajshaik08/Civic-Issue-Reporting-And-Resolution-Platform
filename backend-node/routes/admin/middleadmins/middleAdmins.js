@@ -1,15 +1,8 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // POST /api/admin/middle-admins -> add new middle admin
 router.post("/", async (req, res) => {
@@ -20,7 +13,7 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     // Check if email already exists
     const [rows] = await connection.execute(
@@ -28,7 +21,7 @@ router.post("/", async (req, res) => {
       [email]
     );
     if (rows.length > 0) {
-      await connection.end();
+      connection.release();
       return res.json({
         success: false,
         message: "Email already exists",
@@ -43,7 +36,7 @@ router.post("/", async (req, res) => {
       [username, email, hashed]
     );
 
-    await connection.end();
+    connection.release();
 
     return res.json({
       success: true,

@@ -1,20 +1,14 @@
 // routes/middle-admin/reports/topareasreport.js
 const express = require("express");
 const mysql = require("mysql2/promise");
+const pool = require("../../../config/database");
 const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
 
 // GET /api/middle-admin/reports/areas
 // Returns: each area with total issue count, ordered by most issues
 router.get("/", async (req, res) => {
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const sql = `
       SELECT
@@ -26,7 +20,7 @@ router.get("/", async (req, res) => {
     `;
 
     const [rows] = await connection.execute(sql);
-    await connection.end();
+    connection.release();
 
     res.json({ success: true, areas: rows });
   } catch (err) {

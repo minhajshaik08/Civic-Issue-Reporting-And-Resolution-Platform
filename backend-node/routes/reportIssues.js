@@ -3,13 +3,7 @@ const router = express.Router();
 const mysql = require("mysql2/promise");
 const multer = require("multer");
 const path = require("path");
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const pool = require("../config/database");
 
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -41,7 +35,7 @@ router.post("/report", upload.array("photos", 5), async (req, res) => {
   const photoPathsJson = JSON.stringify(photoPaths);
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     await connection.execute(
       `INSERT INTO report_issues
@@ -60,7 +54,7 @@ router.post("/report", upload.array("photos", 5), async (req, res) => {
       ]
     );
 
-    await connection.end();
+    connection.release();
     res.json({ success: true, message: "Issue saved" });
   } catch (err) {
     console.error("Error saving issue:", err);
@@ -76,7 +70,7 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const [rows] = await connection.execute(
       `SELECT id, full_name, phone, issue_type, description,
@@ -85,7 +79,7 @@ router.get("/", async (req, res) => {
       [phone]
     );
 
-    await connection.end();
+    connection.release();
     res.json({ success: true, issues: rows });
   } catch (err) {
     console.error("Error fetching issues:", err);

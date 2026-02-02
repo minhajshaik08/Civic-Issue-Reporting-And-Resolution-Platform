@@ -1,12 +1,6 @@
 const mysql = require("mysql2/promise");
 const jwt = require("jsonwebtoken");
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "Chandana@1435",
-  database: "civicreport",
-};
+const pool = require("../config/database");
 
 /**
  * Extract performer details from req.user (set by authMiddleware)
@@ -59,7 +53,7 @@ async function findPerformerByEmail(email) {
   }
 
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     // Try admins table
     let [rows] = await connection.execute(
@@ -67,7 +61,7 @@ async function findPerformerByEmail(email) {
       [email]
     );
     if (rows.length > 0) {
-      await connection.end();
+      connection.release();
       return { table: "admins", id: rows[0].id };
     }
 
@@ -77,7 +71,7 @@ async function findPerformerByEmail(email) {
       [email]
     );
     if (rows.length > 0) {
-      await connection.end();
+      connection.release();
       return { table: "middle_admins", id: rows[0].id };
     }
 
@@ -87,11 +81,11 @@ async function findPerformerByEmail(email) {
       [email]
     );
     if (rows.length > 0) {
-      await connection.end();
+      connection.release();
       return { table: "officers", id: rows[0].employee_id };
     }
 
-    await connection.end();
+    connection.release();
     return { table: "unauthenticated", id: null };
   } catch (err) {
     console.error("Error finding performer by email:", err);
@@ -126,7 +120,7 @@ async function logDeletion(req, deletedRow, deletedFromTable, performerTable) {
     // no console output to avoid leaking sensitive data
 
     // Insert into audit_logs table
-    const connection = await mysql.createConnection(dbConfig);
+    const connection = await pool.getConnection();
 
     const [result] = await connection.execute(
       `INSERT INTO audit_logs 
@@ -143,7 +137,7 @@ async function logDeletion(req, deletedRow, deletedFromTable, performerTable) {
       ]
     );
 
-    await connection.end();
+    connection.release();
 
     // audit log inserted (no terminal output)
   } catch (err) {
