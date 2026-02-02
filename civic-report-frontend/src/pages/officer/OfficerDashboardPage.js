@@ -42,7 +42,9 @@ function OfficerDashboardPage() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/login", { replace: true });
+    sessionStorage.removeItem("sessionId");
+    // use full replace to unload SPA state and ensure history entry is replaced
+    window.location.replace("/Login");
   };
 
   // ✅ Menu Items for Officer

@@ -1,94 +1,53 @@
-import React, { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { Spinner, Container } from "react-bootstrap";
 
 function RequireAuth({ allowedRoles }) {
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [role, setRole] = useState("");
-
   const location = useLocation();
 
-  useEffect(() => {
+  const token = localStorage.getItem("token");
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-    const token = localStorage.getItem("token");
-    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-    const userRole = storedUser.role
-      ? String(storedUser.role).toLowerCase()
-      : "";
+  const role = storedUser?.role
+    ? String(storedUser.role).toLowerCase()
+    : "";
 
-    if (token && userRole) {
-      setIsAuthenticated(true);
-      setRole(userRole);
-    } else {
-      setIsAuthenticated(false);
-      setRole("");
-    }
+  const isAuthenticated = !!(token && role);
 
-    setIsLoading(false);
+  const roleHome = (() => {
+    if (role === "super_admin") return "/admin/welcome";
+    if (role === "middle_admin") return "/middle-admin/dashboard";
+    if (role === "officer") return "/officer/dashboard";
+    return null;
+  })();
 
-  }, [location.key]);
-
-  // loading
-  if (isLoading) {
-    return (
-      <Container
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "100vh" }}
-      >
-        <Spinner animation="border" />
-      </Container>
-    );
-  }
-
-  /* -------------------------------------------------
-     PUBLIC ROUTES  (no allowedRoles)
-     Logged-in user must NEVER see public pages
-  ------------------------------------------------- */
+  /* ------------------ PUBLIC ------------------ */
   if (!allowedRoles) {
 
-    if (isAuthenticated && role) {
-
-      if (role === "super_admin") {
-        return <Navigate to="/admin/welcome" replace />;
-      }
-
-      if (role === "middle_admin") {
-        return <Navigate to="/middle-admin/dashboard" replace />;
-      }
-
-      if (role === "officer") {
-        return <Navigate to="/officer/dashboard" replace />;
-      }
-
+    if (isAuthenticated && roleHome && location.pathname !== roleHome) {
+      return <Navigate to={roleHome} replace />;
     }
 
     return <Outlet />;
   }
 
-  /* -------------------------------------------------
-     PROTECTED ROUTES
-  ------------------------------------------------- */
+  /* ------------------ PROTECTED ------------------ */
 
   if (!isAuthenticated) {
-    return <Navigate to="/Login" replace />;
+
+    if (location.pathname !== "/Login") {
+      return <Navigate to="/Login" replace state={{ from: location }} />;
+    }
+
+    return null;
   }
 
   if (!allowedRoles.includes(role)) {
 
-    if (role === "super_admin") {
-      return <Navigate to="/admin/welcome" replace />;
+    if (roleHome && location.pathname !== roleHome) {
+      return <Navigate to={roleHome} replace />;
     }
 
-    if (role === "middle_admin") {
-      return <Navigate to="/middle-admin/dashboard" replace />;
-    }
-
-    if (role === "officer") {
-      return <Navigate to="/officer/dashboard" replace />;
-    }
-
+    return null;
   }
 
   return <Outlet />;

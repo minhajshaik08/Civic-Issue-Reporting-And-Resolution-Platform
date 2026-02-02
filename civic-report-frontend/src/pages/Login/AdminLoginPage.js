@@ -91,6 +91,10 @@ function AdminLoginPage() {
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("user");
 
+      // create a per-tab session marker so we can ignore old history entries
+      const sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      sessionStorage.setItem("sessionId", sessionId);
+
       localStorage.setItem("token", jwt);
       localStorage.setItem(
         "user",

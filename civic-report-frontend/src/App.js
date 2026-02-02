@@ -372,6 +372,109 @@ function AppRoutes() {
   const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
   const path = location.pathname || "";
+  const navigate = useNavigate();
+  // helper: determine if current path is a public route
+  const isPublicPath = (p) => {
+    if (!p) return false;
+    const normalized = String(p).toLowerCase();
+    const publicPaths = [
+      "/",
+      "/report",
+      "/view-issues",
+      "/contact",
+      "/gallery",
+      "/login",
+      "/login/login",
+      "/login/forgot-password",
+      "/login/reset-password",
+      "/login/",
+    ];
+    return publicPaths.includes(normalized);
+  };
+
+  const getRoleHome = (role) => {
+    if (!role) return null;
+    const r = String(role).toLowerCase();
+    if (r === "super_admin") return "/admin/welcome";
+    if (r === "middle_admin") return "/middle-admin/dashboard";
+    if (r === "officer") return "/officer/dashboard";
+    return null;
+  };
+
+  // Attach a popstate guard when authenticated so back/forward can't land on public pages.
+  React.useEffect(() => {
+    const getSessionId = () => sessionStorage.getItem("sessionId");
+    const getStoredRole = () => {
+      try {
+        const u = JSON.parse(localStorage.getItem("user") || "{}") || {};
+        return u?.role ? String(u.role).toLowerCase() : null;
+      } catch (e) {
+        return null;
+      }
+    };
+
+    const isAuth = !!(localStorage.getItem("token") && getStoredRole());
+
+    if (!isAuth) return; // nothing to do when not authenticated
+
+    const onPopState = (ev) => {
+      const cur = window.location.pathname || "/";
+      const currentSession = getSessionId();
+
+      // If the popped entry belongs to a previous session (no or different sessionId)
+      const poppedSession = ev?.state?.sessionId || null;
+
+      if (poppedSession && currentSession && poppedSession !== currentSession) {
+        // prevent navigating to old-session entry by navigating to current session home
+        const role = getStoredRole();
+        const home = getRoleHome(role);
+        if (home) {
+          navigate(home, { replace: true });
+        }
+        return;
+      }
+
+      if (isPublicPath(cur)) {
+        const role = getStoredRole();
+        const home = getRoleHome(role);
+        if (home) {
+          // navigate react-router to dashboard home to avoid visible blink
+          navigate(home, { replace: true });
+        }
+      }
+    };
+
+    window.addEventListener("popstate", onPopState);
+
+    // If app loaded on a public path while authenticated, immediately correct it
+    if (isPublicPath(path)) {
+      const role = getStoredRole();
+      const home = getRoleHome(role);
+      if (home) {
+        navigate(home, { replace: true });
+      }
+    }
+
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, [path]);
+
+  // Ensure every visited dashboard entry contains the current sessionId in history.state
+  React.useEffect(() => {
+    const sessionId = sessionStorage.getItem("sessionId");
+    const isAuth = !!(localStorage.getItem("token") && sessionId);
+    if (!isAuth) return;
+
+    try {
+      const state = window.history.state || {};
+      if (state.sessionId !== sessionId) {
+        window.history.replaceState({ ...state, sessionId }, "", window.location.href);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [location]);
   const hideNav =
     path.startsWith("/officer/dashboard") ||
     path.startsWith("/middle-admin/dashboard") ||
