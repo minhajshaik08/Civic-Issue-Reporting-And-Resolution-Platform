@@ -23,7 +23,6 @@ export default function MiddleAdminEditOfficerForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ load officer data ONLY for edit
   useEffect(() => {
     if (officer) {
       setForm({
@@ -56,17 +55,11 @@ export default function MiddleAdminEditOfficerForm() {
     e.preventDefault();
     setError("");
 
-    // ✅ mandatory fields (same as Admin)
-    if (
-      !form.name.trim() ||
-      !form.mobile.trim() ||
-      !form.department.trim()
-    ) {
+    if (!form.name.trim() || !form.mobile.trim() || !form.department.trim()) {
       setError("Name, Mobile and Department are required.");
       return;
     }
 
-    // ✅ optional password validation
     if (form.password.trim() && form.password.trim().length < 6) {
       setError("Password must be at least 6 characters if provided.");
       return;
@@ -75,14 +68,15 @@ export default function MiddleAdminEditOfficerForm() {
     setLoading(true);
 
     try {
-      // ✅ send ONLY editable fields
       const payload = {
         name: form.name.trim(),
         designation: form.designation.trim(),
         department: form.department.trim(),
         zone: form.zone.trim(),
         mobile: form.mobile.trim(),
-        role: form.role.trim(),
+
+        // ✅ protect role
+        role: form.role.includes("@") ? "" : form.role.trim(),
       };
 
       if (form.password.trim()) {
@@ -104,7 +98,7 @@ export default function MiddleAdminEditOfficerForm() {
         setError(data.message || "Failed to update officer.");
       } else {
         showToast("✅ Officer updated successfully.", "success");
-        setTimeout(() => navigate("/middle-admin/dashboard/officers/edit"), 1500);
+        navigate("/middle-admin/dashboard/officers/edit");
       }
     } catch {
       setError("Network error while updating officer.");
@@ -115,7 +109,7 @@ export default function MiddleAdminEditOfficerForm() {
 
   return (
     <>
-      {/* ✅ SAME STYLING AS ADMIN EDIT */}
+      {/* ✅ YOUR SAME CSS */}
       <style>{`
         .edit-wrapper {
           min-height: 100vh;
@@ -272,7 +266,6 @@ export default function MiddleAdminEditOfficerForm() {
                 value={form.name}
                 onChange={handleChange}
                 disabled={loading}
-                required
               />
             </div>
 
@@ -293,7 +286,6 @@ export default function MiddleAdminEditOfficerForm() {
                 value={form.department}
                 onChange={handleChange}
                 disabled={loading}
-                required
               />
             </div>
 
@@ -314,33 +306,24 @@ export default function MiddleAdminEditOfficerForm() {
                 value={form.mobile}
                 onChange={handleChange}
                 disabled={loading}
-                required
               />
             </div>
 
             <div className="form-group">
               <label>Email (Read Only)</label>
-              <input
-                value={form.email}
-                disabled
-                className="readonly"
-              />
+              <input value={form.email} disabled className="readonly" />
             </div>
 
             <div className="form-group">
               <label>Employee ID (Read Only)</label>
-              <input
-                value={form.employeeId}
-                disabled
-                className="readonly"
-              />
+              <input value={form.employeeId} disabled className="readonly" />
             </div>
 
             <div className="form-group">
               <label>Role</label>
               <input
                 name="role"
-                value={form.role}
+                value={form.role.includes("@") ? "" : form.role}
                 onChange={handleChange}
                 disabled={loading}
               />

@@ -35,6 +35,7 @@ export default function EditOfficerForm() {
         role: officer.role || "",
         password: "",
       });
+      setError("");
     }
   }, [officer]);
 
@@ -54,17 +55,12 @@ export default function EditOfficerForm() {
     e.preventDefault();
     setError("");
 
-    // ✅ Mandatory fields
-    if (
-      !form.name.trim() ||
-      !form.mobile.trim() ||
-      !form.department.trim()
-    ) {
+    // only editable required fields
+    if (!form.name.trim() || !form.mobile.trim() || !form.department.trim()) {
       setError("Name, Mobile and Department are required.");
       return;
     }
 
-    // ✅ Optional password validation
     if (form.password.trim() && form.password.trim().length < 6) {
       setError("Password must be at least 6 characters if provided.");
       return;
@@ -73,17 +69,17 @@ export default function EditOfficerForm() {
     setLoading(true);
 
     try {
-      // ✅ Only editable values sent
       const payload = {
         name: form.name.trim(),
         designation: form.designation.trim(),
         department: form.department.trim(),
         zone: form.zone.trim(),
         mobile: form.mobile.trim(),
-        role: form.role.trim(),
+
+        // ✅ role should never be email
+        role: form.role.includes("@") ? "" : form.role.trim(),
       };
 
-      // ✅ update password only if entered
       if (form.password.trim()) {
         payload.password = form.password.trim();
       }
@@ -103,7 +99,7 @@ export default function EditOfficerForm() {
         setError(data.message || "Failed to update officer.");
       } else {
         showToast("✅ Officer updated successfully.", "success");
-        setTimeout(() => navigate("/admin/welcome/officers/edit"), 1500);
+        navigate("/admin/welcome/officers/edit");
       }
     } catch {
       setError("Network error while updating officer.");
@@ -114,7 +110,7 @@ export default function EditOfficerForm() {
 
   return (
     <>
-      {/* ✅ CSS INSIDE SAME FILE */}
+      {/* ✅ YOUR CSS (UNCHANGED) */}
       <style>{`
         .edit-wrapper {
           min-height: 100vh;
@@ -194,7 +190,6 @@ export default function EditOfficerForm() {
           box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
-        /* ✅ read-only look */
         .readonly {
           background: #f3f4f6 !important;
           cursor: not-allowed;
@@ -280,7 +275,6 @@ export default function EditOfficerForm() {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                required
                 disabled={loading}
               />
             </div>
@@ -301,9 +295,7 @@ export default function EditOfficerForm() {
                 name="department"
                 value={form.department}
                 onChange={handleChange}
-                required
                 disabled={loading}
-                placeholder="Enter department"
               />
             </div>
 
@@ -323,27 +315,24 @@ export default function EditOfficerForm() {
                 name="mobile"
                 value={form.mobile}
                 onChange={handleChange}
-                required
                 disabled={loading}
               />
             </div>
 
-            {/* ✅ READ ONLY EMAIL */}
+            {/* Email - read only */}
             <div className="form-group">
               <label>Email (Read Only)</label>
               <input
-                name="email"
                 value={form.email}
                 disabled
                 className="readonly"
               />
             </div>
 
-            {/* ✅ READ ONLY EMPLOYEE ID */}
+            {/* Employee ID - read only */}
             <div className="form-group">
               <label>Employee ID (Read Only)</label>
               <input
-                name="employeeId"
                 value={form.employeeId}
                 disabled
                 className="readonly"
@@ -354,7 +343,7 @@ export default function EditOfficerForm() {
               <label>Role</label>
               <input
                 name="role"
-                value={form.role}
+                value={form.role.includes("@") ? "" : form.role}
                 onChange={handleChange}
                 disabled={loading}
               />
