@@ -129,7 +129,7 @@ export default function DeleteBlockUnblockMiddleAdmins() {
     }
   };
 
-  if (loading) return <p className="loading-text">Loading middle admins...</p>;
+  if (loading) return <p className="loading-text">Loading admins...</p>;
   if (error) return <p className="error-text">{error}</p>;
 
   return (
@@ -281,7 +281,7 @@ export default function DeleteBlockUnblockMiddleAdmins() {
 
       <div className="manage-wrapper">
         <div className="manage-header">
-          <h2 className="manage-title">Manage Middle Admins</h2>
+          <h2 className="manage-title">Manage Admins</h2>
 
           <input
             type="text"

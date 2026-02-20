@@ -75,8 +75,7 @@ function AdminLoginPage() {
         return;
       }
 
-      const rawRole = user?.role || "";
-      const role = String(rawRole).toLowerCase();
+      const role = String(user?.role || "").toLowerCase();
 
       if (!["super_admin", "middle_admin", "officer"].includes(role)) {
         setError(
@@ -87,12 +86,9 @@ function AdminLoginPage() {
         return;
       }
 
-      /* ================= SAVE SESSION (FIXED) ================= */
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("user");
-
-      // create a per-tab session marker so we can ignore old history entries
-      const sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      const sessionId =
+        Date.now().toString(36) +
+        Math.random().toString(36).slice(2, 8);
       sessionStorage.setItem("sessionId", sessionId);
 
       localStorage.setItem("token", jwt);
@@ -103,18 +99,13 @@ function AdminLoginPage() {
           email: user?.email,
           role: role,
           username: user?.username || "",
-
-          // ✅ Admin / Middle Admin fields
           full_name: user?.full_name || "",
           phone: user?.phone || "",
-
-          // ✅ Officer fields (IMPORTANT FIX)
           name: user?.name || user?.full_name || "",
           mobile: user?.mobile || user?.phone || "",
         })
       );
 
-      /* ================= ROLE BASED REDIRECT ================= */
       if (role === "middle_admin") {
         navigate("/middle-admin/dashboard", { replace: true });
       } else if (role === "officer") {
@@ -135,25 +126,28 @@ function AdminLoginPage() {
   };
 
   return (
-    <main className="py-5">
+    <main className="login-page">
       <Container style={{ maxWidth: "480px" }}>
-        <Card className="shadow-sm">
+        <Card className="login-card shadow-lg">
           <Card.Body>
-            <h3 className="mb-3 text-center">Login</h3>
-            <p className="text-muted text-center mb-4">
-              Super Admin / Middle Admin / Officer access only.
+            <h3 className="login-title">Admin Login</h3>
+            <p className="login-subtitle">
+              Super Admin / Admin / Officer access only
             </p>
 
             {error && (
-              <Alert variant="danger" className="mb-3">
+              <Alert variant="danger" className="mb-3 fade-in">
                 {error}
               </Alert>
             )}
 
             <Form onSubmit={handleSubmit} noValidate>
               <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
+                <Form.Label className="gradient-label">
+                  <b>Email</b>
+                </Form.Label>
                 <Form.Control
+                  className="styled-input"
                   type="email"
                   placeholder="admin@example.com"
                   value={email}
@@ -163,8 +157,11 @@ function AdminLoginPage() {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Password</Form.Label>
+                <Form.Label className="gradient-label">
+                  <b>Password</b>
+                </Form.Label>
                 <Form.Control
+                  className="styled-input"
                   type="password"
                   placeholder="Enter strong password"
                   value={password}
@@ -181,7 +178,7 @@ function AdminLoginPage() {
                 <Button
                   variant="link"
                   size="sm"
-                  className="p-0"
+                  className="forgot-link"
                   onClick={handleForgotPassword}
                   disabled={loading}
                 >
@@ -192,7 +189,7 @@ function AdminLoginPage() {
               <div className="d-grid mb-3">
                 <Button
                   type="submit"
-                  variant="success"
+                  className="login-btn"
                   disabled={loading}
                 >
                   {loading ? "Logging in..." : "Login"}
@@ -202,6 +199,124 @@ function AdminLoginPage() {
           </Card.Body>
         </Card>
       </Container>
+
+      {/* ================= CSS ================= */}
+      <style jsx>{`
+        .login-page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #c7f9cc, #e0f4ef);
+          animation: fadePage 0.8s ease-in;
+        }
+
+        .login-card {
+          border-radius: 18px;
+          border: none;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(8px);
+          animation: slideUp 0.7s ease forwards;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-title {
+          text-align: center;
+          font-weight: 800;
+          background: linear-gradient(135deg, #0bbf7a, #067a58);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-label {
+          background: linear-gradient(135deg, #0bbf7a, #067a58);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-weight: 700;
+        }
+
+        .login-subtitle {
+          text-align: center;
+          color: #64748b;
+          margin-bottom: 1.5rem;
+        }
+
+        .styled-input {
+          border-radius: 10px;
+          padding: 10px;
+          transition: all 0.25s ease;
+        }
+
+        .styled-input:hover {
+          border-color: #22c55e;
+        }
+
+        .styled-input:focus {
+          border-color: #22c55e;
+          box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+          transform: scale(1.02);
+        }
+
+        .login-btn {
+          background: #22c55e;
+          border: none;
+          border-radius: 10px;
+          font-weight: bold;
+          padding: 10px;
+          transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+          background: #16a34a;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .forgot-link {
+          color: #16a34a;
+          font-weight: 500;
+        }
+
+        .forgot-link:hover {
+          text-decoration: underline;
+          color: #15803d;
+        }
+
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadePage {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .fade-in {
+          animation: fadePage 0.4s ease;
+        }
+
+        @media (max-width: 500px) {
+          .login-card {
+            margin: 10px;
+          }
+        }
+      `}</style>
     </main>
   );
 }

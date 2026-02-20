@@ -70,7 +70,7 @@ export default function AddMiddleAdminForm() {
       if (!data.success) {
         setError(data.message || "Failed to create middle admin");
       } else {
-        setSuccess("✅ Middle admin created successfully!");
+        setSuccess("✅ Admin created successfully!");
 
         setUsername("");
         setEmail("");
@@ -104,9 +104,9 @@ export default function AddMiddleAdminForm() {
         <input type="text" name="fakeuser" style={{ display: "none" }} />
         <input type="password" name="fakepass" style={{ display: "none" }} />
 
-        <h3 className="fw-bold text-center mb-2">Add Middle Admin</h3>
+        <h3 className="fw-bold text-center mb-2">Add Admin</h3>
         <p className="text-muted text-center mb-4" style={{ fontSize: "14px" }}>
-          Create a new middle admin account
+          Create a new admin account
         </p>
 
         {error && (

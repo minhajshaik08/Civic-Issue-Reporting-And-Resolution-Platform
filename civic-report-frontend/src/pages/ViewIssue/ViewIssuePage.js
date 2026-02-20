@@ -334,459 +334,278 @@ function ViewIssuePage() {
       </div>
 
       <style>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        .view-issue-container {
-          min-height: 100vh;
-          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-          padding: 20px;
-          display: flex;
-          align-items: flex-start;
-          justify-content: center;
-          padding-top: 40px;
-        }
-
-        .view-issue-card {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-          padding: 40px;
-          width: 100%;
-          max-width: 1100px;
-        }
-
-        h2 {
-          text-align: center;
-          color: #155724;
-          margin-bottom: 10px;
-          font-size: 28px;
-          font-weight: 700;
-        }
-
-        h3 {
-          color: #155724;
-          margin-bottom: 20px;
-          font-size: 20px;
-          margin-top: 0;
-        }
-
-        .subtitle {
-          text-align: center;
-          color: #666;
-          margin-bottom: 30px;
-          font-size: 14px;
-        }
-
-        .auth-section {
-          max-width: 450px;
-          margin: 0 auto;
-        }
-
-        .input-group {
-          margin-bottom: 20px;
-          display: flex;
-          flex-direction: column;
-        }
-
-        label {
-          margin-bottom: 8px;
-          font-weight: 600;
-          color: #333;
-          font-size: 14px;
-        }
-
-        input {
-          padding: 12px 14px;
-          font-size: 16px;
-          border: 2px solid #e0e0e0;
-          border-radius: 8px;
-          outline: none;
-          transition: all 0.3s ease;
-          font-family: inherit;
-        }
-
-        input:focus {
-          border-color: #22c55e;
-          box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
-        }
-
-        input:disabled {
-          background-color: #f5f5f5;
-          cursor: not-allowed;
-          opacity: 0.7;
-        }
-
-        .otp-input {
-          letter-spacing: 0.5em;
-          text-align: center;
-          font-size: 22px;
-          font-weight: bold;
-          font-family: 'Courier New', monospace;
-        }
-
-        .input-hint {
-          color: #888;
-          font-size: 12px;
-          margin-top: 4px;
-        }
-
-        .otp-info {
-          background-color: #f0f9ff;
-          border-left: 4px solid #2563eb;
-          padding: 12px;
-          border-radius: 6px;
-          margin-bottom: 20px;
-        }
-
-        .phone-display {
-          color: #333;
-          font-size: 14px;
-          margin: 0 0 6px 0;
-        }
-
-        .otp-hint {
-          color: #666;
-          font-size: 13px;
-          margin: 0;
-          font-style: italic;
-        }
-
-        .resend-timer {
-          text-align: center;
-          color: #666;
-          font-size: 14px;
-          margin: 12px 0;
-          font-weight: 500;
-        }
-
-        button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          border: none;
-          padding: 12px 24px;
-          font-size: 16px;
-          font-weight: 600;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          width: 100%;
-          margin-bottom: 12px;
-        }
-
-        .btn-primary {
-          background-color: #22c55e;
-          color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-          background-color: #15803d;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-        }
-
-        .btn-primary:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-          opacity: 0.6;
-        }
-
-        .btn-secondary {
-          background-color: #2563eb;
-          color: white;
-          width: 100%;
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-          background-color: #1d4ed8;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-logout {
-          background-color: #6b7280;
-          color: white;
-          width: auto;
-          margin-bottom: 0;
-          margin-left: auto;
-        }
-
-        .btn-logout:hover {
-          background-color: #4b5563;
-        }
-
-        .spinner {
-          display: inline-block;
-          width: 12px;
-          height: 12px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-radius: 50%;
-          border-top-color: white;
-          animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        .error-message {
-          background-color: #fee2e2;
-          color: #991b1b;
-          padding: 14px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          border-left: 4px solid #dc2626;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 14px;
-          font-weight: 500;
-        }
-
-        .error-icon {
-          font-size: 18px;
-        }
-
-        .issues-section {
-          margin-top: 40px;
-        }
-
-        .issues-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
-          flex-wrap: wrap;
-          gap: 10px;
-        }
-
-        .issues-table-wrapper {
-          overflow-x: auto;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .issues-table {
-          width: 100%;
-          border-collapse: collapse;
-          background: white;
-        }
-
-        .issues-table thead {
-          background-color: #155724;
-          color: white;
-          font-weight: 600;
-        }
-
-        .issues-table th {
-          padding: 14px;
-          text-align: left;
-          font-size: 13px;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .issues-table td {
-          padding: 12px 14px;
-          border-bottom: 1px solid #e5e7eb;
-          font-size: 13px;
-        }
-
-        .issues-table tbody tr:hover {
-          background-color: #f9f9f9;
-        }
-
-        .id-cell {
-          font-weight: 600;
-          color: #22c55e;
-        }
-
-        .issue-type-badge {
-          display: inline-block;
-          background-color: #dbeafe;
-          color: #1e40af;
-          padding: 4px 8px;
-          border-radius: 4px;
-          font-size: 12px;
-          font-weight: 600;
-          white-space: nowrap;
-        }
-
-        .description-cell {
-          max-width: 200px;
-          word-break: break-word;
-        }
-
-        .location-cell {
-          max-width: 150px;
-          word-break: break-word;
-        }
-
-        .date-cell {
-          white-space: nowrap;
-          font-size: 12px;
-        }
-
-        .date-cell small {
-          color: #888;
-        }
-
-        .status-badge {
-          display: inline-block;
-          padding: 6px 12px;
-          border-radius: 6px;
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          white-space: nowrap;
-        }
-
-        .status-pending {
-          background-color: #fef3c7;
-          color: #92400e;
-        }
-
-        .status-in_progress {
-          background-color: #dbeafe;
-          color: #1e40af;
-        }
-
-        .status-resolved {
-          background-color: #d1fae5;
-          color: #065f46;
-        }
-
-        .status-rejected {
-          background-color: #fee2e2;
-          color: #991b1b;
-        }
-
-        .photos-cell {
-          min-width: 180px;
-        }
-
-        .photos-grid {
-          display: flex;
-          gap: 6px;
-          flex-wrap: wrap;
-        }
-
-        .issue-photo {
-          width: 70px;
-          height: 70px;
-          object-fit: cover;
-          border-radius: 6px;
-          border: 1px solid #ddd;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-          transition: all 0.3s ease;
-          cursor: pointer;
-        }
-
-        .issue-photo:hover {
-          transform: scale(1.15);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-          z-index: 100;
-        }
-
-        .no-photos {
-          color: #999;
-          font-size: 12px;
-          font-style: italic;
-        }
-
-        @media (max-width: 768px) {
-          .view-issue-card {
-            padding: 20px;
-          }
-
-          h2 {
-            font-size: 22px;
-          }
-
-          h3 {
-            font-size: 18px;
-          }
-
-          .issues-header {
-            flex-direction: column-reverse;
-          }
-
-          .btn-logout {
-            width: 100%;
-            margin-left: 0;
-          }
-
-          .issues-table th,
-          .issues-table td {
-            padding: 8px 10px;
-            font-size: 11px;
-          }
-
-          .issue-photo {
-            width: 50px;
-            height: 50px;
-          }
-
-          button {
-            padding: 10px 16px;
-            font-size: 14px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .view-issue-container {
-            padding: 10px;
-            padding-top: 20px;
-          }
-
-          .view-issue-card {
-            padding: 15px;
-            border-radius: 8px;
-          }
-
-          h2 {
-            font-size: 20px;
-            margin-bottom: 20px;
-          }
-
-          .auth-section {
-            max-width: 100%;
-          }
-
-          .issues-table-wrapper {
-            overflow-x: scroll;
-          }
-
-          .issues-table {
-            font-size: 10px;
-          }
-
-          .issues-table th,
-          .issues-table td {
-            padding: 6px 8px;
-          }
-
-          .issue-photo {
-            width: 40px;
-            height: 40px;
-          }
-
-          button {
-            font-size: 13px;
-            padding: 10px;
-          }
-
-          .status-badge {
-            font-size: 9px;
-            padding: 4px 8px;
-          }
-        }
+       * {
+  box-sizing: border-box;
+  }
+
+/* ===== Page Animation ===== */
+@keyframes fadeInPage {
+from {
+opacity: 0;
+transform: translateY(20px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.view-issue-container {
+min-height: 100vh;
+background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+padding: 20px;
+display: flex;
+align-items: flex-start;
+justify-content: center;
+padding-top: 40px;
+animation: fadeInPage 0.6s ease-out;
+}
+
+/* ===== Card Animation ===== */
+@keyframes cardPop {
+from {
+opacity: 0;
+transform: scale(0.96);
+}
+to {
+opacity: 1;
+transform: scale(1);
+}
+}
+
+.view-issue-card {
+background: white;
+border-radius: 12px;
+box-shadow: 0 8px 30px rgba(34, 197, 94, 0.12);
+padding: 40px;
+width: 100%;
+max-width: 1100px;
+animation: cardPop 0.5s ease-out;
+}
+
+h2 {
+text-align: center;
+color: #166534;
+margin-bottom: 10px;
+font-size: 28px;
+font-weight: 700;
+}
+
+h3 {
+color: #166534;
+margin-bottom: 20px;
+font-size: 20px;
+margin-top: 0;
+}
+
+.subtitle {
+text-align: center;
+color: #666;
+margin-bottom: 30px;
+font-size: 14px;
+}
+
+.auth-section {
+max-width: 450px;
+margin: 0 auto;
+animation: fadeInPage 0.5s ease;
+}
+
+.input-group {
+margin-bottom: 20px;
+display: flex;
+flex-direction: column;
+}
+
+label {
+margin-bottom: 8px;
+font-weight: 600;
+color: #333;
+font-size: 14px;
+}
+
+input {
+padding: 12px 14px;
+font-size: 16px;
+border: 2px solid #d1fae5;
+border-radius: 8px;
+outline: none;
+transition: all 0.3s ease;
+font-family: inherit;
+}
+
+input:focus {
+border-color: #22c55e;
+box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+}
+
+input:disabled {
+background-color: #f5f5f5;
+cursor: not-allowed;
+opacity: 0.7;
+}
+
+.otp-input {
+letter-spacing: 0.5em;
+text-align: center;
+font-size: 22px;
+font-weight: bold;
+font-family: "Courier New", monospace;
+}
+
+.input-hint {
+color: #888;
+font-size: 12px;
+margin-top: 4px;
+}
+
+.otp-info {
+background-color: #ecfdf5;
+border-left: 4px solid #22c55e;
+padding: 12px;
+border-radius: 6px;
+margin-bottom: 20px;
+}
+
+.phone-display {
+color: #333;
+font-size: 14px;
+margin: 0 0 6px 0;
+}
+
+.otp-hint {
+color: #666;
+font-size: 13px;
+margin: 0;
+font-style: italic;
+}
+
+.resend-timer {
+text-align: center;
+color: #166534;
+font-size: 14px;
+margin: 12px 0;
+font-weight: 500;
+}
+
+/* ===== Button Animations ===== */
+button {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+border: none;
+padding: 12px 24px;
+font-size: 16px;
+font-weight: 600;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.25s ease;
+width: 100%;
+margin-bottom: 12px;
+}
+
+button:active {
+transform: scale(0.98);
+}
+
+.btn-primary {
+background: linear-gradient(135deg, #22c55e, #15803d);
+color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+transform: translateY(-2px);
+box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);
+}
+
+.btn-secondary {
+background-color: #16a34a;
+color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+background-color: #15803d;
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+}
+
+.btn-logout {
+background-color: #6b7280;
+color: white;
+width: auto;
+margin-bottom: 0;
+margin-left: auto;
+}
+
+.spinner {
+display: inline-block;
+width: 12px;
+height: 12px;
+border: 2px solid rgba(255, 255, 255, 0.3);
+border-radius: 50%;
+border-top-color: white;
+animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+to {
+transform: rotate(360deg);
+}
+}
+
+.error-message {
+background-color: #fee2e2;
+color: #991b1b;
+padding: 14px;
+border-radius: 8px;
+margin-bottom: 20px;
+border-left: 4px solid #dc2626;
+display: flex;
+align-items: center;
+gap: 10px;
+font-size: 14px;
+font-weight: 500;
+animation: fadeInPage 0.4s ease;
+}
+
+/* ===== Table Animation ===== */
+.issues-section {
+margin-top: 40px;
+animation: fadeInPage 0.5s ease;
+}
+
+.issues-table thead {
+background: linear-gradient(135deg, #15803d, #166534);
+color: white;
+}
+
+.issues-table tbody tr {
+transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.issues-table tbody tr:hover {
+background-color: #f0fdf4;
+transform: scale(1.01);
+}
+
+.issue-photo {
+width: 70px;
+height: 70px;
+object-fit: cover;
+border-radius: 6px;
+border: 1px solid #d1fae5;
+box-shadow: 0 2px 6px rgba(34, 197, 94, 0.15);
+transition: all 0.25s ease;
+cursor: pointer;
+}
+
+.issue-photo:hover {
+transform: scale(1.2) rotate(1deg);
+box-shadow: 0 8px 18px rgba(34, 197, 94, 0.35);
+z-index: 100;
+}
+
       `}</style>
     </div>
   );

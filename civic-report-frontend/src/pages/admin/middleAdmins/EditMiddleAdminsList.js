@@ -17,7 +17,7 @@ export default function ViewMiddleAdminsList() {
         const data = await res.json();
 
         if (!data.success) {
-          setError(data.message || "Failed to fetch middle admins");
+          setError(data.message || "Failed to fetch admins");
         } else {
           setAdmins(data.middleAdmins || []);
           setError("");
@@ -69,7 +69,7 @@ export default function ViewMiddleAdminsList() {
     navigate("/admin/welcome/middle-admins/edit", { state: { admin } });
   };
 
-  if (loading) return <p className="loading-text">Loading middle admins...</p>;
+  if (loading) return <p className="loading-text">Loading admins...</p>;
   if (error) return <p className="error-text">{error}</p>;
 
   return (
@@ -189,7 +189,7 @@ export default function ViewMiddleAdminsList() {
 
       <div className="page-wrapper">
         <div className="header-row">
-          <h2 className="page-title">Middle Admin List</h2>
+          <h2 className="page-title">Admin List</h2>
 
           <input
             type="text"

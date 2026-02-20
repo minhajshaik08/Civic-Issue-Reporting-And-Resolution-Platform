@@ -253,6 +253,7 @@ function ReportIssuePage() {
 
   return (
     <>
+
       {/* inline CSS for this page only */}
       <style>{`
         .report-wrapper {
@@ -332,6 +333,21 @@ function ReportIssuePage() {
           color: #16a34a;
           font-weight: 600;
         }
+          /* Global gradient heading for all steps */
+.gradient-heading {
+  background: linear-gradient(
+    135deg,
+    #0bbf7a,
+    #0a9f6e,
+    #067a58,
+    #065f46
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  text-align: center;
+}
+
 
         .report-inner {
           margin-top: 10px;
@@ -355,14 +371,145 @@ function ReportIssuePage() {
             font-size: 0.8rem;
           }
         }
+          /* ================= PAGE ANIMATIONS ================= */
+
+/* Floating background */
+.floating-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.shape {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  background: rgba(22, 163, 74, 0.12);
+  border-radius: 50%;
+  filter: blur(40px);
+  animation: float 8s infinite ease-in-out;
+}
+
+.shape1 { top: 10%; left: 5%; }
+.shape2 { bottom: 10%; right: 5%; animation-delay: 2s; }
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-25px); }
+  100% { transform: translateY(0); }
+}
+
+/* Card entrance */
+.report-card {
+  animation: cardFadeIn 0.6s ease-out;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Step transition animation */
+.step-animate {
+  animation: stepFade 0.45s ease;
+}
+
+@keyframes stepFade {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Step indicator pulse */
+.step-indicator-item.active .step-indicator-dot {
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Button hover animation */
+button {
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+/* ===== CONTACT STYLE BACKGROUND (for ReportIssue) ===== */
+
+.contact-bg {
+  min-height: 100vh;
+  padding: 80px 0;
+  background: linear-gradient(135deg, #c7f9cc, #e0f4ef);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating background shapes */
+
+.shape {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: float 8s infinite ease-in-out;
+}
+
+.shape1 {
+  top: 10%;
+  left: 5%;
+}
+
+.shape2 {
+  bottom: 10%;
+  right: 5%;
+  animation-delay: 2s;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-25px); }
+  100% { transform: translateY(0px); }
+}
+
       `}</style>
 
       <main className="report-wrapper">
+        <div className="floating-bg">
+  <div className="shape shape1"></div>
+  <div className="shape shape2"></div>
+</div>
+
         <Container className="report-container">
           <div className="report-card">
-            <h2 className="text-center report-title">
-              Report a Community Issue
-            </h2>
+        <h2 className="gradient-heading text-center">
+  Report a Community Issue
+</h2>
+
+
             <p className="text-center report-subtitle">
               keep your city clean and safe by reporting problems directly to the
               authorities in just three steps.
@@ -403,7 +550,7 @@ function ReportIssuePage() {
               </div>
             </div>
 
-            <div className="report-inner">
+            <div key={step} className="report-inner step-animate">
               {step === 1 && (
                 <Step1UserDetails
                   fullName={fullName}

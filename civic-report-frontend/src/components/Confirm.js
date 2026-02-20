@@ -61,7 +61,7 @@ export function confirm(message, title) {
       }
 
       .confirm-yes {
-        background: #ef4444;
+        background: #04a129;
         color: white;
       }
 

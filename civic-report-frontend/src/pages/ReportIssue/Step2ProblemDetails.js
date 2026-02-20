@@ -19,12 +19,49 @@ function Step2ProblemDetails({
       showToast("Please enter the problem description.", "error");
       return;
     }
-    onNext(); // go to Step 3 only if both are valid
+    onNext();
   };
 
   return (
     <>
-      <h5 className="mb-3">Problem Details</h5>
+      {/* ✅ CSS */}
+      <style>{`
+        /* Gradient main heading */
+        .problem-heading {
+          background: linear-gradient(
+            135deg,
+            #0bbf7a,
+            #0a9f6e,
+            #067a58,
+            #065f46
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-weight: 800;
+          text-align: center;
+        }
+
+        /* ✅ Dark side headings (labels) */
+        .form-label {
+          color: #0f172a;
+          font-weight: 600;
+        }
+
+        /* Green hover & focus */
+        .form-select:focus,
+        .form-control:focus {
+          border-color: #16a34a;
+          box-shadow: 0 0 0 0.15rem rgba(22, 163, 74, 0.25);
+        }
+
+        .form-select:hover,
+        .form-control:hover {
+          border-color: #16a34a;
+        }
+      `}</style>
+
+      <h5 className="mb-3 problem-heading">Problem Details</h5>
+
       <Form>
         <Form.Group className="mb-3">
           <Form.Label>Select the type of issue</Form.Label>
@@ -42,7 +79,7 @@ function Step2ProblemDetails({
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Problem Description *</Form.Label>
+          <Form.Label>Problem Description </Form.Label>
           <Form.Control
             as="textarea"
             rows={4}

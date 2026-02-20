@@ -13,7 +13,6 @@ function Step3LocationPhoto({
   onPrev,
   onSubmit,
 }) {
-  // when marker moves (click), fetch address and fill textarea
   useEffect(() => {
     const fetchAddress = async () => {
       if (!mapPosition) return;
@@ -64,7 +63,45 @@ function Step3LocationPhoto({
 
   return (
     <>
-      <h5 className="mb-3">Location &amp; Evidence</h5>
+      {/* ✅ CSS */}
+      <style>{`
+        .gradient-heading {
+          background: linear-gradient(
+            135deg,
+            #0bbf7a,
+            #0a9f6e,
+            #067a58,
+            #065f46
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-weight: 800;
+          text-align: center;
+        }
+
+        /* Dark side headings */
+        .form-label {
+          color: #0f172a;
+          font-weight: 600;
+        }
+
+        /* ✅ Green hover & focus effects */
+        .form-control:hover,
+        .form-select:hover {
+          border-color: #16a34a;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+          border-color: #16a34a;
+          box-shadow: 0 0 0 0.15rem rgba(22, 163, 74, 0.25);
+        }
+      `}</style>
+
+      {/* Gradient centered heading */}
+      <h5 className="mb-3 gradient-heading">
+        Location &amp; Evidence
+      </h5>
 
       <Form>
         <Form.Group className="mb-3">
@@ -85,13 +122,12 @@ function Step3LocationPhoto({
         <Form.Group className="mb-3">
           <Form.Label>Pick Location on Map</Form.Label>
 
-          {/* ✅ FIXED MAP WRAPPER HEIGHT */}
           <div
             style={{
               border: "1px dashed #ced4da",
               borderRadius: "8px",
               overflow: "hidden",
-              height: "350px", // ✅ MUST
+              height: "350px",
               width: "100%",
             }}
           >
@@ -112,7 +148,6 @@ function Step3LocationPhoto({
         <Form.Group className="mb-3">
           <Form.Label>Upload Photo *</Form.Label>
 
-          {/* upload box */}
           <div
             style={{
               border: "1px dashed #28a745",
@@ -127,7 +162,6 @@ function Step3LocationPhoto({
               flexWrap: "wrap",
             }}
           >
-            {/* left: instruction + selected files as chips */}
             <div
               style={{
                 display: "flex",
@@ -204,7 +238,6 @@ function Step3LocationPhoto({
                 ))}
             </div>
 
-            {/* right: hidden file input + button */}
             <div>
               <Form.Control
                 type="file"

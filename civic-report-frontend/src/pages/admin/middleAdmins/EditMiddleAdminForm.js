@@ -58,9 +58,9 @@ export default function EditMiddleAdminForm() {
 
       const data = await res.json();
       if (!data.success) {
-        setError(data.message || "Failed to update middle admin.");
+        setError(data.message || "Failed to update admin.");
       } else {
-        showToast("✅ Middle admin updated successfully.", "success");
+        showToast("✅ Admin updated successfully.", "success");
         setTimeout(() => navigate("/admin/welcome/middle-admins/list"), 1500);
       }
     } catch {
@@ -199,7 +199,7 @@ export default function EditMiddleAdminForm() {
       {/* ✅ Center Form */}
       <div className="edit-wrapper">
         <form className="edit-form-card" onSubmit={handleSubmit}>
-          <div className="edit-title">Edit Middle Admin</div>
+          <div className="edit-title">Edit Admin</div>
           <div className="edit-subtitle">
             Update username or password (optional)
           </div>

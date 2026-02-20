@@ -44,7 +44,7 @@ function HamburgerSidebar({
 
   return (
     <div className="hamburger-sidebar-wrapper">
-      {/* ✅ Hamburger Button - Always visible on mobile */}
+      {/* Hamburger Button */}
       {isMobile && (
         <button
           className={`hamburger-btn ${isOpen ? "active" : ""}`}
@@ -57,12 +57,11 @@ function HamburgerSidebar({
         </button>
       )}
 
-      {/* ✅ Sidebar - Fixed desktop, slide on mobile */}
+      {/* Sidebar */}
       <div className={`hamburger-sidebar ${isOpen ? "open" : ""}`}>
-        {/* Show profile header only for logged-in users (dashboards) */}
+        {/* Profile Header */}
         {user && (
           <div className="sidebar-header">
-            {/* Close button for mobile */}
             {isMobile && (
               <button
                 className="close-btn"
@@ -78,18 +77,23 @@ function HamburgerSidebar({
               {photoUrl ? (
                 <img src={photoUrl} alt="Profile" />
               ) : (
-                <span>{initial.toUpperCase()}</span>
+                <span>{initial?.toUpperCase()}</span>
               )}
             </div>
 
-            {/* User info */}
+            {/* User Info */}
             <div className="sidebar-user-info">
               <div className="user-name">{user}</div>
-              {role && <div className="user-role">{role.replace("_", " ")}</div>}
+              {role && (
+                <div className="user-role">
+                  {role.replace("_", " ")}
+                </div>
+              )}
             </div>
           </div>
         )}
-        {/* Close button for mobile (when no user profile) */}
+
+        {/* Close Button if no user */}
         {!user && isMobile && (
           <button
             className="close-btn"
@@ -110,7 +114,9 @@ function HamburgerSidebar({
               >
                 <Link
                   to={item.to}
-                  className={`menu-link ${isActive(item.to) ? "active" : ""}`}
+                  className={`menu-link ${
+                    isActive(item.to) ? "active" : ""
+                  }`}
                   onClick={handleMenuItemClick}
                 >
                   <span className="menu-icon">{item.icon}</span>
@@ -121,7 +127,7 @@ function HamburgerSidebar({
           </ListGroup>
         </div>
 
-        {/* Logout Button - Show only for logged-in users */}
+        {/* Logout */}
         {user && (
           <div className="sidebar-footer">
             <button
@@ -139,9 +145,12 @@ function HamburgerSidebar({
         )}
       </div>
 
-      {/* ✅ Overlay - Click to close menu on mobile */}
+      {/* Overlay */}
       {isMobile && isOpen && (
-        <div className="sidebar-overlay" onClick={() => setIsOpen(false)}></div>
+        <div
+          className="sidebar-overlay"
+          onClick={() => setIsOpen(false)}
+        ></div>
       )}
     </div>
   );

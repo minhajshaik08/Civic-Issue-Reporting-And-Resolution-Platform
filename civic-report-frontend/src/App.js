@@ -128,232 +128,213 @@ import OfficerGalleryUploadPage from "./pages/officer/gallary/OfficerGalleryUplo
 
 function HomePage() {
   const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  React.useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all elements with scroll animation classes
+    const animateElements = document.querySelectorAll(
+      '.scroll-animate, .scroll-animate-left, .scroll-animate-right, .scroll-animate-scale'
+    );
+    
+    animateElements.forEach(el => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
-      {/* HERO */}
+      {/* HERO BANNER - Embassy Style */}
       <section className="hero-wrapper">
-        <Container fluid className="px-3 px-md-4">
-          <Row className="align-items-center">
-            <Col>
+        <Container fluid className="px-0">
+          <div className="hero-content-wrapper">
+            {/* Left Content */}
+            <div className="hero-left-content">
               <h1 className="hero-title">
-                Report Issues. Get Them Resolved. Build a Cleaner, Greener City
-                Together.
+                Your Voice, Our Action - Building Cleaner, Safer Cities Together
               </h1>
               <p className="hero-subtitle">
-                A smart platform that connects citizens and authorities to
-                resolve civic problems like potholes, garbage, drainage, and
-                streetlights with real-time updates and full transparency. By
-                improving communication between the public and civic bodies, the
-                platform helps reduce response time and enhances the overall
-                quality of urban services. It encourages active citizen
-                participation and supports the development of cleaner, safer,
-                and more sustainable cities.
+                A smart platform that connects citizens and authorities to resolve civic problems like potholes, garbage, drainage, and streetlights with real-time updates and full transparency.
               </p>
               <div className="hero-actions">
-                <Button
-                  size="lg"
-                  className="hero-primary-btn"
-                  onClick={() => navigate("/report")}
-                >
+                <Button className="hero-primary-btn" onClick={() => navigate("/report")}>
                   Report an Issue
                 </Button>
-                <Button
-                  size="lg"
-                  className="hero-secondary-btn"
-                  onClick={() => navigate("/view-issues")}
-                >
-                  View Reported Issues
+                <Button className="hero-secondary-btn" onClick={() => navigate("/view-issues")}>
+                  View Issues
                 </Button>
               </div>
-              {/* RIGHT HERO HIGHLIGHT moved below buttons to match layout */}
-              <div className="hero-right-highlight d-flex align-items-start mt-3">
-                <div className="hero-highlight-icon me-3">
-                  <span>✅</span>
-                </div>
-                <div className="hero-highlight-content">
-                  <h4 className="mb-2 hero-highlight-title">
-                    24/7 System Available. 100% Secure &amp; Private. Real‑Time Updates.
-                  </h4>
-                  <ul className="hero-highlight-list mb-0">
-                    <li>Citizens can report any civic issue anytime.</li>
-                    <li>Receive updates and track issue status in real time.</li>
-                  </ul>
-                </div>
-              </div>
-            </Col>
-            
-          </Row>
-        </Container>
-      </section>
+            </div>
 
-      {/* HOW IT WORKS */}
-      <section className="section-wrapper how-works-section" id="how">
-        <Container fluid className="px-3 px-md-4">
-          <h2 className="section-title">How It Works</h2>
-          <p className="section-subtitle">
-            Our streamlined process ensures your civic issues are handled
-            efficiently from report to resolution.
-          </p>
-          <Row className="g-4">
-            {[
-              {
-                step: "01",
-                title: "Report an Issue",
-                text:
-                  "Submit details with description, photo, and location through our simple form.",
-                icon: "📝",
-              },
-              {
-                step: "02",
-                title: "Stored in System",
-                text:
-                  "Issue is recorded in a centralized database for tracking and management.",
-                icon: "🗄️",
-              },
-              {
-                step: "03",
-                title: "Authorities Take Action",
-                text:
-                  "Concerned department is automatically notified and assigned the issue.",
-                icon: "👤",
-              },
-              {
-                step: "04",
-                title: "Track & Resolve",
-                text:
-                  "Citizen receives real-time updates until the issue is completely resolved.",
-                icon: "✅",
-              },
-            ].map((item) => (
-              <Col md={3} sm={6} key={item.step}>
-                <div className="feature-card text-center">
-                  <div className="feature-icon">{item.icon}</div>
-                  <div className="fw-bold text-success mb-2">{item.step}</div>
-                  <h5>{item.title}</h5>
-                  <p className="mb-0 text-muted">{item.text}</p>
-                </div>
-              </Col>
-            ))}
-          </Row>
+            {/* Right Image Container */}
+            <div className="hero-image-container">
+              <div className="hero-image-frame">
+                <img 
+                  src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&h=400&fit=crop" 
+                  alt="City Infrastructure" 
+                />
+              </div>
+            </div>
+          </div>
         </Container>
       </section>
 
       {/* ABOUT OUR MISSION */}
-      <section className="section-wrapper about-mission-section" id="about">
-        <Container fluid className="px-3 px-md-4">
-          <h2 className="section-title">About Our Mission</h2>
-          {/* subtitle moved here so it shows centered under heading */}
-          <p className="section-subtitle">
-            We empower citizens to build cleaner, safer, and stronger
-            communities.
+      <section className="section-wrapper">
+        <Container>
+          <h2 className="section-title scroll-animate">About Our Mission</h2>
+          <p className="section-subtitle scroll-animate">
+            We empower citizens to build cleaner, safer, and stronger communities.
           </p>
-          <Row className="g-5">
-            {[
-              {
-                title: "Clean & Green",
-                text:
-                  "Promoting environmental sustainability through technology-driven civic solutions.",
-              },
-              {
-                title: "Trust & Transparency",
-                text:
-                  "Building accountability between citizens and authorities with full transparency.",
-              },
-              {
-                title: "Community Driven",
-                text:
-                  "Empowering citizens to actively participate in making their city better.",
-              },
-              {
-                title: "Efficient Resolution",
-                text:
-                  "Streamlined processes ensure issues are resolved quickly and effectively.",
-              },
-            ].map((item) => (
-              <Col md={3} sm={6} key={item.title}>
-                <div className="feature-card">
-                  <h5>{item.title}</h5>
-                  <p className="mb-0 text-muted">{item.text}</p>
-                </div>
-              </Col>
-            ))}
-          </Row>
+          
+          <div className="feature-cards-grid">
+            <div className="feature-card scroll-animate">
+              <div className="feature-icon">🌱</div>
+              <h5>Clean & Green</h5>
+              <p>Promoting environmental sustainability through technology-driven civic solutions.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate">
+              <div className="feature-icon">🤝</div>
+              <h5>Trust & Transparency</h5>
+              <p>Building accountability between citizens and authorities with full transparency.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate">
+              <div className="feature-icon">👥</div>
+              <h5>Community Driven</h5>
+              <p>Empowering citizens to actively participate in making their city better.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate">
+              <div className="feature-icon">⚡</div>
+              <h5>Efficient Resolution</h5>
+              <p>Streamlined processes ensure issues are resolved quickly and effectively.</p>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="section-wrapper">
+        <Container>
+          <h2 className="section-title scroll-animate">How It Works</h2>
+          <p className="section-subtitle scroll-animate">
+            Our streamlined process ensures your civic issues are handled efficiently from report to resolution.
+          </p>
+          
+          <div className="feature-cards-grid">
+            <div className="feature-card scroll-animate">
+              <span className="step-number">01</span>
+              <div className="feature-icon">📝</div>
+              <h5>Report an Issue</h5>
+              <p>Submit details with description, photo, and location through our simple form.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate">
+              <span className="step-number">02</span>
+              <div className="feature-icon">🗄️</div>
+              <h5>Stored in System</h5>
+              <p>Issue is recorded in a centralized database for tracking and management.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate">
+              <span className="step-number">03</span>
+              <div className="feature-icon">👮</div>
+              <h5>Authorities Take Action</h5>
+              <p>Concerned department is automatically notified and assigned the issue.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate">
+              <span className="step-number">04</span>
+              <div className="feature-icon">✅</div>
+              <h5>Track & Resolve</h5>
+              <p>Citizen receives real-time updates until the issue is completely resolved.</p>
+            </div>
+          </div>
         </Container>
       </section>
 
       {/* WHY THIS MATTERS */}
-      <section className="section-wrapper why-matters-section">
-        <Container fluid className="px-3 px-md-4">
-          <h2 className="section-title">Why This Matters</h2>
-          {/* keep single-line variant here */}
-          <p className="section-subtitle-single">
-            A clean and well-managed city is every citizen&apos;s right.
+      <section className="section-wrapper">
+        <Container>
+          <h2 className="section-title scroll-animate">Why This Matters</h2>
+          <p className="section-subtitle scroll-animate">
+            A clean and well-managed city is every citizen's right.
           </p>
-          <Row className="g-5">
-            {[
-              {
-                title: "Quality of Life",
-                text:
-                  "Cleaner streets, better infrastructure, and safer neighborhoods improve daily life.",
-              },
-              {
-                title: "Good Governance",
-                text:
-                  "Transparent communication between citizens and authorities builds trust.",
-              },
-              {
-                title: "Environmental Impact",
-                text:
-                  "Quick resolution of environmental issues contributes to greener cities.",
-              },
-              {
-                title: "Community Unity",
-                text:
-                  "Citizens and authorities working together create stronger communities.",
-              },
-            ].map((item) => (
-              <Col md={3} sm={6} key={item.title}>
-                <div className="feature-card">
-                  <h5>{item.title}</h5>
-                  <p className="mb-0 text-muted">{item.text}</p>
-                </div>
-              </Col>
-            ))}
-          </Row>
+          
+          <div className="feature-cards-grid">
+            <div className="feature-card scroll-animate-scale">
+              <div className="feature-icon">🏘️</div>
+              <h5>Quality of Life</h5>
+              <p>Cleaner streets, better infrastructure, and safer neighborhoods improve daily life.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate-scale">
+              <div className="feature-icon">📊</div>
+              <h5>Good Governance</h5>
+              <p>Transparent communication between citizens and authorities builds trust.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate-scale">
+              <div className="feature-icon">🌍</div>
+              <h5>Environmental Impact</h5>
+              <p>Quick resolution of environmental issues contributes to greener cities.</p>
+            </div>
+            
+            <div className="feature-card scroll-animate-scale">
+              <div className="feature-icon">💪</div>
+              <h5>Community Unity</h5>
+              <p>Citizens and authorities working together create stronger communities.</p>
+            </div>
+          </div>
         </Container>
       </section>
 
-      {/* FOOTER */}
-      <footer className="footer-section" id="contact">
-        <Container fluid className="px-3 px-md-4">
-          <Row className="g-5">
+      {/* FOOTER - CONDENSED */}
+      <footer className="footer-section">
+        <Container>
+          <Row className="g-3">
             <Col md={4}>
-              <h5>Civic Report</h5>
-              <p className="mb-2">
-                Building cleaner, greener cities through transparent civic
-                issue reporting and resolution.
+              <h5>Embassy Of India</h5>
+              <p style={{ fontSize: '0.85rem', lineHeight: '1.6', marginBottom: '0.5rem' }}>
+                Guatemala, Guatemala City
               </p>
-              <Button size="sm" variant="warning" className="footer-btn">
-                Learn More
-              </Button>
+              <p style={{ fontSize: '0.8rem', marginBottom: '0.3rem' }}>
+                Mon-Fri: 9:30am - 6:00pm
+              </p>
             </Col>
+            
             <Col md={4}>
               <h6>Quick Links</h6>
-              <ul className="list-unstyled footer-links">
-                <li>Home</li>
-                <li>Report Issue</li>
-                <li>View Issues</li>
-                <li>About</li>
+              <ul className="footer-links">
+                <li>• Home </li><li>• Report Issue</li><li> • View Issues</li>
+                <li>• Gallery </li><li>• Contact</li>
               </ul>
             </Col>
+            
             <Col md={4}>
               <h6>Contact Information</h6>
-              <p className="mb-1 footer-contact">Municipal Office, City Hall</p>
-              <p className="mb-1 footer-contact">support@civicreport.com</p>
-              <p className="mb-0 footer-contact">+91-1234567890</p>
+              <p className="footer-contact">support@civicreport.com</p>
+              <p className="footer-contact">+91-1234567890</p>
             </Col>
           </Row>
+          
+          <div className="footer-bottom">
+            <p>© Embassy Of India, Guatemala | All Rights Reserved</p>
+          </div>
         </Container>
       </footer>
     </>
@@ -373,7 +354,7 @@ function AppRoutes() {
   const location = useLocation();
   const path = location.pathname || "";
   const navigate = useNavigate();
-  // helper: determine if current path is a public route
+  
   const isPublicPath = (p) => {
     if (!p) return false;
     const normalized = String(p).toLowerCase();
@@ -401,7 +382,6 @@ function AppRoutes() {
     return null;
   };
 
-  // Attach a popstate guard when authenticated so back/forward can't land on public pages.
   React.useEffect(() => {
     const getSessionId = () => sessionStorage.getItem("sessionId");
     const getStoredRole = () => {
@@ -414,18 +394,14 @@ function AppRoutes() {
     };
 
     const isAuth = !!(localStorage.getItem("token") && getStoredRole());
-
-    if (!isAuth) return; // nothing to do when not authenticated
+    if (!isAuth) return;
 
     const onPopState = (ev) => {
       const cur = window.location.pathname || "/";
       const currentSession = getSessionId();
-
-      // If the popped entry belongs to a previous session (no or different sessionId)
       const poppedSession = ev?.state?.sessionId || null;
 
       if (poppedSession && currentSession && poppedSession !== currentSession) {
-        // prevent navigating to old-session entry by navigating to current session home
         const role = getStoredRole();
         const home = getRoleHome(role);
         if (home) {
@@ -438,7 +414,6 @@ function AppRoutes() {
         const role = getStoredRole();
         const home = getRoleHome(role);
         if (home) {
-          // navigate react-router to dashboard home to avoid visible blink
           navigate(home, { replace: true });
         }
       }
@@ -446,7 +421,6 @@ function AppRoutes() {
 
     window.addEventListener("popstate", onPopState);
 
-    // If app loaded on a public path while authenticated, immediately correct it
     if (isPublicPath(path)) {
       const role = getStoredRole();
       const home = getRoleHome(role);
@@ -460,7 +434,6 @@ function AppRoutes() {
     };
   }, [path]);
 
-  // Ensure every visited dashboard entry contains the current sessionId in history.state
   React.useEffect(() => {
     const sessionId = sessionStorage.getItem("sessionId");
     const isAuth = !!(localStorage.getItem("token") && sessionId);
@@ -475,12 +448,12 @@ function AppRoutes() {
       // ignore
     }
   }, [location]);
+
   const hideNav =
     path.startsWith("/officer/dashboard") ||
     path.startsWith("/middle-admin/dashboard") ||
     path.startsWith("/admin/welcome");
 
-  // Public site menu (used on home/contact/report/view/gallery)
   const publicMenuItems = [
     { to: "/", label: "Home", icon: "🏠" },
     { to: "/gallery", label: "Gallery", icon: "🖼️" },
@@ -494,15 +467,14 @@ function AppRoutes() {
     <>
       {/* Horizontal navbar - Desktop only */}
       {!hideNav && (
-        <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm custom-navbar d-none d-lg-block">
-          <div className="container-fluid px-3 px-md-4">
+        <nav className="navbar navbar-expand-lg navbar-light custom-navbar d-none d-lg-block">
+          <div className="container-fluid px-4">
             <Link to="/" className="navbar-brand custom-navbar-brand">
-              Civic Report
+              🏛️ Civic Report
             </Link>
 
             <div className="collapse navbar-collapse">
-              {/* Left nav links */}
-              <div className="navbar-nav me-auto custom-nav-links">
+              <div className="navbar-nav me-auto">
                 <Link to="/gallery" className="nav-link custom-nav-link">
                   Gallery
                 </Link>
@@ -510,16 +482,15 @@ function AppRoutes() {
                   Report Issue
                 </Link>
                 <Link to="/view-issues" className="nav-link custom-nav-link">
-                  View Reported Issues
+                  View Issues
                 </Link>
                 <Link to="/contact" className="nav-link custom-nav-link">
                   Contact
                 </Link>
               </div>
 
-              {/* Right side - Only Login button */}
-              <div className="d-flex gap-2 custom-login-buttons">
-                <Link to="/Login" className="btn btn-sm custom-login-btn">
+              <div className="d-flex">
+                <Link to="/Login" className="btn custom-login-btn">
                   Login
                 </Link>
               </div>
@@ -542,142 +513,102 @@ function AppRoutes() {
         </div>
       )}
 
-     <Routes>
+      <Routes>
+        {/* ================= PUBLIC ROUTES ================= */}
+        <Route element={<RequireAuth />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/report" element={<ReportIssuePage />} />
+          <Route path="/view-issues" element={<ViewIssuePage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/gallery" element={<MainGalleryPage />} />
+          <Route path="/Login" element={<AdminLoginPage />} />
+          <Route path="/Login/login" element={<AdminLoginPage />} />
+          <Route path="/Login/forgot-password" element={<AdminForgotPassword />} />
+          <Route path="/Login/reset-password" element={<AdminResetPassword />} />
+        </Route>
 
-  {/* ================= PUBLIC ROUTES (WRAPPED) ================= */}
-  <Route element={<RequireAuth />}>
-    <Route path="/" element={<HomePage />} />
-    <Route path="/report" element={<ReportIssuePage />} />
-    <Route path="/view-issues" element={<ViewIssuePage />} />
-    <Route path="/contact" element={<ContactPage />} />
-    <Route path="/gallery" element={<MainGalleryPage />} />
+        {/* ================= MIDDLE ADMIN DASHBOARD ================= */}
+        <Route element={<RequireAuth allowedRoles={["middle_admin"]} />}>
+          <Route path="/middle-admin/dashboard" element={<MiddleAdminDashboardPage />}>
+            <Route index element={<></>} />
+            <Route path="officers" element={<MiddleAdminOfficerOptionsPage />} />
+            <Route path="officers/add" element={<MiddleAdminAddOfficerForm />} />
+            <Route path="officers/edit" element={<MiddleAdminOfficerListEdit />} />
+            <Route path="officers/editform" element={<MiddleAdminEditOfficerForm />} />
+            <Route path="officers/manage" element={<MiddleAdminManageOfficersPage />} />
+            <Route path="officers/list" element={<MiddleAdminOfficerListPage />} />
+            <Route path="users" element={<MiddleAdminUserOptionsPage />} />
+            <Route path="users/manage" element={<MiddleAdminManageUsersPage />} />
+            <Route path="users/activity" element={<MiddleAdminUserActivityPage />} />
+            <Route path="users/list" element={<MiddleAdminUserListPage />} />
+            <Route path="issues" element={<MiddleAdminIssuesOptions />} />
+            <Route path="issues/:id" element={<MiddleAdminIssueDetails />} />
+            <Route path="issues/list" element={<MiddleAdminIssuesList />} />
+            <Route path="issues/assign" element={<MiddleAdminAssignIssuesPage />} />
+            <Route path="reports" element={<MiddleAdminReportsHomePage />} />
+            <Route path="reports/areas/details" element={<MiddleAdminAreaDetailsPage />} />
+            <Route path="reports/areas" element={<MiddleAdminAreasReportPage />} />
+            <Route path="reports/issues" element={<MiddleAdminIssuesReportPage />} />
+            <Route path="reports/officers/performance" element={<MiddleAdminOfficerPerformancePage />} />
+            <Route path="settings" element={<MiddleAdminSettingsPage />} />
+            <Route path="settings/appearance" element={<MiddleAdminAppearanceSettingsPage />} />
+            <Route path="settings/profile" element={<MiddleAdminProfileSettingsPage />} />
+            <Route path="settings/security" element={<MiddleAdminSecuritySettingsPage />} />
+          </Route>
+        </Route>
 
-    {/* Login routes */}
-    <Route path="/Login" element={<AdminLoginPage />} />
-    <Route path="/Login/login" element={<AdminLoginPage />} />
-    <Route path="/Login/forgot-password" element={<AdminForgotPassword />} />
-    <Route path="/Login/reset-password" element={<AdminResetPassword />} />
-  </Route>
+        {/* ================= OFFICER DASHBOARD ================= */}
+        <Route element={<RequireAuth allowedRoles={["officer"]} />}>
+          <Route path="/officer/dashboard" element={<OfficerDashboardPage />}>
+            <Route index element={<div>Officer dashboard home</div>} />
+            <Route path="issues" element={<OfficerIssuesList />} />
+            <Route path="issues/:id" element={<OfficerIssueDetails />} />
+            <Route path="reports" element={<OfficerIssuesReportPage />} />
+            <Route path="settings" element={<OfficerSettingsPage />} />
+            <Route path="settings/profile" element={<OfficerProfileSettingsPage />} />
+            <Route path="settings/security" element={<OfficerSecuritySettingsPage />} />
+            <Route path="settings/appearance" element={<OfficerAppearanceSettingsPage />} />
+            <Route path="gallery-upload" element={<GalleryOptionsPage />} />
+            <Route path="gallery-upload/list" element={<GalleryListPage />} />
+            <Route path="gallery-upload/new" element={<OfficerGalleryUploadPage />} />
+          </Route>
+        </Route>
 
-
-  {/* ================= MIDDLE ADMIN DASHBOARD ================= */}
-  <Route element={<RequireAuth allowedRoles={["middle_admin"]} />}>
-    <Route
-      path="/middle-admin/dashboard"
-      element={<MiddleAdminDashboardPage />}
-    >
-      <Route index element={<></>} />
-
-      {/* officers */}
-      <Route path="officers" element={<MiddleAdminOfficerOptionsPage />} />
-      <Route path="officers/add" element={<MiddleAdminAddOfficerForm />} />
-      <Route path="officers/edit" element={<MiddleAdminOfficerListEdit />} />
-      <Route path="officers/editform" element={<MiddleAdminEditOfficerForm />} />
-      <Route path="officers/manage" element={<MiddleAdminManageOfficersPage />} />
-      <Route path="officers/list" element={<MiddleAdminOfficerListPage />} />
-
-      {/* users */}
-      <Route path="users" element={<MiddleAdminUserOptionsPage />} />
-      <Route path="users/manage" element={<MiddleAdminManageUsersPage />} />
-      <Route path="users/activity" element={<MiddleAdminUserActivityPage />} />
-      <Route path="users/list" element={<MiddleAdminUserListPage />} />
-
-      {/* issues */}
-      <Route path="issues" element={<MiddleAdminIssuesOptions />} />
-      <Route path="issues/:id" element={<MiddleAdminIssueDetails />} />
-      <Route path="issues/list" element={<MiddleAdminIssuesList />} />
-      <Route path="issues/assign" element={<MiddleAdminAssignIssuesPage />} />
-
-      {/* reports */}
-      <Route path="reports" element={<MiddleAdminReportsHomePage />} />
-      <Route path="reports/areas/details" element={<MiddleAdminAreaDetailsPage />} />
-      <Route path="reports/areas" element={<MiddleAdminAreasReportPage />} />
-      <Route path="reports/issues" element={<MiddleAdminIssuesReportPage />} />
-      <Route
-        path="reports/officers/performance"
-        element={<MiddleAdminOfficerPerformancePage />}
-      />
-
-      {/* settings */}
-      <Route path="settings" element={<MiddleAdminSettingsPage />} />
-      <Route path="settings/appearance" element={<MiddleAdminAppearanceSettingsPage />} />
-      <Route path="settings/profile" element={<MiddleAdminProfileSettingsPage />} />
-      <Route path="settings/security" element={<MiddleAdminSecuritySettingsPage />} />
-    </Route>
-  </Route>
-
-
-  {/* ================= OFFICER DASHBOARD ================= */}
-  <Route element={<RequireAuth allowedRoles={["officer"]} />}>
-    <Route path="/officer/dashboard" element={<OfficerDashboardPage />}>
-      <Route index element={<div>Officer dashboard home</div>} />
-      <Route path="issues" element={<OfficerIssuesList />} />
-      <Route path="issues/:id" element={<OfficerIssueDetails />} />
-      <Route path="reports" element={<OfficerIssuesReportPage />} />
-
-      <Route path="settings" element={<OfficerSettingsPage />} />
-      <Route path="settings/profile" element={<OfficerProfileSettingsPage />} />
-      <Route path="settings/security" element={<OfficerSecuritySettingsPage />} />
-      <Route path="settings/appearance" element={<OfficerAppearanceSettingsPage />} />
-
-      <Route path="gallery-upload" element={<GalleryOptionsPage />} />
-      <Route path="gallery-upload/list" element={<GalleryListPage />} />
-      <Route path="gallery-upload/new" element={<OfficerGalleryUploadPage />} />
-    </Route>
-  </Route>
-
-
-  {/* ================= SUPER ADMIN DASHBOARD ================= */}
-  <Route element={<RequireAuth allowedRoles={["super_admin"]} />}>
-    <Route path="/admin/welcome" element={<WelcomePage />}>
-      <Route index element={<></>} />
-
-      {/* issues */}
-      <Route path="issues" element={<Issuesoptions />} />
-      <Route path="issues/list" element={<Issueslist />} />
-      <Route path="issues/:id" element={<IssueDetails />} />
-
-      {/* middle admins */}
-      <Route path="middle-admins" element={<MiddleAdminpageoptions />} />
-      <Route path="middle-admins/add" element={<AddMiddleAdminForm />} />
-      <Route path="middle-admins/list" element={<ViewMiddleAdminsList />} />
-      <Route path="middle-admins/edit" element={<EditMiddleAdminForm />} />
-      <Route path="middle-admins/edit-list" element={<EditMiddleAdminsList />} />
-      <Route path="middle-admins/manage" element={<DeleteBlockUnblockMiddleAdmins />} />
-
-      {/* officers */}
-      <Route path="officers" element={<OfficerOptionsPage />} />
-      <Route path="officers/add" element={<AddOfficerForm />} />
-      <Route path="officers/list" element={<OfficerListPage />} />
-      <Route path="officers/manage" element={<ManageOfficersPage />} />
-      <Route path="officers/edit" element={<OfficerListEdit />} />
-      <Route path="officers/editform" element={<EditOfficerForm />} />
-
-      {/* users */}
-      <Route path="users" element={<UserOptionsPage />} />
-      <Route path="users/list" element={<UserListPage />} />
-      <Route path="users/manage" element={<ManageUsersPage />} />
-      <Route path="users/activity" element={<UserActivityPage />} />
-
-      {/* settings */}
-      <Route path="settings" element={<AdminSettingsPage />} />
-      <Route path="settings/profile" element={<ProfileSettingsPage />} />
-      <Route path="settings/security" element={<SecuritySettingsPage />} />
-      <Route path="settings/appearance" element={<AppearanceSettingsPage />} />
-
-      {/* reports */}
-      <Route path="reports" element={<ReportsHomePage />} />
-      <Route path="reports/issues" element={<IssuesReportPage />} />
-      <Route path="reports/areas" element={<AreasReportPage />} />
-      <Route path="reports/areas/details" element={<AreaDetailsPage />} />
-      <Route
-        path="reports/officers/performance"
-        element={<OfficerPerformancePage />}
-      />
-    </Route>
-  </Route>
-
-</Routes>
+        {/* ================= SUPER ADMIN DASHBOARD ================= */}
+        <Route element={<RequireAuth allowedRoles={["super_admin"]} />}>
+          <Route path="/admin/welcome" element={<WelcomePage />}>
+            <Route index element={<></>} />
+            <Route path="issues" element={<Issuesoptions />} />
+            <Route path="issues/list" element={<Issueslist />} />
+            <Route path="issues/:id" element={<IssueDetails />} />
+            <Route path="middle-admins" element={<MiddleAdminpageoptions />} />
+            <Route path="middle-admins/add" element={<AddMiddleAdminForm />} />
+            <Route path="middle-admins/list" element={<ViewMiddleAdminsList />} />
+            <Route path="middle-admins/edit" element={<EditMiddleAdminForm />} />
+            <Route path="middle-admins/edit-list" element={<EditMiddleAdminsList />} />
+            <Route path="middle-admins/manage" element={<DeleteBlockUnblockMiddleAdmins />} />
+            <Route path="officers" element={<OfficerOptionsPage />} />
+            <Route path="officers/add" element={<AddOfficerForm />} />
+            <Route path="officers/list" element={<OfficerListPage />} />
+            <Route path="officers/manage" element={<ManageOfficersPage />} />
+            <Route path="officers/edit" element={<OfficerListEdit />} />
+            <Route path="officers/editform" element={<EditOfficerForm />} />
+            <Route path="users" element={<UserOptionsPage />} />
+            <Route path="users/list" element={<UserListPage />} />
+            <Route path="users/manage" element={<ManageUsersPage />} />
+            <Route path="users/activity" element={<UserActivityPage />} />
+            <Route path="settings" element={<AdminSettingsPage />} />
+            <Route path="settings/profile" element={<ProfileSettingsPage />} />
+            <Route path="settings/security" element={<SecuritySettingsPage />} />
+            <Route path="settings/appearance" element={<AppearanceSettingsPage />} />
+            <Route path="reports" element={<ReportsHomePage />} />
+            <Route path="reports/issues" element={<IssuesReportPage />} />
+            <Route path="reports/areas" element={<AreasReportPage />} />
+            <Route path="reports/areas/details" element={<AreaDetailsPage />} />
+            <Route path="reports/officers/performance" element={<OfficerPerformancePage />} />
+          </Route>
+        </Route>
+      </Routes>
 
       <ToastContainer />
     </>
