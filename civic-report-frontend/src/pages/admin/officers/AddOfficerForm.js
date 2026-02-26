@@ -73,7 +73,7 @@ export default function AddOfficerForm() {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/admin/officers/add", form);
+      await axios.post("http://13.201.16.142:5000/api/admin/officers/add", form);
 
       setSuccess("✅ Officer added successfully!");
 

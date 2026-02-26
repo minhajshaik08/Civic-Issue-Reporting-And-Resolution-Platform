@@ -27,7 +27,7 @@ const OfficerIssuesReportPage = () => {
       if (statusFilter) params.append("status", statusFilter);
 
       const res = await fetch(
-        "http://localhost:5000/api/officer/issues?" + params.toString()
+        "http://13.201.16.142:5000/api/officer/issues?" + params.toString()
       );
       const data = await res.json();
 
@@ -60,7 +60,7 @@ const OfficerIssuesReportPage = () => {
       if (statusFilter) params.append("status", statusFilter);
 
       const res = await fetch(
-        "http://localhost:5000/api/officer/reports/issues/download?" +
+        "http://13.201.16.142:5000/api/officer/reports/issues/download?" +
           params.toString()
       );
 

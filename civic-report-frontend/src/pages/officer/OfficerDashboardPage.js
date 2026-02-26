@@ -27,7 +27,7 @@ function OfficerDashboardPage() {
     "U";
 
   const photoUrl = photoPath
-    ? `http://localhost:5000/uploads/${photoPath}`
+    ? `http://13.201.16.142:5000/uploads/${photoPath}`
     : null;
 
   // Apply saved theme for this user when dashboard mounts

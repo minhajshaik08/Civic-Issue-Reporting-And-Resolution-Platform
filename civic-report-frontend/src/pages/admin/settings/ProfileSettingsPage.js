@@ -39,7 +39,7 @@ function ProfileSettingsPage() {
       // Username uniqueness check
       if (username !== userData.username) {
         const checkRes = await fetch(
-          `http://localhost:5000/api/admin/settings/profile/check-username?username=${encodeURIComponent(
+          `http://13.201.16.142:5000/api/admin/settings/profile/check-username?username=${encodeURIComponent(
             username
           )}&excludeId=${userId}`
         );
@@ -52,7 +52,7 @@ function ProfileSettingsPage() {
       }
 
       const res = await fetch(
-        "http://localhost:5000/api/admin/settings/profile",
+        "http://13.201.16.142:5000/api/admin/settings/profile",
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

@@ -12,7 +12,7 @@ export default function MiddleAdminUserActivityPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://localhost:5000/api/middle-admin/users/list"
+        "http://13.201.16.142:5000/api/middle-admin/users/list"
       );
       const data = await res.json();
 

@@ -38,7 +38,7 @@ const IssuesReportPage = () => {
       if (status) params.append("status", status);
 
       const res = await fetch(
-        "http://localhost:5000/api/admin/reports/issues?" + params.toString()
+        "http://13.201.16.142:5000/api/admin/reports/issues?" + params.toString()
       );
 
       const data = await res.json();
@@ -83,7 +83,7 @@ const IssuesReportPage = () => {
       params.append("format", format);
 
       const res = await fetch(
-        "http://localhost:5000/api/admin/reports/issues/download?" +
+        "http://13.201.16.142:5000/api/admin/reports/issues/download?" +
           params.toString()
       );
 

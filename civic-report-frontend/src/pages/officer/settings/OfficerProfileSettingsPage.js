@@ -40,7 +40,7 @@ function OfficerProfileSettingsPage() {
       // Username uniqueness check
       if (username !== userData.username) {
         const checkRes = await fetch(
-          `http://localhost:5000/api/officer/settings/profile/check-username?username=${encodeURIComponent(
+          `http://13.201.16.142:5000/api/officer/settings/profile/check-username?username=${encodeURIComponent(
             username
           )}&excludeId=${userId}`
         );
@@ -53,7 +53,7 @@ function OfficerProfileSettingsPage() {
       }
 
       const res = await fetch(
-        "http://localhost:5000/api/officer/settings/profile",
+        "http://13.201.16.142:5000/api/officer/settings/profile",
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

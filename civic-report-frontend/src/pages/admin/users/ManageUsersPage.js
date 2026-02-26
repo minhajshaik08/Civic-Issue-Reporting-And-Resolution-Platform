@@ -16,7 +16,7 @@ export default function ManageUsersPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:5000/api/admin/users/list");
+      const res = await fetch("http://13.201.16.142:5000/api/admin/users/list");
       const data = await res.json();
 
       if (!data.success) {
@@ -61,7 +61,7 @@ export default function ManageUsersPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/admin/users/block/${user.mobile}`,
+        `http://13.201.16.142:5000/api/admin/users/block/${user.mobile}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

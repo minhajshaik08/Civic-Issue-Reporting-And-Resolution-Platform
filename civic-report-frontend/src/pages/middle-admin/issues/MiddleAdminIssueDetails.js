@@ -21,7 +21,7 @@ const MiddleAdminIssueDetails = () => {
       try {
         setError("");
         const res = await fetch(
-          `http://localhost:5000/api/middle-admin/issues/${id}`
+          `http://13.201.16.142:5000/api/middle-admin/issues/${id}`
         );
         const data = await res.json();
 
@@ -51,7 +51,7 @@ const MiddleAdminIssueDetails = () => {
       setUpdating(true);
 
       const res = await fetch(
-        `http://localhost:5000/api/middle-admin/issues/${id}/status`,
+        `http://13.201.16.142:5000/api/middle-admin/issues/${id}/status`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -91,7 +91,7 @@ const MiddleAdminIssueDetails = () => {
 
       return arr
         .filter(Boolean)
-        .map((file) => `http://localhost:5000/uploads/issues/${file}`);
+        .map((file) => `http://13.201.16.142:5000/uploads/issues/${file}`);
     } catch {
       return [];
     }

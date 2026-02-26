@@ -10,7 +10,7 @@ export default function ViewMiddleAdminsList() {
     const fetchAdmins = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/admin/middle-admins/list"
+          "http://13.201.16.142:5000/api/admin/middle-admins/list"
         );
         const data = await res.json();
 

@@ -27,7 +27,7 @@ export default function ManageOfficersPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/officers/list");
+      const res = await fetch("http://13.201.16.142:5000/api/admin/officers/list");
 
       const data = await safeJson(res);
 
@@ -92,7 +92,7 @@ export default function ManageOfficersPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/admin/officers/block/${officer.id}`,
+        `http://13.201.16.142:5000/api/admin/officers/block/${officer.id}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -134,7 +134,7 @@ export default function ManageOfficersPage() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:5000/api/admin/officers/${officer.id}`,
+        `http://13.201.16.142:5000/api/admin/officers/${officer.id}`,
         {
           method: "DELETE",
           headers: {

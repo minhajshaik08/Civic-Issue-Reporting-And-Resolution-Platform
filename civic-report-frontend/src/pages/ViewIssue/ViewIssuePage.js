@@ -52,7 +52,7 @@ function ViewIssuePage() {
       const normalized = normalizeIndianPhone(phone);
       console.log("📤 Sending OTP to:", normalized);
 
-      const res = await fetch("http://localhost:5000/api/auth/send-otp", {
+      const res = await fetch("http://13.201.16.142:5000/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: normalized }),
@@ -90,7 +90,7 @@ function ViewIssuePage() {
       const normalized = normalizeIndianPhone(phone);
       console.log("🔐 Verifying OTP for:", normalized);
 
-      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const res = await fetch("http://13.201.16.142:5000/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: normalized, otp }),
@@ -109,7 +109,7 @@ function ViewIssuePage() {
       console.log("📤 Fetching issues...");
 
       const issuesRes = await fetch(
-        `http://localhost:5000/api/issues?phone=${normalized}`
+        `http://13.201.16.142:5000/api/issues?phone=${normalized}`
       );
 
       const issuesData = await issuesRes.json();
@@ -313,7 +313,7 @@ function ViewIssuePage() {
                             ).map((filename) => (
                               <img
                                 key={filename}
-                                src={`http://localhost:5000/uploads/issues/${filename}`}
+                                src={`http://13.201.16.142:5000/uploads/issues/${filename}`}
                                 alt="issue-photo"
                                 className="issue-photo"
                                 title={filename}

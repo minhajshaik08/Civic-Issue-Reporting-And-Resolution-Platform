@@ -38,7 +38,7 @@ export default function GalleryListPage() {
       const token = getAuthToken();
 
       const res = await axios.get(
-        "http://localhost:5000/api/officer/gallary/list",
+        "http://13.201.16.142:5000/api/officer/gallary/list",
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -52,7 +52,7 @@ export default function GalleryListPage() {
 
   /* ================= IMAGE URL BUILDER ================= */
   const buildAllUrls = (g) => {
-    const base = "http://localhost:5000/uploads/gallary/";
+    const base = "http://13.201.16.142:5000/uploads/gallary/";
     return [
       ...(g.imagepaths || []).map((f) => base + f),
       ...(g.afterimagepath || []).map((f) => base + f),
@@ -80,7 +80,7 @@ export default function GalleryListPage() {
       const token = getAuthToken();
 
       await axios.delete(
-        `http://localhost:5000/api/officer/gallary/${deleteId}`,
+        `http://13.201.16.142:5000/api/officer/gallary/${deleteId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

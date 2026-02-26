@@ -40,7 +40,7 @@ function MiddleAdminProfileSettingsPage() {
       // ✅ Username uniqueness check (admin-style)
       if (username !== userData.username) {
         const checkRes = await fetch(
-          `http://localhost:5000/api/middle-admin/settings/profile/check-username?username=${encodeURIComponent(
+          `http://13.201.16.142:5000/api/middle-admin/settings/profile/check-username?username=${encodeURIComponent(
             username
           )}&excludeId=${userId}`
         );
@@ -54,7 +54,7 @@ function MiddleAdminProfileSettingsPage() {
 
       // ✅ Update profile (ADMIN STYLE)
       const res = await fetch(
-        "http://localhost:5000/api/middle-admin/settings/profile",
+        "http://13.201.16.142:5000/api/middle-admin/settings/profile",
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

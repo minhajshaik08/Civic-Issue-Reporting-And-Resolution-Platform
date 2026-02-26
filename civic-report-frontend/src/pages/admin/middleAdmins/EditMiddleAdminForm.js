@@ -48,7 +48,7 @@ export default function EditMiddleAdminForm() {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/middle-admins/edit/${existingAdmin.id}`,
+        `http://13.201.16.142:5000/api/admin/middle-admins/edit/${existingAdmin.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

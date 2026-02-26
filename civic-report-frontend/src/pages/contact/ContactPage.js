@@ -24,7 +24,7 @@ export default function ContactPage() {
     setSending(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/contact", form);
+      const res = await axios.post("http://13.201.16.142:5000/api/contact", form);
 
       if (res.data?.success) {
         setToastMsg("Message sent successfully!");

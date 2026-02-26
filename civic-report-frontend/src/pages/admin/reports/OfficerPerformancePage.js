@@ -13,7 +13,7 @@ const OfficerPerformancePage = () => {
     const load = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/admin/reports/officers/performance"
+          "http://13.201.16.142:5000/api/admin/reports/officers/performance"
         );
 
         // support either {success,data:[...]} or plain [...], or {success:true, rows:[...]}

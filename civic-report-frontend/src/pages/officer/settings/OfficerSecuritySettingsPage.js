@@ -35,7 +35,7 @@ function OfficerSecuritySettingsPage() {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/officer/settings/change-password",
+        "http://13.201.16.142:5000/api/officer/settings/change-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

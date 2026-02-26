@@ -19,7 +19,7 @@ function Issueslist() {
       if (status) params.append("status", status);
 
       const res = await fetch(
-        "http://localhost:5000/api/admin/issues" +
+        "http://13.201.16.142:5000/api/admin/issues" +
           (params.toString() ? "?" + params.toString() : "")
       );
 

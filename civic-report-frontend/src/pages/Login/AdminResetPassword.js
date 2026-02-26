@@ -25,7 +25,7 @@ function AdminResetPassword() {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/reset-password",
+        "http://13.201.16.142:5000/api/admin/reset-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

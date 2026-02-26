@@ -14,7 +14,7 @@ const AreasReportPage = () => {
         setLoading(true);
         setError("");
 
-        const res = await fetch("http://localhost:5000/api/admin/reports/areas");
+        const res = await fetch("http://13.201.16.142:5000/api/admin/reports/areas");
         const data = await res.json();
 
         if (!res.ok || !data.success) {

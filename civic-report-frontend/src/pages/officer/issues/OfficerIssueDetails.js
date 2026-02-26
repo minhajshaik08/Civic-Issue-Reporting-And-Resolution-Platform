@@ -26,7 +26,7 @@ const OfficerIssueDetails = () => {
         setError("");
 
         const res = await fetch(
-          `http://localhost:5000/api/officer/issues/${id}?officer_id=${officerId}`
+          `http://13.201.16.142:5000/api/officer/issues/${id}?officer_id=${officerId}`
         );
         const data = await res.json();
 
@@ -54,7 +54,7 @@ const OfficerIssueDetails = () => {
       const arr = JSON.parse(issue.photo_paths);
       if (!Array.isArray(arr)) return [];
       return arr.map(
-        (f) => `http://localhost:5000/uploads/issues/${f}`
+        (f) => `http://13.201.16.142:5000/uploads/issues/${f}`
       );
     } catch {
       return [];

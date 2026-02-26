@@ -16,12 +16,12 @@ function MiddleAdminAssignIssuesPage() {
         setLoading(true);
 
         const issuesRes = await fetch(
-          "http://localhost:5000/api/middle-admin/issues?status=NEW"
+          "http://13.201.16.142:5000/api/middle-admin/issues?status=NEW"
         );
         const issuesData = await issuesRes.json();
 
         const officersRes = await fetch(
-          "http://localhost:5000/api/middle-admin/officers/list"
+          "http://13.201.16.142:5000/api/middle-admin/officers/list"
         );
         const officersData = await officersRes.json();
 
@@ -60,7 +60,7 @@ function MiddleAdminAssignIssuesPage() {
       setError("");
 
       const res = await fetch(
-        `http://localhost:5000/api/middle-admin/issues/${issueId}/assign-officer`,
+        `http://13.201.16.142:5000/api/middle-admin/issues/${issueId}/assign-officer`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

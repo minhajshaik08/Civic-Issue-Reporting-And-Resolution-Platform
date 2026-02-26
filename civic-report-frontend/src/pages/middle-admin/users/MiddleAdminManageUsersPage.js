@@ -17,7 +17,7 @@ export default function MiddleAdminManageUsersPage() {
     setError("");
     try {
       const res = await fetch(
-        "http://localhost:5000/api/middle-admin/users/list"
+        "http://13.201.16.142:5000/api/middle-admin/users/list"
       );
       const data = await res.json();
 
@@ -62,7 +62,7 @@ export default function MiddleAdminManageUsersPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/middle-admin/users/block/${user.mobile}`,
+        `http://13.201.16.142:5000/api/middle-admin/users/block/${user.mobile}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

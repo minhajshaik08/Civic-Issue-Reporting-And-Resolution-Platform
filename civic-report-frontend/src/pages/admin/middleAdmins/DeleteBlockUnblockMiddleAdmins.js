@@ -12,7 +12,7 @@ export default function DeleteBlockUnblockMiddleAdmins() {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/middle-admins/list"
+        "http://13.201.16.142:5000/api/admin/middle-admins/list"
       );
       const data = await res.json();
 
@@ -70,7 +70,7 @@ export default function DeleteBlockUnblockMiddleAdmins() {
   const toggleBlock = async (admin) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/admin/middle-admins/block/${admin.id}`,
+        `http://13.201.16.142:5000/api/admin/middle-admins/block/${admin.id}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -105,7 +105,7 @@ export default function DeleteBlockUnblockMiddleAdmins() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:5000/api/admin/middle-admins/${admin.id}`,
+        `http://13.201.16.142:5000/api/admin/middle-admins/${admin.id}`,
         {
           method: "DELETE",
           headers: {

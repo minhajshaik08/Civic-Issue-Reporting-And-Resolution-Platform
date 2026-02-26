@@ -27,7 +27,7 @@ function OfficerIssuesList() {
       if (statusFilter) params.append("status", statusFilter);
 
       const res = await fetch(
-        "http://localhost:5000/api/officer/issues?" + params.toString()
+        "http://13.201.16.142:5000/api/officer/issues?" + params.toString()
       );
       const data = await res.json();
 
@@ -58,7 +58,7 @@ function OfficerIssuesList() {
       setSavingId(issueId);
 
       const res = await fetch(
-        `http://localhost:5000/api/officer/issues/${issueId}/status`,
+        `http://13.201.16.142:5000/api/officer/issues/${issueId}/status`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

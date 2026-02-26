@@ -11,7 +11,6 @@ function WelcomePage() {
   const isDashboard = location.pathname === "/admin/welcome";
 
   // ✅ READ JWT TOKEN + USER
-  const token = localStorage.getItem("token");
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   // ✅ REMOVED: Token redirect check - RequireAuth handles this now
@@ -31,7 +30,7 @@ function WelcomePage() {
     const fetchDashboardData = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/admin/dashboard/summary"
+          "http://13.201.16.142:5000/api/admin/dashboard/summary"
         );
 
         setStats(res.data.stats);
@@ -55,7 +54,7 @@ function WelcomePage() {
     (email && email.trim()[0]) || (fullName && fullName.trim()[0]) || "U";
 
   const photoUrl = photoPath
-    ? `http://localhost:5000/uploads/${photoPath}`
+    ? `http://13.201.16.142:5000/uploads/${photoPath}`
     : null;
 
   // ✅ Apply saved theme for admin
@@ -238,4 +237,4 @@ function WelcomePage() {
   );
 }
 
-export default WelcomePage; 
+export default WelcomePage;

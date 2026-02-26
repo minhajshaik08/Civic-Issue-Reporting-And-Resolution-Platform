@@ -92,7 +92,7 @@ function ReportIssuePage() {
     try {
       const normalized = normalizeIndianPhone(phone);
 
-      const res = await fetch("http://localhost:5000/api/auth/send-otp", {
+      const res = await fetch("http://13.201.16.142:5000/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: normalized }),
@@ -143,7 +143,7 @@ function ReportIssuePage() {
     try {
       const normalized = normalizeIndianPhone(phone);
 
-      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const res = await fetch("http://13.201.16.142:5000/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: normalized, otp }),
@@ -209,7 +209,7 @@ function ReportIssuePage() {
     photoFiles.forEach((file) => formData.append("photos", file));
 
     try {
-      const res = await fetch("http://localhost:5000/api/issues/report", {
+      const res = await fetch("http://13.201.16.142:5000/api/issues/report", {
         method: "POST",
         body: formData,
       });

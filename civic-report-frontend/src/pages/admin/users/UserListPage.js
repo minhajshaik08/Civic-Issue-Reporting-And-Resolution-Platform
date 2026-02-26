@@ -17,7 +17,7 @@ export default function UserListPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:5000/api/admin/users/list");
+      const res = await fetch("http://13.201.16.142:5000/api/admin/users/list");
       const data = await res.json();
 
       if (!data.success) {

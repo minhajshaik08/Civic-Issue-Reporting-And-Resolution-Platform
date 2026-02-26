@@ -13,7 +13,7 @@ export default function OfficerListEdit() {
       setLoading(true);
       setError("");
       try {
-        const res = await fetch("http://localhost:5000/api/admin/officers/list");
+        const res = await fetch("http://13.201.16.142:5000/api/admin/officers/list");
         const data = await res.json();
 
         if (!data.success) {

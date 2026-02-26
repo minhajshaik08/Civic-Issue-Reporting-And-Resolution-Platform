@@ -38,7 +38,7 @@ function AdminSignupPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/admin/signup", {
+      const response = await fetch("http://13.201.16.142:5000/api/admin/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password })

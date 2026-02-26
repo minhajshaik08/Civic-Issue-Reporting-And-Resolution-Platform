@@ -28,7 +28,7 @@ export default function MiddleAdminManageOfficersPage() {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/middle-admin/officers/list"
+        "http://13.201.16.142:5000/api/middle-admin/officers/list"
       );
 
       const data = await safeJson(res);
@@ -92,7 +92,7 @@ export default function MiddleAdminManageOfficersPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/middle-admin/officers/block/${officer.id}`,
+        `http://13.201.16.142:5000/api/middle-admin/officers/block/${officer.id}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -135,7 +135,7 @@ export default function MiddleAdminManageOfficersPage() {
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:5000/api/middle-admin/officers/${officer.id}`,
+        `http://13.201.16.142:5000/api/middle-admin/officers/${officer.id}`,
         {
           method: "DELETE",
           headers: {

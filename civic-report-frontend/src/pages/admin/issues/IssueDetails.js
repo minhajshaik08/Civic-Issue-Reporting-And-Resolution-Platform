@@ -21,7 +21,7 @@ const IssueDetails = () => {
     const loadIssue = async () => {
       try {
         setError("");
-        const res = await fetch(`http://localhost:5000/api/admin/issues/${id}`);
+        const res = await fetch(`http://13.201.16.142:5000/api/admin/issues/${id}`);
         const data = await res.json();
 
         if (!res.ok || !data.success) {
@@ -50,7 +50,7 @@ const IssueDetails = () => {
       setUpdating(true);
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/issues/${id}/status`,
+        `http://13.201.16.142:5000/api/admin/issues/${id}/status`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -89,7 +89,7 @@ const IssueDetails = () => {
 
       return arr
         .filter(Boolean)
-        .map((file) => `http://localhost:5000/uploads/issues/${file}`);
+        .map((file) => `http://13.201.16.142:5000/uploads/issues/${file}`);
     } catch (e) {
       console.error("Error parsing photo_paths JSON", e);
       return [];

@@ -72,7 +72,7 @@ export default function MiddleAdminAddOfficerForm() {
     setLoading(true);
     try {
       await axios.post(
-        "http://localhost:5000/api/middle-admin/officers/add",
+        "http://13.201.16.142:5000/api/middle-admin/officers/add",
         form
       );
 

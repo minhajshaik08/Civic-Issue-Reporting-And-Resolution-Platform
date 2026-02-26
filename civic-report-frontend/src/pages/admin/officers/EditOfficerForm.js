@@ -85,7 +85,7 @@ export default function EditOfficerForm() {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/officers/edit/${officer.id}`,
+        `http://13.201.16.142:5000/api/admin/officers/edit/${officer.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { Container, Row, Col, Button } from "react-bootstrap";
@@ -128,7 +128,6 @@ import OfficerGalleryUploadPage from "./pages/officer/gallary/OfficerGalleryUplo
 
 function HomePage() {
   const navigate = useNavigate();
-  const [currentSlide, setCurrentSlide] = useState(0);
 
   React.useEffect(() => {
     const observerOptions = {
@@ -350,7 +349,6 @@ function App() {
 }
 
 function AppRoutes() {
-  const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
   const path = location.pathname || "";
   const navigate = useNavigate();
@@ -432,7 +430,7 @@ function AppRoutes() {
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, [path]);
+  }, [path, navigate]);
 
   React.useEffect(() => {
     const sessionId = sessionStorage.getItem("sessionId");

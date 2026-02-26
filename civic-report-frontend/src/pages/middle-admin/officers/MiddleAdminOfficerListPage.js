@@ -17,7 +17,7 @@ export default function MiddleAdminOfficerListPage() {
 
       try {
         const res = await fetch(
-          "http://localhost:5000/api/middle-admin/officers/list"
+          "http://13.201.16.142:5000/api/middle-admin/officers/list"
         );
         const data = await res.json();
 
