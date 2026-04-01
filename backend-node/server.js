@@ -8,8 +8,8 @@ const path = require("path");
 
 /* ================= GLOBAL MIDDLEWARE ================= */
 
-const express = require("express");
-const cors = require("cors");
+// const express = require("express");
+// const cors = require("cors");
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.use(
 );
 
 app.use(express.json());
-const cors = require("cors");
+// const cors = require("cors");
 // Enables CORS so frontend (React) can access backend APIs
 
 app.use(express.json()); 

@@ -43,7 +43,7 @@ const OfficerGalleryUploadPage = () => {
       setCurrentEmail(payload.email);
 
       const res = await axios.get(
-        "http://13.201.16.142:5000/api/officer/gallary/profile",
+        "http://localhost:5000/api/officer/gallary/profile",
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -99,7 +99,7 @@ const OfficerGalleryUploadPage = () => {
 
     try {
       const res = await axios.post(
-        "http://13.201.16.142:5000/api/officer/gallary/upload",
+        "http://localhost:5000/api/officer/gallary/upload",
         formData,
         {
           headers: {

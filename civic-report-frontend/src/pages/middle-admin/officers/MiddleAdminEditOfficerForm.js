@@ -102,7 +102,7 @@ export default function MiddleAdminEditOfficerForm() {
       }
 
       const res = await fetch(
-        `http://13.201.16.142:5000/api/middle-admin/officers/edit/${officer.id}`,
+        `http://localhost:5000/api/middle-admin/officers/edit/${officer.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

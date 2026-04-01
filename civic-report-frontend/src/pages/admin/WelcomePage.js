@@ -30,7 +30,7 @@ function WelcomePage() {
     const fetchDashboardData = async () => {
       try {
         const res = await axios.get(
-          "http://13.201.16.142:5000/api/admin/dashboard/summary"
+          "http://localhost:5000/api/admin/dashboard/summary"
         );
 
         setStats(res.data.stats);
@@ -54,7 +54,7 @@ function WelcomePage() {
     (email && email.trim()[0]) || (fullName && fullName.trim()[0]) || "U";
 
   const photoUrl = photoPath
-    ? `http://13.201.16.142:5000/uploads/${photoPath}`
+    ? `http://localhost:5000/uploads/${photoPath}`
     : null;
 
   // ✅ Apply saved theme for admin

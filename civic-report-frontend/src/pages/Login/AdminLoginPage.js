@@ -55,7 +55,7 @@ function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://13.201.16.142:5000/api/login", {
+      const res = await fetch("http://localhost:5000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -174,17 +174,6 @@ function AdminLoginPage() {
                 </Form.Text>
               </Form.Group>
 
-              <div className="text-end mb-3">
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="forgot-link"
-                  onClick={handleForgotPassword}
-                  disabled={loading}
-                >
-                  Forgot password?
-                </Button>
-              </div>
 
               <div className="d-grid mb-3">
                 <Button

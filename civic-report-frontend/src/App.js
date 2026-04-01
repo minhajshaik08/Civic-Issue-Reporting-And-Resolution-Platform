@@ -27,8 +27,8 @@ import MainGalleryPage from "./pages/gallary/MainGalleryPage";
 
 // Login routes
 import AdminLoginPage from "./pages/Login/AdminLoginPage";
-import AdminForgotPassword from "./pages/Login/AdminForgotPassword";
-import AdminResetPassword from "./pages/Login/AdminResetPassword";
+// import AdminForgotPassword from "./pages/Login/AdminForgotPassword";
+// import AdminResetPassword from "./pages/Login/AdminResetPassword";
 
 // 2) ADMIN (super admin)
 // Admin main dashboard
@@ -521,8 +521,8 @@ function AppRoutes() {
           <Route path="/gallery" element={<MainGalleryPage />} />
           <Route path="/Login" element={<AdminLoginPage />} />
           <Route path="/Login/login" element={<AdminLoginPage />} />
-          <Route path="/Login/forgot-password" element={<AdminForgotPassword />} />
-          <Route path="/Login/reset-password" element={<AdminResetPassword />} />
+          {/* <Route path="/Login/forgot-password" element={<AdminForgotPassword />} />
+          <Route path="/Login/reset-password" element={<AdminResetPassword />} /> */}
         </Route>
 
         {/* ================= MIDDLE ADMIN DASHBOARD ================= */}

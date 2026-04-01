@@ -31,7 +31,7 @@ function MiddleAdminDashboardPage() {
     const fetchDashboardData = async () => {
       try {
         const res = await axios.get(
-          "http://13.201.16.142:5000/api/middle-admin/dashboard/summary"
+          "http://localhost:5000/api/middle-admin/dashboard/summary"
         );
 
         setStats(res.data.stats);
@@ -55,7 +55,7 @@ function MiddleAdminDashboardPage() {
     "U";
 
   const photoUrl = photoPath
-    ? `http://13.201.16.142:5000/uploads/${photoPath}`
+    ? `http://localhost:5000/uploads/${photoPath}`
     : null;
 
   // ✅ APPLY THEME

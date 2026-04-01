@@ -9,8 +9,8 @@ import {
   Alert,
 } from "react-bootstrap";
 import axios from "axios";
-
-const BASE_URL = "http://13.201.16.142:5000/uploads/gallary/";
+ const BASE_URL = "http://localhost:5000/uploads/gallary/";
+//const API = "http://localhost:5000";
 
 export default function MainGalleryPage() {
   const [galleries, setGalleries] = useState([]);
@@ -28,7 +28,8 @@ export default function MainGalleryPage() {
       setError("");
 
       const res = await axios.get(
-        "http://13.201.16.142:5000/api/gallary/public"
+         "http://localhost:5000/api/gallary/public"
+        //`${API}/api/gallary/public`
       );
 
       setGalleries(res.data.galleries || []);
@@ -41,15 +42,34 @@ export default function MainGalleryPage() {
   };
 
   /* ================= IMAGE BUILDER ================= */
- const getBeforeImages = (g) =>
-  Array.isArray(g.imagepaths)
-    ? g.imagepaths.map((f) => `${BASE_URL}${f.trim()}`)
-    : [];
+  const getBeforeImages = (g) =>
+   Array.isArray(g.imagepaths)
+     ? g.imagepaths.map((f) => `${BASE_URL}${f.trim()}`)
+     : [];
 
-const getAfterImages = (g) =>
-  Array.isArray(g.afterimagepath)
+ const getAfterImages = (g) =>
+   Array.isArray(g.afterimagepath)
     ? g.afterimagepath.map((f) => `${BASE_URL}${f.trim()}`)
     : [];
+// const getBeforeImages = (g) =>
+//   Array.isArray(g.imagepaths)
+//     ? g.imagepaths.map((f) =>
+//         f.startsWith("uploads")
+//           ? `${API}/${f.trim()}`
+//           : `${API}/uploads/gallary/${f.trim()}`
+//       )
+//     : [];
+
+// const getAfterImages = (g) =>
+//   Array.isArray(g.afterimagepath)
+//     ? g.afterimagepath.map((f) =>
+//         f.startsWith("uploads")
+//           ? `${API}/${f.trim()}`
+//           : `${API}/uploads/gallary/${f.trim()}`
+//       )
+//     : [];
+
+
 
   /* ================= LOADING ================= */
   if (loading) {
@@ -85,6 +105,7 @@ const getAfterImages = (g) =>
         <div className="text-center text-muted">No gallery data</div>
       ) : (
         galleries.map((g, index) => {
+          
           const beforeImages = getBeforeImages(g);
           const afterImages = getAfterImages(g);
 
